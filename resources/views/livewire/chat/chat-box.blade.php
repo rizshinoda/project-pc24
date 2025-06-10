@@ -39,7 +39,8 @@
             <div class="shrink-0">
                 <x-avatar src="{{ asset('/dist/assets/images/faces/2.png') }}" class="h-9 w-9 lg:w-11 lg:h-11"></x-avatar>
             </div>
-            <h6 class="font-bold truncate">{{$selectedConversation->getReceiver()->name}}</h6>
+            <h6 class="font-bold truncate">{{ $selectedConversation->getReceiver()?->name ?? 'user sudah dihapus' }}
+            </h6>
         </div>
     </header>
 

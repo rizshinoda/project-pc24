@@ -71,7 +71,7 @@ conversationElement.scrollIntoView({'behavior':''smooth'});
                         <div class="w-full flex flex-col gap-0">
                             <div class="w-full flex justify-between items-center">
                                 <h6 class="truncate font-medium tracking-wider text-gray-700">
-                                    {{$conversation->getReceiver()->name}}
+                                    {{ $conversation->getReceiver()?->name ?? 'user sudah dihapus' }}
                                 </h6>
                                 <small class="text-gray-700">
                                     {{$conversation->messages?->last()?->created_at?->shortAbsoluteDiffForHumans()}}
