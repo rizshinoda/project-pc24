@@ -250,4 +250,17 @@
          overflow-y: auto;
          height: 100vh;
      }
+
+     .sidebar {
+         overflow-y: auto;
+         scrollbar-width: thin;
+
+         /* Firefox */
+     }
+
+     .sidebar::-webkit-scrollbar {
+         width: 6px;
+         /* Chrome */
+
+     }
  </style>
