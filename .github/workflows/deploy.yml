@@ -22,7 +22,7 @@ jobs:
 
       - name: Deploy ke production
         run:
-          rsync -av --delete ./ /var/www/html/project --exclude=.git --exclude=vendor
-          cd /var/www/html/project
+          rsync -av --delete ./ /var/www/html/project-pc24 --exclude=.git --exclude=vendor
+          cd /var/www/html/project-pc24
           composer install
           php artisan migrate --force
