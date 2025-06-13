@@ -19,3 +19,10 @@ jobs:
 
       - name: PHP Artisan Config
         run: php artisan optimize
+
+      - name: Deploy ke production
+        run:
+          rsync -av --delete ./ /var/www/html/project --exclude=.git --exclude=vendor
+          cd /var/www/html/project
+          composer install
+          php artisan migrate --force
