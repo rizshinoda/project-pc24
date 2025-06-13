@@ -29,5 +29,3 @@ jobs:
 
           cd /var/www/html/project
           composer install --no-interaction --prefer-dist
-          php artisan migrate --force
-          php artisan config:cache
