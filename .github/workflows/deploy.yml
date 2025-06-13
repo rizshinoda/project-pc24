@@ -19,3 +19,15 @@ jobs:
 
       - name: PHP Artisan Config
         run: php artisan optimize
+
+      - name: Deploy ke Laravel aktif
+        run: |
+          rsync -av --delete ./ /var/www/html/project \
+          --exclude=.git \
+          --exclude=vendor \
+          --no-perms --no-owner --no-group
+
+          cd /var/www/html/project
+          composer install --no-interaction --prefer-dist
+          php artisan migrate --force
+          php artisan config:cache
