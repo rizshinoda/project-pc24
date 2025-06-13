@@ -14,16 +14,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-
       - name: Install Dependencies
         run: composer install --no-progress --prefer-dist
-
-      - name: Run Migrations
-        run: php artisan migrate --force
 
       - name: Cache Config
         run: php artisan config:cache
