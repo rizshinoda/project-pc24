@@ -22,7 +22,7 @@ jobs:
 
       - name: Deploy ke Laravel aktif
         run: |
-          rsync -av --delete ./ /var/www/html/project \
+          rsync -av --delete ./ /var/www/html/project-pc24 \
           --exclude=.git \
           --exclude=vendor \
           --no-perms --no-owner --no-group
