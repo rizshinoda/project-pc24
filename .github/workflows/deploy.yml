@@ -17,5 +17,5 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-progress --prefer-dist
 
-      - name: Cache Config
-        run: php artisan config:cache
+      - name: PHP Artisan Config
+        run: php artisan optimize
