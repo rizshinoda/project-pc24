@@ -3,31 +3,51 @@ name: Deploy
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
 
 jobs:
   deploy:
-    runs-on: self-hosted # pastikan runner aktif di server
+    runs-on: self-hosted
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Salin kode ke folder Laravel aktif
+      - name: Salin file ke server
         run: |
           rsync -av --delete ./ /var/www/html/project-pc24 \
-            --exclude=.git \
             --exclude=vendor \
-            --no-perms --no-owner --no-group
-            --exclude=.env
+            --exclude=node_modules \
+            --exclude=.env \
+            --exclude=.git \
+            --exclude=.github
 
-      - name: Install Dependencies
+      - name: Setup Laravel Project
         run: |
           cd /var/www/html/project-pc24
+
+          # Salin .env jika belum ada
+          if [ ! -f .env ]; then
+            cp .env.example .env
+          fi
+
+          # Install PHP dependencies
           composer install --no-progress --prefer-dist --optimize-autoloader
 
-      - name: PHP Artisan Config
-        run: |
-          cd /var/www/html/project-pc24
+          # Install frontend dependencies dan build
+          npm install
+          npm run build
+
+          # Generate app key
+          php artisan key:generate
+
+          # Migrasi database
+          php artisan migrate --force
+
+          # Buat symbolic link ke storage
+          php artisan storage:link
+
+          # Optimasi Laravel
           php artisan optimize
+
+          # (Opsional) Jalankan queue worker
+          nohup php artisan queue:work > /dev/null 2>&1 &
