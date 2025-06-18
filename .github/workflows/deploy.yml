@@ -10,7 +10,16 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
+
+      - name: Salin file ke server
+        run: |
+          rsync -av --delete ./ /var/www/html/project-pc24 \
+            --exclude=vendor \
+            --exclude=node_modules \
+            --exclude=.env \
+            --exclude=.git \
+            --exclude=.github
 
       - name: Setup Laravel Project
         run: |
