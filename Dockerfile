@@ -16,6 +16,9 @@ WORKDIR /var/www
 # Salin file Laravel
 COPY . /var/www
 
+# (Opsional) versi terbaru Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs
 # Beri permission
 RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 # Install dependency Laravel
