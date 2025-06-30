@@ -21,8 +21,8 @@ jobs:
           git reset --hard
           git pull origin main
 
-      - name: Rebuild containers
+      - name: Rebuild and restart Docker containers
         run: |
           cd /var/www/project-pc24
-          /usr/local/bin/docker-compose down
-          /usr/local/bin/docker-compose up -d --build
+           docker compose down
+           docker compose up -d --build
