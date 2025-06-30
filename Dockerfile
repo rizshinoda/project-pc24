@@ -19,11 +19,6 @@ COPY . /var/www
 # (Opsional) versi terbaru Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs
-# Beri permission
-RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
-
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
- && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Install dependency Laravel
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader

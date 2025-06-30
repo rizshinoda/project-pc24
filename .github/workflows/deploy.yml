@@ -26,3 +26,8 @@ jobs:
           cd /var/www/project-pc24
            docker compose down
            docker compose up -d --build
+
+      - name: Perbaiki permission di container
+        run: |
+          docker compose exec -T app chown -R www-data:www-data storage bootstrap/cache
+          docker compose exec -T app chmod -R 775 storage bootstrap/cache
