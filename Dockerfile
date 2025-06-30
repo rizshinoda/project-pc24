@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Install ekstensi PHP dan dependensi sistem
+# Install PHP dependencies
 RUN apt-get update && apt-get install -y \
     zip unzip curl git libzip-dev libpng-dev libonig-dev libxml2-dev \
     libjpeg-dev libfreetype6-dev \
@@ -10,17 +10,30 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set workdir
+# Set working directory
 WORKDIR /var/www
 
-# Salin file Laravel
-COPY . /var/www
+# Copy composer files for caching
+COPY composer.* ./
 
-# (Opsional) versi terbaru Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y nodejs
-
-# Install dependency Laravel
+# Install PHP dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
+# Copy all Laravel source code
+COPY . .
+
+# Copy default .env if not present
+RUN [ ! -f .env ] && cp .env.example .env || true
+
+# Laravel setup
+RUN php artisan key:generate && \
+    php artisan storage:link && \
+    php artisan migrate --force && \
+    php artisan optimize
+
+# Set permissions
+RUN chown -R www-data:www-data storage bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache
+
 EXPOSE 9000
+CMD ["php-fpm"]

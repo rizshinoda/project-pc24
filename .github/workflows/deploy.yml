@@ -9,25 +9,11 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Fix permissions
-        run: sudo chown -R $USER:$USER /var/www/project-pc24
-
-      - name: Pull latest code
+      - name: Build & Deploy Docker Containers
         run: |
           cd /var/www/project-pc24
-          git reset --hard
-          git pull origin main
-
-      - name: Rebuild and restart Docker containers
-        run: |
-          cd /var/www/project-pc24
-           docker compose down
-           docker compose up -d --build
-
-      - name: Perbaiki permission di container
-        run: |
-          docker exec project24-app chown -R www-data:www-data storage bootstrap/cache
-          docker exec project24-app chmod -R 775 storage bootstrap/cache
+          docker compose down
+          docker compose up -d --build
