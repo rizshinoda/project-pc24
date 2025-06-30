@@ -9,7 +9,7 @@
                 <h1
                     class="display-4 text-dark mb-4 wow fadeInUp"
                     data-wow-delay="0.3s">
-                    The Perfect Place to Build your Futuree
+                    The Perfect Place to Build your FuturX
                 </h1>
                 <p class="fs-4 mb-4 wow fadeInUp" data-wow-delay="0.5s">
                     Experience the difference with our high-speed internet solutions.
