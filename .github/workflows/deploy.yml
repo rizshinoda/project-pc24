@@ -1,19 +1,65 @@
-name: Deploy Laravel via Docker
+name: Build & Deploy Laravel (Staging & Production)
 
 on:
   push:
-    branches: ["main"]
+    branches: ["staging", "main"]
+
+env:
+  DOCKER_IMAGE_NAME: rizshinoda/project24-laravel
 
 jobs:
-  deploy:
-    runs-on: self-hosted
+  build-and-push:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Build & Deploy Docker Containers
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set Environment Name
+        id: envname
         run: |
-          cd /var/www/project-pc24
-          docker compose down
-          docker compose up -d --build
+          if [[ "${GITHUB_REF##*/}" == "main" ]]; then
+            echo "env=prod" >> $GITHUB_OUTPUT
+            echo "tag=prod" >> $GITHUB_OUTPUT
+          else
+            echo "env=staging" >> $GITHUB_OUTPUT
+            echo "tag=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Docker Image
+        run: |
+          docker build --build-arg ENV_FILE=.env.${{ steps.envname.outputs.env }} -t $DOCKER_IMAGE_NAME:${{ steps.envname.outputs.tag }} .
+
+      - name: Push to Docker Hub
+        run: docker push $DOCKER_IMAGE_NAME:${{ steps.envname.outputs.tag }}
+
+  deploy:
+    runs-on: self-hosted
+    needs: build-and-push
+
+    steps:
+      - name: Set Deployment Tag
+        id: tag
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "main" ]]; then
+            echo "tag=prod" >> $GITHUB_OUTPUT
+          else
+            echo "tag=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Pull & Run Docker Container
+        run: |
+          docker pull $DOCKER_IMAGE_NAME:${{ steps.tag.outputs.tag }}
+          docker stop project24-${{ steps.tag.outputs.tag }} || true
+          docker rm project24-${{ steps.tag.outputs.tag }} || true
+          docker run -d \
+            --name project24-${{ steps.tag.outputs.tag }} \
+            -p 9000:9000 \
+            --env-file .env.${{ steps.tag.outputs.tag }} \
+            $DOCKER_IMAGE_NAME:${{ steps.tag.outputs.tag }}
