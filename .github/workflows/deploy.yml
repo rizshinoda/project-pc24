@@ -54,6 +54,9 @@ jobs:
             echo "compose=docker-compose.staging.yml" >> $GITHUB_OUTPUT
           fi
 
+      - name: Checkout Kode dari GitHub
+        uses: actions/checkout@v3
+
       - name: Pull Image & Deploy with Docker Compose
         run: |
           docker pull $DOCKER_IMAGE_NAME:${{ steps.set-env.outputs.tag }}

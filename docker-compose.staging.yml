@@ -9,6 +9,21 @@ services:
       - .env.staging
     networks:
       - laravel
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rizal8
+      MYSQL_DATABASE: pc24_project
+      MYSQL_USER: rizal
+      MYSQL_PASSWORD: rizal8
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - laravel
 
   nginx-staging:
     image: nginx:alpine
@@ -21,6 +36,9 @@ services:
       - app-staging
     networks:
       - laravel
+
+volumes:
+  dbdata:
 
 networks:
   laravel:
