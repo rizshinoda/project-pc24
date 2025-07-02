@@ -9,7 +9,7 @@
                 <h1
                     class="display-4 text-dark mb-4 wow fadeInUp"
                     data-wow-delay="0.3s">
-                    The Perfect Place to Build your Future
+                    The Perfect Place to Build your FutureX
 
                 </h1>
                 <p class="fs-4 mb-4 wow fadeInUp" data-wow-delay="0.5s">
