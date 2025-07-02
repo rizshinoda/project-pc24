@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  app-staging:
+    image: rizshinoda/project24-laravel:staging
+    container_name: app-staging
+    restart: unless-stopped
+    env_file:
+      - .env.staging
+    networks:
+      - laravel
+
+  nginx-staging:
+    image: nginx:alpine
+    container_name: nginx-staging
+    ports:
+      - "8100:80"
+    volumes:
+      - ./nginx/staging.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app-staging
+    networks:
+      - laravel
+
+networks:
+  laravel:
