@@ -55,6 +55,7 @@ jobs:
           fi
 
       - name: Pull Image & Deploy with Docker Compose
+        working-directory: /home/rizal/actions-runner/_work/project-pc24/project-pc24
         run: |
           docker pull $DOCKER_IMAGE_NAME:${{ steps.set-env.outputs.tag }}
           docker compose -f ${{ steps.set-env.outputs.compose }} down
