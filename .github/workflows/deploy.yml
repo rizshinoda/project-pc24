@@ -55,11 +55,16 @@ jobs:
 
       - name: Pull & Run Docker Container
         run: |
+          PORT=9000
+          if [[ "${{ steps.tag.outputs.tag }}" == "staging" ]]; then
+          PORT=9001
+           fi
+
           docker pull $DOCKER_IMAGE_NAME:${{ steps.tag.outputs.tag }}
           docker stop project24-${{ steps.tag.outputs.tag }} || true
-          docker rm project24-${{ steps.tag.outputs.tag }} || true
+           docker rm project24-${{ steps.tag.outputs.tag }} || true
           docker run -d \
-            --name project24-${{ steps.tag.outputs.tag }} \
-            -p 9000:9000 \
-            --env-file .env.${{ steps.tag.outputs.tag }} \
-            $DOCKER_IMAGE_NAME:${{ steps.tag.outputs.tag }}
+          --name project24-${{ steps.tag.outputs.tag }} \
+          -p $PORT:9000 \
+          --env-file .env.${{ steps.tag.outputs.tag }} \
+          $DOCKER_IMAGE_NAME:${{ steps.tag.outputs.tag }}
