@@ -24,6 +24,7 @@ services:
       - dbdata:/var/lib/mysql
     networks:
       - laravel
+
   nginx-staging:
     image: nginx:alpine
     container_name: nginx-staging
@@ -35,6 +36,9 @@ services:
       - app-staging
     networks:
       - laravel
+
+volumes:
+  dbdata:
 
 networks:
   laravel:
