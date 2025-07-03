@@ -29,11 +29,12 @@ COPY ${ENV_FILE} .env
 # Laravel setup
 RUN php artisan key:generate \
  && php artisan storage:link \
- && php artisan optimize \
- && php artisan cache:clear \
- && php artisan queue:work \
+ && php artisan config:cache \
+ && php artisan route:cache \
+ && php artisan view:cache \
  && chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
+
 
 EXPOSE 9000
 CMD ["php-fpm"]
