@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql zip mbstring exif pcntl bcmath gd
 
-# Install Node.js & npm (v22 LTS)
+# Install Node.js & npm (v18 LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g npm
@@ -20,21 +20,24 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy project files
+# Copy source code
 COPY . .
 
 # Copy selected .env
 COPY ${ENV_FILE} .env
 
-# Laravel setup
+
+# Optional: install npm packages and build assets (uncomment if needed)
+# RUN npm install && npm run build
+
+# Laravel config
 RUN php artisan key:generate \
- && php artisan storage:link \
  && php artisan config:cache \
  && php artisan route:cache \
  && php artisan view:cache \
+ && php artisan storage:link \
  && chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
-
 
 EXPOSE 9000
 CMD ["php-fpm"]
