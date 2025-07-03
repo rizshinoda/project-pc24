@@ -32,8 +32,8 @@ services:
       - "8100:80"
     volumes:
       - ./nginx/staging.conf:/etc/nginx/conf.d/default.conf
-      - ./public:/var/www/public # ⬅️ Tambahkan ini!
-
+      - ./public:/var/www/public
+      - ./storage:/var/www/storage # ⬅️ Tambahkan ini!
     depends_on:
       - app-staging
     networks:
