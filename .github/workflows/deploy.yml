@@ -70,3 +70,10 @@ jobs:
           docker pull $DOCKER_IMAGE_NAME:${{ steps.set-env.outputs.tag }}
           docker compose -f ${{ steps.set-env.outputs.compose }} down
           docker compose -f ${{ steps.set-env.outputs.compose }} up -d
+
+      - name: Run Artisan Commands
+        run: |
+          docker exec app-staging php artisan storage:link || true
+          docker exec app-staging php artisan config:cache
+          docker exec app-staging php artisan route:cache
+          docker exec app-staging php artisan view:cache
