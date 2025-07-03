@@ -30,7 +30,8 @@ COPY ${ENV_FILE} .env
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # Optional: install npm packages and build assets (uncomment if needed)
-# RUN npm install && npm run build
+# Install frontend dependencies and build assets
+RUN npm install && npm run build
 
 # Laravel config
 RUN php artisan key:generate \
