@@ -28,9 +28,10 @@ COPY ${ENV_FILE} .env
 
 # Laravel setup
 RUN php artisan key:generate \
- && php artisan config:cache \
- && php artisan route:cache \
- && php artisan view:cache \
+ && php artisan storage:link \
+ && php artisan optimize \
+ && php artisan cache:clear \
+ && php artisan queue:work \
  && chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
