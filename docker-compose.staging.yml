@@ -5,6 +5,9 @@ services:
     image: rizshinoda/project24-laravel:staging
     container_name: app-staging
     restart: unless-stopped
+    volumes:
+      - .:/var/www # ✅ ini ditambahkan agar nginx bisa baca file Laravel
+
     env_file:
       - .env.staging
     networks:
