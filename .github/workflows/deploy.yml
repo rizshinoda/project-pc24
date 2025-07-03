@@ -45,3 +45,28 @@ jobs:
 
       - name: Push to Docker Hub
         run: docker push $DOCKER_IMAGE_NAME:${{ steps.set-env.outputs.tag }}
+
+  deploy:
+    runs-on: self-hosted
+    needs: build-and-push
+
+    steps:
+      - name: Set Environment
+        id: set-env
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "main" ]]; then
+            echo "tag=prod" >> $GITHUB_OUTPUT
+            echo "compose=docker-compose.prod.yml" >> $GITHUB_OUTPUT
+          else
+            echo "tag=staging" >> $GITHUB_OUTPUT
+            echo "compose=docker-compose.staging.yml" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout Kode dari GitHub
+        uses: actions/checkout@v3
+
+      - name: Pull Image & Deploy with Docker Compose
+        run: |
+          docker pull $DOCKER_IMAGE_NAME:${{ steps.set-env.outputs.tag }}
+          docker compose -f ${{ steps.set-env.outputs.compose }} down
+          docker compose -f ${{ steps.set-env.outputs.compose }} up -d
