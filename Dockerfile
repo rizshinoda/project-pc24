@@ -20,20 +20,13 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy source code
+# Copy project files
 COPY . .
 
 # Copy selected .env
 COPY ${ENV_FILE} .env
 
-# Install PHP dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-# Optional: install npm packages and build assets (uncomment if needed)
-# Install frontend dependencies and build assets
-RUN npm install && npm run build
-
-# Laravel config
+# Laravel setup
 RUN php artisan key:generate \
  && php artisan config:cache \
  && php artisan route:cache \
