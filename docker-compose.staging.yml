@@ -33,6 +33,7 @@ services:
       - "8100:80"
     volumes:
       - ./nginx/staging.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/var/www/public
     depends_on:
       - app-staging
     networks:
