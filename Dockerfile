@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql zip mbstring exif pcntl bcmath gd
 
-# Install Node.js & npm (v18 LTS)
+# Install Node.js & npm
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g npm
@@ -17,26 +17,24 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www
 
-# Copy source code
+# Copy all source
 COPY . .
 
 # Copy selected .env
 COPY ${ENV_FILE} .env
 
-
-# Optional: install npm packages and build assets (uncomment if needed)
-# RUN npm install && npm run build
-
-# Laravel config
-RUN php artisan key:generate \
+# Laravel setup (tanpa queue:work karena itu untuk proses runtime, bukan build)
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
+ && npm install && npm run build \
+ && php artisan key:generate \
  && php artisan config:cache \
  && php artisan route:cache \
  && php artisan view:cache \
- && chown -R www-data:www-data storage bootstrap/cache \
- && chmod -R 775 storage bootstrap/cache
+ && php artisan storage:link \
+ && chown -R www-data:www-data storage bootstrap/cache public/storage \
+ && chmod -R 775 storage bootstrap/cache public/storage
 
 EXPOSE 9000
 CMD ["php-fpm"]
