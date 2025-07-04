@@ -5,6 +5,8 @@ services:
     image: rizshinoda/project24-laravel:staging
     container_name: app-staging
     restart: unless-stopped
+    volumes:
+      - ./storage/app/public:/var/www/storage/app/public # 👈 tambahkan ini
     env_file:
       - .env.staging
     networks:
