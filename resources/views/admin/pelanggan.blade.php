@@ -164,7 +164,7 @@
                                                 <td style="text-align: center; vertical-align: middle;">{{$pelanggan->alamat= \Str::limit($pelanggan->alamat, 70);}}</td>
                                                 <td>
                                                     @if ($pelanggan->foto)
-                                                    <img src="{{ asset('storage/pelanggan/' . $pelanggan->foto) }}" alt="Foto Pelanggan" class="img-fluid square-image" style="width: 100px;">
+                                                    <img src="{{ asset('storage/app/public/pelanggan/' . $pelanggan->foto) }}" alt="Foto Pelanggan" class="img-fluid square-image" style="width: 100px;">
                                                     @endif
                                                 </td>
                                                 <td style="text-align: center; vertical-align: middle;">
