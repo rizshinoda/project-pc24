@@ -7,7 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: app-staging
     volumes:
-      - app-code:/var/www
+      - ../../storage:/var/www/storage
+      - ../../bootstrap/cache:/var/www/bootstrap/cache
     env_file:
       - ../../.env.staging
     depends_on:
