@@ -52,6 +52,9 @@ jobs:
       - name: Build & start containers
         run: docker compose -f $COMPOSE_FILE up -d --build --force-recreate
 
+      - name: Copy updated source code into container manually
+        run: docker cp . $APP_CONTAINER:/var/www
+
       - name: Fix permission inside container
         run: |
           docker exec $APP_CONTAINER bash -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
