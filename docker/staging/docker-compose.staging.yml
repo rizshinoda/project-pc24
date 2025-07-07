@@ -30,10 +30,10 @@ services:
     image: mysql:8.0
     container_name: db-staging
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: laravel
+      MYSQL_ROOT_PASSWORD: rizal8
+      MYSQL_DATABASE: pc24_project
+      MYSQL_USER: rizal
+      MYSQL_PASSWORD: rizal8
     ports:
       - "3306:3306"
     networks:
