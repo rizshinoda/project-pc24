@@ -36,10 +36,9 @@ jobs:
       - name: Build & Start containers
         run: docker compose -f $COMPOSE_FILE up -d --build
 
-      - name: Fix storage permission
+      - name: Fix storage permission (inside container, point to mounted host)
         run: |
-          docker exec $APP_CONTAINER chmod -R ug+rwx storage bootstrap/cache
-          docker exec $APP_CONTAINER chown -R www-data:www-data storage bootstrap/cache
+          docker exec $APP_CONTAINER bash -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
 
       - name: Laravel setup composer, migrate, storage link, cache
         run: |
