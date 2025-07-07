@@ -40,6 +40,14 @@ jobs:
         run: |
           docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
           docker exec $APP_CONTAINER php artisan key:generate
+          docker exec $APP_CONTAINER php artisan config:clear
+
+          for i in {1..30}; do
+            docker exec $APP_CONTAINER mysql -h db -urizal -prizal8 -e "SELECT 1" && break
+            echo "⏳ Waiting for MySQL ($i)..."
+            sleep 2
+          done
+
           docker exec $APP_CONTAINER php artisan migrate --force
           docker exec $APP_CONTAINER php artisan storage:link
           docker exec $APP_CONTAINER php artisan config:cache
