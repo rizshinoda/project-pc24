@@ -36,11 +36,11 @@ jobs:
       - name: Build & Start containers
         run: docker compose -f $COMPOSE_FILE up -d --build
 
-      - name: Fix storage permission on host (optional)
+      - name: Fix host permissions before build
         run: |
-          sudo chown -R 33:33 storage bootstrap/cache || true
-          sudo chmod -R 775 storage bootstrap/cache || true
-          docker exec $APP_CONTAINER bash -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
+          cd /home/rizal/actions-runner/_work/project-pc24/project-pc24
+          sudo chown -R 33:33 storage bootstrap/cache
+          sudo chmod -R 775 storage bootstrap/cache
 
       - name: Laravel setup composer, migrate, storage link, cache
         run: |
