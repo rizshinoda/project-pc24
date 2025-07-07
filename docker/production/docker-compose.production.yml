@@ -9,7 +9,7 @@ services:
     volumes:
       - app-code:/var/www
     env_file:
-      - ../../.env.production
+      - ../../.env.prod
     depends_on:
       - db
     networks:
