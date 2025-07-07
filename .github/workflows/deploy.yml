@@ -28,11 +28,13 @@ jobs:
             echo "COMPOSE_FILE=docker/staging/docker-compose.staging.yml" >> $GITHUB_ENV
             echo "APP_CONTAINER=app-staging" >> $GITHUB_ENV
             echo "DB_CONTAINER=db-staging" >> $GITHUB_ENV
+            echo "VOLUME_NAME=app-code" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "ENV=prod" >> $GITHUB_ENV
             echo "COMPOSE_FILE=docker/production/docker-compose.production.yml" >> $GITHUB_ENV
             echo "APP_CONTAINER=app-production" >> $GITHUB_ENV
             echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
+            echo "VOLUME_NAME=app-code" >> $GITHUB_ENV
           fi
 
       - name: Fix storage/cache permission on host
@@ -44,8 +46,14 @@ jobs:
       - name: Stop old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
+      - name: Remove old volume to apply new code
+        run: docker volume rm $VOLUME_NAME || true
+
       - name: Build & start containers
-        run: docker compose -f $COMPOSE_FILE up -d --build
+        run: docker compose -f $COMPOSE_FILE up -d --build --force-recreate
+
+      - name: Copy updated source code into container manually
+        run: docker cp . $APP_CONTAINER:/var/www
 
       - name: Fix permission inside container
         run: |
