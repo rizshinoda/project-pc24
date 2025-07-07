@@ -36,6 +36,11 @@ jobs:
       - name: Build & Start containers
         run: docker compose -f $COMPOSE_FILE up -d --build
 
+      - name: Fix storage permission
+        run: |
+          docker exec $APP_CONTAINER chmod -R ug+rwx storage bootstrap/cache
+          docker exec $APP_CONTAINER chown -R www-data:www-data storage bootstrap/cache
+
       - name: Laravel setup composer, migrate, storage link, cache
         run: |
           docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
@@ -43,9 +48,9 @@ jobs:
           docker exec $APP_CONTAINER php artisan config:clear
 
           for i in {1..30}; do
-            docker exec $APP_CONTAINER mysql -h db -urizal -prizal8 -e "SELECT 1" && break
-            echo "⏳ Waiting for MySQL ($i)..."
-            sleep 2
+          docker exec db-staging mysqladmin ping -h 127.0.0.1 -prizal8 && break
+          echo "⏳ Waiting for MySQL ($i)..."
+          sleep 2
           done
 
           docker exec $APP_CONTAINER php artisan migrate --force
