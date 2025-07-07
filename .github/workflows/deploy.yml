@@ -11,6 +11,10 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Fix permission before checkout
+        run: |
+          sudo chown -R $USER:$USER /home/rizal/actions-runner/_work/project-pc24 || true
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -32,9 +36,20 @@ jobs:
       - name: Build & Start containers
         run: docker compose -f $COMPOSE_FILE up -d --build
 
-      - name: Laravel setup (composer, migrate, cache)
+      - name: Laravel setup composer, migrate, storage link, cache
         run: |
           docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
           docker exec $APP_CONTAINER php artisan key:generate
           docker exec $APP_CONTAINER php artisan migrate --force
+          docker exec $APP_CONTAINER php artisan storage:link
           docker exec $APP_CONTAINER php artisan config:cache
+
+      - name: Install npm & build frontend
+        working-directory: ./resources
+        run: |
+          npm install
+          npm run build
+
+      - name: Fix permission after deployment
+        run: |
+          sudo chown -R $USER:$USER /home/rizal/actions-runner/_work/project-pc24 || true
