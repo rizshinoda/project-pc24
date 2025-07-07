@@ -6,6 +6,9 @@ on:
       - staging
       - main
 
+env:
+  PROJECT_ROOT: /home/rizal/actions-runner/_work/project-pc24/project-pc24
+
 jobs:
   deploy:
     runs-on: self-hosted
@@ -13,52 +16,58 @@ jobs:
     steps:
       - name: Fix permission before checkout
         run: |
-          sudo chown -R $USER:$USER /home/rizal/actions-runner/_work/project-pc24 || true
+          sudo chown -R $USER:$USER $PROJECT_ROOT || true
 
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set ENV and COMPOSE FILE
+      - name: Set environment variables
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             echo "ENV=staging" >> $GITHUB_ENV
             echo "COMPOSE_FILE=docker/staging/docker-compose.staging.yml" >> $GITHUB_ENV
             echo "APP_CONTAINER=app-staging" >> $GITHUB_ENV
+            echo "DB_CONTAINER=db-staging" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "ENV=production" >> $GITHUB_ENV
             echo "COMPOSE_FILE=docker/production/docker-compose.production.yml" >> $GITHUB_ENV
             echo "APP_CONTAINER=app-production" >> $GITHUB_ENV
+            echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
           fi
+
+      - name: Fix storage/cache permission on host
+        run: |
+          cd $PROJECT_ROOT
+          sudo chown -R 33:33 storage bootstrap/cache
+          sudo chmod -R 775 storage bootstrap/cache
 
       - name: Stop old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
-      - name: Build & Start containers
+      - name: Build & start containers
         run: docker compose -f $COMPOSE_FILE up -d --build
 
-      - name: Fix host permissions before build
+      - name: Fix permission inside container
         run: |
-          cd /home/rizal/actions-runner/_work/project-pc24/project-pc24
-          sudo chown -R 33:33 storage bootstrap/cache
-          sudo chmod -R 775 storage bootstrap/cache
+          docker exec $APP_CONTAINER bash -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
 
-      - name: Laravel setup composer, migrate, storage link, cache
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in {1..30}; do
+            docker exec $DB_CONTAINER mysqladmin ping -h 127.0.0.1 -prizal8 && break
+            echo "⏳ Waiting for MySQL ($i)..."
+            sleep 2
+          done
+
+      - name: Laravel setup (composer, migrate, cache)
         run: |
           docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
           docker exec $APP_CONTAINER php artisan key:generate
-          docker exec $APP_CONTAINER php artisan config:clear
-
-          for i in {1..30}; do
-          docker exec db-staging mysqladmin ping -h 127.0.0.1 -prizal8 && break
-          echo "⏳ Waiting for MySQL ($i)..."
-          sleep 2
-          done
-
           docker exec $APP_CONTAINER php artisan migrate --force
           docker exec $APP_CONTAINER php artisan storage:link
           docker exec $APP_CONTAINER php artisan config:cache
 
-      - name: Install npm & build frontend
+      - name: Build frontend with npm
         working-directory: ./resources
         run: |
           npm install
@@ -66,4 +75,4 @@ jobs:
 
       - name: Fix permission after deployment
         run: |
-          sudo chown -R $USER:$USER /home/rizal/actions-runner/_work/project-pc24 || true
+          sudo chown -R $USER:$USER $PROJECT_ROOT || true
