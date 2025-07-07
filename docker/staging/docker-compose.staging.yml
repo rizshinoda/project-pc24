@@ -24,7 +24,7 @@ services:
       MYSQL_USER: rizal
       MYSQL_PASSWORD: rizal8
     ports:
-      - "3306:3306"
+      - "3307:3306"
     networks:
       - app-network
 
