@@ -1,64 +1,78 @@
-name: Build & Deploy Laravel (Staging & Production)
+name: Deploy Laravel with Docker
 
 on:
   push:
-    branches: ["staging", "main"]
+    branches:
+      - staging
+      - main
 
 env:
-  DOCKER_IMAGE_NAME: rizshinoda/project24-laravel
+  PROJECT_ROOT: /home/rizal/actions-runner/_work/project-pc24/project-pc24
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set Environment
-        id: set-env
-        run: |
-          if [[ "${GITHUB_REF##*/}" == "main" ]]; then
-            echo "tag=prod" >> $GITHUB_OUTPUT
-          else
-            echo "tag=staging" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build Docker Image
-        run: |
-          docker build --build-arg ENV_FILE=.env.${{ steps.set-env.outputs.tag }} \
-            -t $DOCKER_IMAGE_NAME:${{ steps.set-env.outputs.tag }} .
-
-      - name: Push to Docker Hub
-        run: docker push $DOCKER_IMAGE_NAME:${{ steps.set-env.outputs.tag }}
-
   deploy:
     runs-on: self-hosted
-    needs: build-and-push
 
     steps:
-      - name: Set Environment
-        id: set-env
+      - name: Fix permission before checkout
         run: |
-          if [[ "${GITHUB_REF##*/}" == "main" ]]; then
-            echo "tag=prod" >> $GITHUB_OUTPUT
-            echo "compose=docker-compose.prod.yml" >> $GITHUB_OUTPUT
-          else
-            echo "tag=staging" >> $GITHUB_OUTPUT
-            echo "compose=docker-compose.staging.yml" >> $GITHUB_OUTPUT
+          sudo chown -R $USER:$USER $PROJECT_ROOT || true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            echo "ENV=staging" >> $GITHUB_ENV
+            echo "COMPOSE_FILE=docker/staging/docker-compose.staging.yml" >> $GITHUB_ENV
+            echo "APP_CONTAINER=app-staging" >> $GITHUB_ENV
+            echo "DB_CONTAINER=db-staging" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "ENV=production" >> $GITHUB_ENV
+            echo "COMPOSE_FILE=docker/production/docker-compose.production.yml" >> $GITHUB_ENV
+            echo "APP_CONTAINER=app-production" >> $GITHUB_ENV
+            echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
           fi
 
-      - name: Checkout Kode dari GitHub
-        uses: actions/checkout@v3
-
-      - name: Pull Image & Deploy with Docker Compose
+      - name: Fix storage/cache permission on host
         run: |
-          docker pull $DOCKER_IMAGE_NAME:${{ steps.set-env.outputs.tag }}
-          docker compose -f ${{ steps.set-env.outputs.compose }} down
-          docker compose -f ${{ steps.set-env.outputs.compose }} up -d
+          cd $PROJECT_ROOT
+          sudo chown -R 33:33 storage bootstrap/cache
+          sudo chmod -R 775 storage bootstrap/cache
+
+      - name: Stop old containers
+        run: docker compose -f $COMPOSE_FILE down || true
+
+      - name: Build & start containers
+        run: docker compose -f $COMPOSE_FILE up -d --build
+
+      - name: Fix permission inside container
+        run: |
+          docker exec $APP_CONTAINER bash -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
+
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in {1..30}; do
+            docker exec $DB_CONTAINER mysqladmin ping -h 127.0.0.1 -prizal8 && break
+            echo "⏳ Waiting for MySQL ($i)..."
+            sleep 2
+          done
+
+      - name: Laravel setup (composer, migrate, cache)
+        run: |
+          docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
+          docker exec $APP_CONTAINER php artisan key:generate
+          docker exec $APP_CONTAINER php artisan migrate --force
+          docker exec $APP_CONTAINER php artisan storage:link
+          docker exec $APP_CONTAINER php artisan config:cache
+
+      - name: Build frontend with npm
+        working-directory: ./resources
+        run: |
+          npm install
+          npm run build
+
+      - name: Fix permission after deployment
+        run: |
+          sudo chown -R $USER:$USER $PROJECT_ROOT || true
