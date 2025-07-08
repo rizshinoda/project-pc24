@@ -53,13 +53,14 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:alpine
-    container_name: redis-production
-    ports:
-      - "6381:6379"
-  networks:
-    - app-network
+    redis:
+      image: redis:alpine
+      container_name: redis-production
+      ports:
+        - "6381:6379"
+      networks: # ✅ dipindahkan ke dalam blok redis
+        - app-network
+
 volumes:
   app-code:
   db-data:
