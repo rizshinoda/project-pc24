@@ -47,8 +47,9 @@ jobs:
       - name: Build & start containers
         run: docker compose -f $COMPOSE_FILE up -d --build --force-recreate
 
-      - name: Fix final host-mounted storage permissions
+      - name: Fix storage permission on host (AFTER docker up)
         run: |
+          sudo mkdir -p $PROJECT_ROOT/storage/framework/views $PROJECT_ROOT/storage/framework/cache
           sudo find $PROJECT_ROOT/storage -type d -exec chmod 775 {} \;
           sudo find $PROJECT_ROOT/storage -type f -exec chmod 664 {} \;
           sudo find $PROJECT_ROOT/bootstrap/cache -type d -exec chmod 775 {} \;
