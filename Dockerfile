@@ -18,12 +18,15 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy entire app (except volume mounted storage & cache)
+# Copy application files
 COPY . .
 
-# Set correct permissions
+# Set permissions
 RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage
+    && chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
+
+# Run as www-data user
+USER www-data
 
 EXPOSE 9000
 CMD ["php-fpm"]

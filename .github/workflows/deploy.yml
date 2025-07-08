@@ -57,11 +57,6 @@ jobs:
             echo "⏳ Waiting for MySQL ($i)..."
             sleep 2
           done
-      - name: Check storage permissions before Laravel setup
-        run: |
-          docker exec $APP_CONTAINER id
-          docker exec $APP_CONTAINER ls -ld /var/www/storage/framework/views
-          docker exec $APP_CONTAINER touch /var/www/storage/framework/views/test.log || echo "❌ Failed to write"
 
       - name: Laravel setup (composer, migrate, cache)
         run: |
