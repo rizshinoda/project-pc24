@@ -34,24 +34,21 @@ jobs:
             echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
           fi
 
-      - name: Fix storage/cache permission on host
+      - name: Fix storage/cache permission on host BEFORE docker up
         run: |
-          cd $PROJECT_ROOT
-          sudo mkdir -p storage/framework/views storage/framework/cache
-          sudo chown -R 33:33 storage bootstrap/cache
-          sudo chmod -R 775 storage bootstrap/cache
+          sudo mkdir -p $PROJECT_ROOT/storage/framework/views $PROJECT_ROOT/storage/framework/cache
+          sudo find $PROJECT_ROOT/storage -type d -exec chmod 775 {} \;
+          sudo find $PROJECT_ROOT/storage -type f -exec chmod 664 {} \;
+          sudo find $PROJECT_ROOT/bootstrap/cache -type d -exec chmod 775 {} \;
+          sudo find $PROJECT_ROOT/bootstrap/cache -type f -exec chmod 664 {} \;
+          sudo chown -R 33:33 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
+          sudo chmod +x $PROJECT_ROOT
 
       - name: Stop and remove old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
       - name: Build & start containers
         run: docker compose -f $COMPOSE_FILE up -d --build --force-recreate
-
-      - name: Ensure host and parent folders are accessible
-        run: |
-          sudo chown -R 33:33 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
-          sudo chmod -R 775 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
-          sudo chmod +x $PROJECT_ROOT
 
       - name: Wait for MySQL to be ready
         run: |
