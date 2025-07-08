@@ -6,19 +6,14 @@ services:
       context: ../../
       dockerfile: Dockerfile
     container_name: app-production
-
+    volumes:
+      - app-code:/var/www
     env_file:
       - ../../.env.prod
     depends_on:
       - db
-      - redis
     networks:
       - app-network
-    volumes:
-      - ../../storage:/var/www/storage
-      - ../../bootstrap/cache:/var/www/bootstrap/cache
-
-    command: ["sh", "-c", "sleep 10 && php-fpm"]
 
   nginx:
     image: nginx:alpine
@@ -46,19 +41,6 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:alpine
-    container_name: redis-production
-    ports:
-      - "6381:6379"
-    networks: # ✅ dipindahkan ke dalam blok redis
       - app-network
 
 volumes:

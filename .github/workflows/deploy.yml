@@ -15,19 +15,11 @@ jobs:
 
     steps:
       - name: Fix permission before checkout
-        run: sudo chown -R $USER:$USER $PROJECT_ROOT || true
+        run: |
+          sudo chown -R $USER:$USER $PROJECT_ROOT || true
 
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Fix storage permission on host
-        run: |
-          sudo mkdir -p $PROJECT_ROOT/storage/framework/views $PROJECT_ROOT/storage/framework/cache
-          sudo chown -R 33:33 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
-          sudo find $PROJECT_ROOT/storage -type d -exec chmod 775 {} \;
-          sudo find $PROJECT_ROOT/storage -type f -exec chmod 664 {} \;
-          sudo find $PROJECT_ROOT/bootstrap/cache -type d -exec chmod 775 {} \;
-          sudo find $PROJECT_ROOT/bootstrap/cache -type f -exec chmod 664 {} \;
 
       - name: Set environment variables
         run: |
@@ -36,48 +28,59 @@ jobs:
             echo "COMPOSE_FILE=docker/staging/docker-compose.staging.yml" >> $GITHUB_ENV
             echo "APP_CONTAINER=app-staging" >> $GITHUB_ENV
             echo "DB_CONTAINER=db-staging" >> $GITHUB_ENV
+            echo "VOLUME_NAME=app-code" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "ENV=production" >> $GITHUB_ENV
+            echo "ENV=prod" >> $GITHUB_ENV
             echo "COMPOSE_FILE=docker/production/docker-compose.production.yml" >> $GITHUB_ENV
             echo "APP_CONTAINER=app-production" >> $GITHUB_ENV
             echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
+            echo "VOLUME_NAME=app-code" >> $GITHUB_ENV
           fi
+
+      - name: Fix storage/cache permission on host
+        run: |
+          cd $PROJECT_ROOT
+          sudo chown -R 33:33 storage bootstrap/cache
+          sudo chmod -R 775 storage bootstrap/cache
 
       - name: Stop old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
+      - name: Remove old volume to apply new code
+        run: docker volume rm $VOLUME_NAME || true
+
       - name: Build & start containers
         run: docker compose -f $COMPOSE_FILE up -d --build --force-recreate
 
-      - name: Fix Git safe.directory
-        run: |
-          docker exec $APP_CONTAINER git config --global --add safe.directory /var/www
+      - name: Copy updated source code into container manually
+        run: docker cp . $APP_CONTAINER:/var/www
 
-      - name: Fix permissions inside container
+      - name: Fix permission inside container
         run: |
-          docker exec $APP_CONTAINER bash -c "\
-            chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
-            chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
+          docker exec $APP_CONTAINER bash -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
 
       - name: Wait for MySQL to be ready
         run: |
           for i in {1..30}; do
             docker exec $DB_CONTAINER mysqladmin ping -h 127.0.0.1 -prizal8 && break
-            echo '⏳ Waiting for MySQL...'
+            echo "⏳ Waiting for MySQL ($i)..."
             sleep 2
           done
 
-      - name: Laravel setup (composer, artisan)
+      - name: Laravel setup (composer, migrate, cache)
         run: |
-          docker exec $APP_CONTAINER bash -c "\
-            composer install --no-interaction --prefer-dist && \
-            php artisan key:generate && \
-            php artisan migrate --force && \
-            php artisan storage:link && \
-            php artisan config:cache"
+          docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
+          docker exec $APP_CONTAINER php artisan key:generate
+          docker exec $APP_CONTAINER php artisan migrate --force
+          docker exec $APP_CONTAINER php artisan storage:link
+          docker exec $APP_CONTAINER php artisan config:cache
 
       - name: Build frontend with npm
         working-directory: ./resources
         run: |
           npm install
           npm run build
+
+      - name: Fix permission after deployment
+        run: |
+          sudo chown -R $USER:$USER $PROJECT_ROOT || true
