@@ -37,20 +37,17 @@ jobs:
       - name: Fix storage/cache permission on host
         run: |
           cd $PROJECT_ROOT
+          sudo mkdir -p storage/framework/views storage/framework/cache
           sudo chown -R 33:33 storage bootstrap/cache
           sudo chmod -R 775 storage bootstrap/cache
 
-      - name: Check storage permission
-        run: |
-          docker exec $APP_CONTAINER ls -l /var/www/storage/framework/views
-
-      - name: Stop old containers
+      - name: Stop and remove old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
       - name: Build & start containers
         run: docker compose -f $COMPOSE_FILE up -d --build --force-recreate
 
-      - name: Fix permission inside container
+      - name: Fix permissions inside container
         run: |
           docker exec $APP_CONTAINER bash -c "\
             mkdir -p /var/www/storage/framework/views /var/www/storage/framework/cache && \
@@ -79,5 +76,13 @@ jobs:
           npm install
           npm run build
 
-      - name: Fix permission after deployment
+      - name: Final check & fix permissions (diagnostic)
+        run: |
+          docker exec $APP_CONTAINER ls -l /var/www/storage/framework/views || true
+          docker exec $APP_CONTAINER ls -ld /var/www/storage /var/www/bootstrap/cache || true
+          docker exec $APP_CONTAINER bash -c "\
+            chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
+            chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
+
+      - name: Fix permission after deployment on host
         run: sudo chown -R $USER:$USER $PROJECT_ROOT || true
