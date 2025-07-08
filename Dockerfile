@@ -25,5 +25,8 @@ COPY . .
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage
 
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
 EXPOSE 9000
 CMD ["php-fpm"]
