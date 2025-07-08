@@ -20,6 +20,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Fix storage permission on host
+        run: |
+          sudo mkdir -p $PROJECT_ROOT/storage/framework/views $PROJECT_ROOT/storage/framework/cache
+          sudo chown -R 33:33 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
+          sudo find $PROJECT_ROOT/storage -type d -exec chmod 775 {} \;
+          sudo find $PROJECT_ROOT/storage -type f -exec chmod 664 {} \;
+          sudo find $PROJECT_ROOT/bootstrap/cache -type d -exec chmod 775 {} \;
+          sudo find $PROJECT_ROOT/bootstrap/cache -type f -exec chmod 664 {} \;
+
       - name: Set environment variables
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
@@ -33,15 +42,6 @@ jobs:
             echo "APP_CONTAINER=app-production" >> $GITHUB_ENV
             echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
           fi
-
-      - name: Prepare storage & cache permissions (before Docker)
-        run: |
-          sudo mkdir -p $PROJECT_ROOT/storage/framework/views $PROJECT_ROOT/storage/framework/cache
-          sudo find $PROJECT_ROOT/storage -type d -exec chmod 775 {} \;
-          sudo find $PROJECT_ROOT/storage -type f -exec chmod 664 {} \;
-          sudo find $PROJECT_ROOT/bootstrap/cache -type d -exec chmod 775 {} \;
-          sudo find $PROJECT_ROOT/bootstrap/cache -type f -exec chmod 664 {} \;
-          sudo chown -R 33:33 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
 
       - name: Stop old containers
         run: docker compose -f $COMPOSE_FILE down || true
