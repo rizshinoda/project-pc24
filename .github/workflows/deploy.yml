@@ -49,8 +49,8 @@ jobs:
 
       - name: Fix storage permission on host (AFTER docker up)
         run: |
-          chown -R 33:33 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
-          chmod -R 775 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
+          sudo chown -R 33:33 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
+          sudo chmod -R 775 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
 
       - name: Wait for MySQL to be ready
         run: |
