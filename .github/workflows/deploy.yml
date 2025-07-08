@@ -40,6 +40,10 @@ jobs:
           sudo chown -R 33:33 storage bootstrap/cache
           sudo chmod -R 775 storage bootstrap/cache
 
+      - name: Check storage permission
+        run: |
+          docker exec $APP_CONTAINER ls -l /var/www/storage/framework/views
+
       - name: Stop old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
