@@ -34,7 +34,7 @@ jobs:
             echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
           fi
 
-      - name: Fix storage/cache permission on host BEFORE docker up
+      - name: Prepare storage & cache permissions (before Docker)
         run: |
           sudo mkdir -p $PROJECT_ROOT/storage/framework/views $PROJECT_ROOT/storage/framework/cache
           sudo find $PROJECT_ROOT/storage -type d -exec chmod 775 {} \;
@@ -42,28 +42,34 @@ jobs:
           sudo find $PROJECT_ROOT/bootstrap/cache -type d -exec chmod 775 {} \;
           sudo find $PROJECT_ROOT/bootstrap/cache -type f -exec chmod 664 {} \;
           sudo chown -R 33:33 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
-          sudo chmod +x $PROJECT_ROOT
 
-      - name: Stop and remove old containers
+      - name: Stop old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
       - name: Build & start containers
         run: docker compose -f $COMPOSE_FILE up -d --build --force-recreate
 
+      - name: Fix Git safe.directory
+        run: |
+          docker exec $APP_CONTAINER git config --global --add safe.directory /var/www
+
+      - name: Fix permissions inside container
+        run: |
+          docker exec $APP_CONTAINER bash -c "\
+            chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
+            chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
+
       - name: Wait for MySQL to be ready
         run: |
           for i in {1..30}; do
             docker exec $DB_CONTAINER mysqladmin ping -h 127.0.0.1 -prizal8 && break
-            echo "⏳ Waiting for MySQL ($i)..."
+            echo '⏳ Waiting for MySQL...'
             sleep 2
           done
 
-      - name: Laravel setup (composer, migrate, cache)
+      - name: Laravel setup (composer, artisan)
         run: |
           docker exec $APP_CONTAINER bash -c "\
-            git config --global --add safe.directory /var/www && \
-            mkdir -p /var/www/vendor && \
-            chown -R www-data:www-data /var/www && \
             composer install --no-interaction --prefer-dist && \
             php artisan key:generate && \
             php artisan migrate --force && \
@@ -76,5 +82,5 @@ jobs:
           npm install
           npm run build
 
-      - name: Fix permission after deployment on host
+      - name: Fix permission after deployment (host)
         run: sudo chown -R $USER:$USER $PROJECT_ROOT || true

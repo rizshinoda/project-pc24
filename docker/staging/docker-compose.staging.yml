@@ -13,7 +13,9 @@ services:
     networks:
       - app-network
     volumes:
-      - ../../:/var/www
+      - ../../storage:/var/www/storage
+      - ../../bootstrap/cache:/var/www/bootstrap/cache
+
     command: ["sh", "-c", "sleep 10 && php-fpm"]
 
   db:
