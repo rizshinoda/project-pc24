@@ -81,6 +81,3 @@ jobs:
         run: |
           npm install
           npm run build
-
-      - name: Fix permission after deployment (host)
-        run: sudo chown -R $USER:$USER $PROJECT_ROOT || true
