@@ -34,13 +34,6 @@ jobs:
             echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
           fi
 
-      - name: Fix storage/cache permission on host
-        run: |
-          cd $PROJECT_ROOT
-          sudo mkdir -p storage/framework/views storage/framework/cache
-          sudo chown -R 33:33 storage bootstrap/cache
-          sudo chmod -R 775 storage bootstrap/cache
-
       - name: Stop and remove old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
