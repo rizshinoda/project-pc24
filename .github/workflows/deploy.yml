@@ -60,11 +60,15 @@ jobs:
 
       - name: Laravel setup (composer, migrate, cache)
         run: |
-          docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
-          docker exec $APP_CONTAINER php artisan key:generate
-          docker exec $APP_CONTAINER php artisan migrate --force
-          docker exec $APP_CONTAINER php artisan storage:link
-          docker exec $APP_CONTAINER php artisan config:cache
+          docker exec $APP_CONTAINER bash -c "\
+            git config --global --add safe.directory /var/www && \
+            mkdir -p /var/www/vendor && \
+            chown -R www-data:www-data /var/www && \
+            composer install --no-interaction --prefer-dist && \
+            php artisan key:generate && \
+            php artisan migrate --force && \
+            php artisan storage:link && \
+            php artisan config:cache"
 
       - name: Build frontend with npm
         working-directory: ./resources
