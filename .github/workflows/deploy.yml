@@ -47,14 +47,11 @@ jobs:
       - name: Build & start containers
         run: docker compose -f $COMPOSE_FILE up -d --build --force-recreate
 
-      - name: Fix storage permission on host (AFTER docker up)
+      - name: Ensure host and parent folders are accessible
         run: |
-          sudo mkdir -p $PROJECT_ROOT/storage/framework/views $PROJECT_ROOT/storage/framework/cache
-          sudo find $PROJECT_ROOT/storage -type d -exec chmod 775 {} \;
-          sudo find $PROJECT_ROOT/storage -type f -exec chmod 664 {} \;
-          sudo find $PROJECT_ROOT/bootstrap/cache -type d -exec chmod 775 {} \;
-          sudo find $PROJECT_ROOT/bootstrap/cache -type f -exec chmod 664 {} \;
           sudo chown -R 33:33 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
+          sudo chmod -R 775 $PROJECT_ROOT/storage $PROJECT_ROOT/bootstrap/cache
+          sudo chmod +x $PROJECT_ROOT
 
       - name: Wait for MySQL to be ready
         run: |
