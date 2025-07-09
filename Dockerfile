@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y \
 
 
 
+# ✅ Install Node.js 18 (untuk Vite)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
