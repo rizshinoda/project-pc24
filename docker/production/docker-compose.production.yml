@@ -35,7 +35,7 @@ services:
     image: nginx:alpine
     container_name: nginx-production
     ports:
-      - "80:80"
+      - "8001:80"
     volumes:
       - app-code-production:/var/www
       - storage-production:/var/www/storage/app/public
