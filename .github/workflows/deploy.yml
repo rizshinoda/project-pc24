@@ -28,6 +28,7 @@ jobs:
             echo "COMPOSE_FILE=docker/staging/docker-compose.staging.yml" >> $GITHUB_ENV
             echo "APP_CONTAINER=app-staging" >> $GITHUB_ENV
             echo "DB_CONTAINER=db-staging" >> $GITHUB_ENV
+            echo "NGINX_CONTAINER=nginx-staging" >> $GITHUB_ENV
             echo "APP_VOLUME=app-code-staging" >> $GITHUB_ENV
             echo "STORAGE_VOLUME=storage-staging" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
@@ -35,6 +36,7 @@ jobs:
             echo "COMPOSE_FILE=docker/production/docker-compose.production.yml" >> $GITHUB_ENV
             echo "APP_CONTAINER=app-production" >> $GITHUB_ENV
             echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
+            echo "NGINX_CONTAINER=nginx-production" >> $GITHUB_ENV
             echo "APP_VOLUME=app-code-production" >> $GITHUB_ENV
             echo "STORAGE_VOLUME=storage-production" >> $GITHUB_ENV
           fi
@@ -42,7 +44,7 @@ jobs:
       - name: Stop old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
-      - name: Remove old volumes (to ensure updated code)
+      - name: Remove old volumes to ensure updated code
         run: |
           docker volume rm $APP_VOLUME || true
 
@@ -52,10 +54,19 @@ jobs:
       - name: Copy updated code into app container
         run: docker cp . $APP_CONTAINER:/var/www
 
+      - name: Copy updated code into nginx container
+        run: docker cp . $NGINX_CONTAINER:/var/www
+
+      - name: Laravel setup (composer, artisan)
+        run: |
+          docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
+          docker exec $APP_CONTAINER php artisan key:generate
+          docker exec $APP_CONTAINER php artisan migrate --force
+
       - name: Re-link storage directory
         run: |
           docker exec $APP_CONTAINER bash -c "\
-          rm -f public/storage && php artisan storage:link"
+            if [ -L public/storage ]; then rm public/storage; fi && php artisan storage:link"
 
       - name: Set permissions inside container
         run: |
@@ -72,13 +83,8 @@ jobs:
             sleep 2
           done
 
-      - name: Laravel setup (composer, artisan)
-        run: |
-          docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
-          docker exec $APP_CONTAINER php artisan key:generate
-          docker exec $APP_CONTAINER php artisan migrate --force
-
-          docker exec $APP_CONTAINER php artisan config:cache
+      - name: Laravel config cache
+        run: docker exec $APP_CONTAINER php artisan config:cache
 
       - name: Build frontend with npm
         working-directory: ./resources
@@ -86,6 +92,6 @@ jobs:
           npm install
           npm run build
 
-      - name: Fix final permission
+      - name: Fix final permissions
         run: |
           sudo chown -R $USER:$USER $PROJECT_ROOT || true
