@@ -52,6 +52,11 @@ jobs:
       - name: Copy updated code into app container
         run: docker cp . $APP_CONTAINER:/var/www
 
+      - name: Re-link storage directory
+        run: |
+          docker exec $APP_CONTAINER bash -c "\
+          rm -f public/storage && php artisan storage:link"
+
       - name: Set permissions inside container
         run: |
           docker exec $APP_CONTAINER bash -c "\
@@ -72,9 +77,7 @@ jobs:
           docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
           docker exec $APP_CONTAINER php artisan key:generate
           docker exec $APP_CONTAINER php artisan migrate --force
-          docker exec $APP_CONTAINER bash -c "\
-          if [ -L public/storage ]; then rm public/storage; fi && \
-          php artisan storage:link"
+
           docker exec $APP_CONTAINER php artisan config:cache
 
       - name: Build frontend with npm
