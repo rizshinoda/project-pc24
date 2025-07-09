@@ -1,23 +1,22 @@
 FROM php:8.2-fpm
 
-# Install system dependencies
 # Install system dependencies with WebP support
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
-    libwebp-dev \                       # ✅ Tambahkan untuk dukungan WebP
+    libwebp-dev \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
     zip unzip git curl \
-    && docker-php-ext-configure gd \
-        --with-jpeg \
-        --with-freetype \
-        --with-webp \                  # ✅ Aktifkan dukungan WebP
-    && docker-php-ext-install \
-        pdo_mysql mbstring exif pcntl bcmath gd zip
+ && docker-php-ext-configure gd \
+    --with-jpeg \
+    --with-freetype \
+    --with-webp \
+ && docker-php-ext-install \
+    pdo_mysql mbstring exif pcntl bcmath gd zip
 
 
 
