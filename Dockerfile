@@ -12,19 +12,18 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-jpeg --with-freetype \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
+
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www
 
-# Copy source code (for image build only; final code injected via volume in CI/CD)
+# Copy project (used in production build)
 COPY . .
 
-# Ensure storage directory exists (prevent crash if volume not mounted)
-RUN mkdir -p storage bootstrap/cache \
-    && chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage
 
 EXPOSE 9000
 CMD ["php-fpm"]

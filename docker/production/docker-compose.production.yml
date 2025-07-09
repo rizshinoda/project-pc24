@@ -7,12 +7,24 @@ services:
       dockerfile: Dockerfile
     container_name: app-production
     volumes:
-      - app-code-production:/var/www
-      - storage-production:/var/www/storage
+      - app-code:/var/www
     env_file:
-      - ../../.env.production
+      - ../../.env.prod
     depends_on:
       - db
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-production
+    ports:
+      - "8001:80"
+    volumes:
+      - app-code:/var/www
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
     networks:
       - app-network
 
@@ -25,29 +37,15 @@ services:
       MYSQL_USER: rizal
       MYSQL_PASSWORD: rizal8
     ports:
-      - "3306:3306" # default port
+      - "3306:3306"
     volumes:
-      - db-data-production:/var/lib/mysql
-    networks:
-      - app-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx-production
-    ports:
-      - "8001:80" # beda port dari staging
-    volumes:
-      - app-code-production:/var/www
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - app
+      - db-data:/var/lib/mysql
     networks:
       - app-network
 
 volumes:
-  app-code-production:
-  storage-production:
-  db-data-production:
+  app-code:
+  db-data:
 
 networks:
   app-network:

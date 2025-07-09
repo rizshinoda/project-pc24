@@ -7,8 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: app-staging
     volumes:
-      - app-code-staging:/var/www
-      - storage-staging:/var/www/storage
+      - app-code:/var/www
     env_file:
       - ../../.env.staging
     depends_on:
@@ -25,9 +24,9 @@ services:
       MYSQL_USER: rizal
       MYSQL_PASSWORD: rizal8
     ports:
-      - "3307:3306"
+      - "3307:3306" # gunakan port berbeda agar tidak konflik dengan production
     volumes:
-      - db-data-staging:/var/lib/mysql
+      - db-data:/var/lib/mysql
     networks:
       - app-network
 
@@ -37,7 +36,7 @@ services:
     ports:
       - "8000:80"
     volumes:
-      - app-code-staging:/var/www
+      - app-code:/var/www
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
@@ -45,9 +44,8 @@ services:
       - app-network
 
 volumes:
-  app-code-staging:
-  storage-staging:
-  db-data-staging:
+  app-code:
+  db-data:
 
 networks:
   app-network:
