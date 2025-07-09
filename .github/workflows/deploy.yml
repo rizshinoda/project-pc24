@@ -30,7 +30,7 @@ jobs:
             echo "DB_CONTAINER=db-staging" >> $GITHUB_ENV
             echo "VOLUME_APP_CODE=app-code-staging" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "ENV=production" >> $GITHUB_ENV
+            echo "ENV=prod" >> $GITHUB_ENV
             echo "COMPOSE_FILE=docker/production/docker-compose.production.yml" >> $GITHUB_ENV
             echo "APP_CONTAINER=app-production" >> $GITHUB_ENV
             echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
