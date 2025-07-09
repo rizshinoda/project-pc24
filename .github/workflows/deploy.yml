@@ -77,10 +77,11 @@ jobs:
           docker exec $APP_CONTAINER php artisan config:cache
 
       - name: Build frontend with npm
-        working-directory: ./resources
         run: |
-          npm install
-          npm run build
+          docker exec $APP_CONTAINER bash -c "\
+            cd /var/www && \
+            npm install && \
+            npm run build"
 
       - name: Fix final permission on host
         run: |
