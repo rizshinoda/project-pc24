@@ -10,7 +10,7 @@ services:
       - app-code-production:/var/www
       - storage-production:/var/www/storage/app/public
     env_file:
-      - ../../.env.production
+      - ../../.env.prod
     depends_on:
       - db
     networks:
