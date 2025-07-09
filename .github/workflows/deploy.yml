@@ -40,21 +40,34 @@ jobs:
       - name: Stop old containers
         run: docker compose -f $COMPOSE_FILE down || true
 
-      - name: Remove app-code volume (code only, keep storage!)
+      - name: Remove app volume to force code refresh
         run: docker volume rm $VOLUME_APP_CODE || true
 
-      - name: Build & start containers
+      - name: Build and start containers
         run: docker compose -f $COMPOSE_FILE up -d --build --force-recreate
 
-      - name: Copy updated Laravel app code
+      - name: Copy source code to container
         run: docker cp . $APP_CONTAINER:/var/www
 
-      - name: Re-link Laravel storage
+      - name: Install Composer dependencies
+        run: docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
+
+      - name: Laravel artisan setup
+        run: |
+          docker exec $APP_CONTAINER php artisan key:generate
+          docker exec $APP_CONTAINER php artisan migrate --force
+
+      - name: Build frontend (npm)
+        run: |
+          docker exec $APP_CONTAINER bash -c "\
+            cd /var/www && npm install && npm run build"
+
+      - name: Link Laravel storage
         run: |
           docker exec $APP_CONTAINER bash -c "\
             rm -f public/storage && php artisan storage:link"
 
-      - name: Set correct permissions inside container
+      - name: Fix permissions inside container
         run: |
           docker exec $APP_CONTAINER bash -c "\
             mkdir -p storage bootstrap/cache && \
@@ -69,19 +82,8 @@ jobs:
             sleep 2
           done
 
-      - name: Laravel setup (composer, artisan)
-        run: |
-          docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
-          docker exec $APP_CONTAINER php artisan key:generate
-          docker exec $APP_CONTAINER php artisan migrate --force
-          docker exec $APP_CONTAINER php artisan config:cache
-
-      - name: Build frontend with npm
-        run: |
-          docker exec $APP_CONTAINER bash -c "\
-            cd /var/www && \
-            npm install && \
-            npm run build"
+      - name: Cache Laravel config
+        run: docker exec $APP_CONTAINER php artisan config:cache
 
       - name: Fix final permission on host
         run: |
