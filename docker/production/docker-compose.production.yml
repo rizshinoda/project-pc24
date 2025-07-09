@@ -8,7 +8,6 @@ services:
     container_name: app-production
     volumes:
       - app-code-production:/var/www
-      - storage-production:/var/www/storage
     env_file:
       - ../../.env.production
     depends_on:
@@ -46,7 +45,6 @@ services:
 
 volumes:
   app-code-production:
-  storage-production:
   db-data-production:
 
 networks:
