@@ -88,3 +88,8 @@ jobs:
       - name: Fix final permission on host
         run: |
           sudo chown -R $USER:$USER $PROJECT_ROOT || true
+
+      - name: Clean up unused Docker resources
+        run: |
+          echo "🧹 Cleaning up Docker storage..."
+          docker system prune -f
