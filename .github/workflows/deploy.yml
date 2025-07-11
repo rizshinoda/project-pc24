@@ -52,6 +52,14 @@ jobs:
       - name: Install Composer dependencies
         run: docker exec $APP_CONTAINER composer install --no-interaction --prefer-dist
 
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in {1..30}; do
+            docker exec $DB_CONTAINER mysqladmin ping -h 127.0.0.1 -prizal8 && break
+            echo "⏳ Waiting for MySQL ($i)..."
+            sleep 2
+          done
+
       - name: Laravel artisan setup
         run: |
           docker exec $APP_CONTAINER php artisan key:generate
@@ -73,14 +81,6 @@ jobs:
             mkdir -p storage bootstrap/cache && \
             chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
             chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
-
-      - name: Wait for MySQL to be ready
-        run: |
-          for i in {1..30}; do
-            docker exec $DB_CONTAINER mysqladmin ping -h 127.0.0.1 -prizal8 && break
-            echo "⏳ Waiting for MySQL ($i)..."
-            sleep 2
-          done
 
       - name: Cache Laravel config
         run: docker exec $APP_CONTAINER php artisan config:cache
