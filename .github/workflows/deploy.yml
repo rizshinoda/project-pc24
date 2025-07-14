@@ -7,7 +7,7 @@ on:
       - main
 
 env:
-  PROJECT_ROOT: /home/rizal/actions-runner/_work/project-pc24/project-pc24
+  PROJECT_ROOT: /home/a2_vps/actions-runner/_work/project-pc24/project-pc24
 
 jobs:
   deploy:
