@@ -55,7 +55,7 @@ jobs:
       - name: Wait for MySQL to be ready
         run: |
           for i in {1..30}; do
-            docker exec $DB_CONTAINER mysqladmin ping -h 127.0.0.1 -prizal8 && break
+            docker exec $DB_CONTAINER mysqladmin ping -h 127.0.0.1 -p$MYSQL_PASSWORD && break
             echo "⏳ Waiting for MySQL ($i)..."
             sleep 2
           done
