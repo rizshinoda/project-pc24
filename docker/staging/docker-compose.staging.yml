@@ -17,7 +17,7 @@ services:
       - app-network
 
   db:
-    image: mysql:8.0
+    image: mysql:5.7
     container_name: db-staging
     environment:
       MYSQL_ROOT_PASSWORD: rizal8
