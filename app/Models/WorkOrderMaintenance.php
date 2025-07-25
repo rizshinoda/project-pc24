@@ -10,9 +10,11 @@ class WorkOrderMaintenance extends Model
     use HasFactory;
     protected $fillable = [
         'online_billing_id',
+        'tanggal_maintenance',
         'no_spk',
         'status',
         'keterangan',
+        'non_stock',
         'admin_id',
 
     ];

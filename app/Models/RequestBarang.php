@@ -12,10 +12,13 @@ class RequestBarang extends Model
     protected $table = 'request_barangs';
 
     protected $fillable = [
+        'online_billing_id',
+        'subject_manual',
         'nama_penerima',
         'alamat_penerima',
         'no_penerima',
         'keterangan',
+        'non_stock',
         'status',
         'user_id',
     ];
@@ -34,5 +37,9 @@ class RequestBarang extends Model
     public function barangKeluar()
     {
         return $this->hasMany(BarangKeluar::class, 'request_barang_id');
+    }
+    public function onlineBilling()
+    {
+        return $this->belongsTo(OnlineBilling::class, 'online_billing_id');
     }
 }

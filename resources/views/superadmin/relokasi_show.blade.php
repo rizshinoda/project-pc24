@@ -110,6 +110,7 @@
                                     <p><strong>Nomer PIC:</strong> {{ $getRelokasi->onlineBilling->no_pic }}</p>
                                     <p><strong>Alamat Baru:</strong> {{ $getRelokasi->alamat_pemasangan_baru }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getRelokasi->keterangan }}</p>
+                                    <p><strong>Barang non stock:</strong> {{ $getRelokasi->non_stock }}</p>
 
                                 </div>
                             </div>

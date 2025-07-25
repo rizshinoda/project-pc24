@@ -77,7 +77,7 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-danger text-white me-2">
                                 <i class="mdi mdi-home"></i>
-                            </span> Relokasi
+                            </span> Maintenance
                         </h3>
 
 
@@ -86,7 +86,7 @@
                     <div class="col-lg-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="mb-5 text-center">Form Relokasi</h4>
+                                <h4 class="mb-5 text-center">Form Maintenance</h4>
                                 {{-- Menampilkan pesan error jika ada --}}
                                 @if ($errors->any())
                                 <div class="alert alert-danger">
@@ -213,7 +213,12 @@
                                                     </table>
                                                 </div>
                                             </div>
-
+                                            <div class="form-group row">
+                                                <label for="non_stock" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $workOrder->non_stock) }}</textarea>
+                                                </div>
+                                            </div>
                                         </div>
 
                                     </div>

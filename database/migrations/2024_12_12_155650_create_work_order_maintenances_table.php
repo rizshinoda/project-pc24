@@ -16,8 +16,10 @@ return new class extends Migration
             $table->unsignedBigInteger('online_billing_id');
             $table->string('no_spk')->unique();
             $table->unsignedBigInteger('admin_id'); // Admin yang membuat work order
+            $table->date('tanggal_maintenance');
             $table->enum('status', ['Pending', 'On Progress', 'Completed', 'Shipped', 'Rejected', 'Canceled'])->default('Pending');
             $table->string('keterangan')->nullable();
+            $table->string('non_stock')->nullable();
             $table->timestamps();
             $table->foreign('admin_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('online_billing_id')->references('id')->on('online_billings')->onDelete('cascade');

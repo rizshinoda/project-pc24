@@ -296,6 +296,8 @@ class AdminController extends Controller
             'harga_sewa_hidden' => 'required|integer',
             'harga_instalasi_hidden' => 'required|integer',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
             'cart' => 'nullable|array', // Keranjang tidak wajib
             // tambahkan validasi lain sesuai kebutuhan
         ]);
@@ -342,6 +344,8 @@ class AdminController extends Controller
             'harga_sewa' => $hargaSewa,  // Simpan harga sewa (angka murni)
             'harga_instalasi' => $hargaInstalasi, // Simpan harga instalasi (angka murni)
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+
 
         ]);
         LogActivity::add(
@@ -480,6 +484,7 @@ class AdminController extends Controller
             'harga_sewa_hidden' => 'required|integer',
             'harga_instalasi_hidden' => 'required|integer',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
 
             'cart' => 'nullable|array',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi untuk foto
@@ -527,6 +532,7 @@ class AdminController extends Controller
             'harga_sewa' => $validatedData['harga_sewa_hidden'],
             'harga_instalasi' => $validatedData['harga_instalasi_hidden'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
 
         ]);
         LogActivity::add('Instalasi', $workOrder->nama_site, 'edit');
@@ -2313,6 +2319,7 @@ class AdminController extends Controller
             'online_billing_id' => 'required|exists:online_billings,id',
             'alamat_pemasangan_baru' => 'required|string',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
 
@@ -2341,6 +2348,7 @@ class AdminController extends Controller
             'admin_id' => Auth::user()->id,
             'status' => 'Pending', // Default status
             'keterangan' => $validated['keterangan'],
+            'non_stock' => $validated['non_stock'],
 
         ]);
         // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
@@ -2477,6 +2485,7 @@ class AdminController extends Controller
             'alamat_pemasangan_baru' => 'required|string',
             'keterangan' => 'nullable|string',
             'cart' => 'nullable|array',
+            'non_stock' => 'nullable|string',
 
             // tambahkan validasi lain sesuai kebutuhan
         ]);
@@ -2488,6 +2497,7 @@ class AdminController extends Controller
             'online_billing_id' => $validatedData['online_billing_id'],
             'alamat_pemasangan_baru' => $validatedData['alamat_pemasangan_baru'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
 
         ]);
         LogActivity::add('Relokasi', $workOrder->onlineBilling->nama_site, 'edit');
@@ -3059,6 +3069,8 @@ class AdminController extends Controller
             'alamat_penerima' => 'required|string|max:255',
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
             'cart' => 'nullable|array', // Keranjang tidak wajib
         ]);
 
@@ -3068,6 +3080,8 @@ class AdminController extends Controller
             'alamat_penerima' => $validatedData['alamat_penerima'],
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+
             'status' => 'pending',
             'user_id' => Auth::user()->id,
         ]);
@@ -3153,6 +3167,8 @@ class AdminController extends Controller
             'alamat_penerima' => 'required|string|max:255',
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
             'cart' => 'nullable|array', // Keranjang tidak wajib
         ]);
 
@@ -3163,6 +3179,8 @@ class AdminController extends Controller
             'alamat_penerima' => $validatedData['alamat_penerima'],
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+
         ]);
 
         // Hapus detail barang yang ada sebelumnya

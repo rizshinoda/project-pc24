@@ -35,7 +35,8 @@ class WorkOrderInstall extends Model
         'harga_instalasi',
         'admin_id',
         'status',
-        'keterangan'
+        'keterangan',
+        'non_stock'
     ];
     public function survey()
     {

@@ -207,7 +207,13 @@
 
                                                 </div>
                                             </div>
-
+                                            <div class="form-group row">
+                                                <label for="no_penerima" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4"></textarea>
+                                                </div>
+                                            </div>
+                                            <br>
                                             <!-- Submit Button -->
                                             <button style="text-align: center;" type="submit" class="btn btn-info">Kirim Permintaan</button>
                                             <a href="{{ route('psb.request_barang',) }}" class="btn btn-light">Kembali</a>

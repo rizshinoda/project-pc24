@@ -349,3 +349,31 @@
         chart.render();
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const clientSelect = document.getElementById('online_billing_id');
+        const subjectManual = document.getElementById('subject_manual');
+
+        function toggleInputs() {
+            if (clientSelect.value) {
+                // Jika pilih client, disable subject manual
+                subjectManual.disabled = true;
+                subjectManual.value = '';
+            } else if (subjectManual.value.trim() !== '') {
+                // Jika isi subject manual, disable dropdown client
+                clientSelect.disabled = true;
+            } else {
+                // Jika tidak pilih apa-apa, dua-duanya aktif
+                subjectManual.disabled = false;
+                clientSelect.disabled = false;
+            }
+        }
+
+        // Event listener
+        clientSelect.addEventListener('change', toggleInputs);
+        subjectManual.addEventListener('input', toggleInputs);
+
+        // Panggil saat awal halaman
+        toggleInputs();
+    });
+</script>

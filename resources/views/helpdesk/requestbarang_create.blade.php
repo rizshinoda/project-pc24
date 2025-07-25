@@ -87,6 +87,27 @@
 
                                     <div class="row">
                                         <div class="col-md-6">
+
+                                            <div class="form-group row">
+                                                <label for="online_billing_id" class="col-sm-4 col-form-label">Pilih Client</label>
+                                                <div class="col-sm-8">
+                                                    <select name="online_billing_id" id="online_billing_id" class="form-control">
+                                                        <option value="">-- Pilih Client --</option>
+                                                        @foreach ($clients as $client)
+                                                        <option value="{{ $client->id }}">
+                                                            {{ $client->pelanggan->nama_pelanggan}} / {{ $client->nama_site }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="subject_manual" class="col-sm-4 col-form-label">Subject Kebutuhan (Manual)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" id="subject_manual" name="subject_manual" class="form-control" placeholder="Contoh: Permintaan Barang untuk Area Bandung">
+                                                </div>
+                                            </div>
+
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Penerima</label>
                                                 <div class="col-sm-8">
@@ -107,6 +128,7 @@
                                                     <input type="text" id="no_penerima" name="no_penerima" class="form-control" required>
                                                 </div>
                                             </div>
+
                                             <div class="form-group row">
                                                 <label for="no_penerima" class="col-sm-4 col-form-label">Keterangan</label>
                                                 <div class="col-sm-8">
@@ -187,7 +209,13 @@
 
                                                 </div>
                                             </div>
-
+                                            <div class="form-group row">
+                                                <label for="no_penerima" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="5" cols="40"></textarea>
+                                                </div>
+                                            </div>
+                                            <br>
                                             <!-- Submit Button -->
                                             <button style="text-align: center;" type="submit" class="btn btn-info">Kirim Permintaan</button>
                                             <!-- Tombol Kembali -->

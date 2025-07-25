@@ -580,6 +580,12 @@
                                                 </table>
                                             </div>
                                         </div>
+                                        <div class="form-group row">
+                                            <label for="non_stock" class="col-sm-2 col-form-label">Input Barang Non Stock</label>
+                                            <div class="col-sm-4">
+                                                <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $getInstall->non_stock) }}</textarea>
+                                            </div>
+                                        </div>
                                     </div>
                                     <br>
                                     <!-- Tombol submit -->

@@ -6,7 +6,9 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Jenis;
 use App\Models\Status;
+use setasign\Fpdi\Fpdi;
 use App\Models\StockBarang;
+use Illuminate\Support\Str;
 use App\Helpers\LogActivity;
 use App\Models\Notification;
 use Illuminate\Http\Request;
@@ -14,14 +16,17 @@ use App\Models\OnlineBilling;
 use App\Models\RequestBarang;
 use App\Models\WorkOrderInstall;
 use App\Models\ReqBarangProgress;
+use App\Mail\PermintaanBarangMail;
 use App\Models\WorkOrderDismantle;
 use App\Models\GantiVendorProgress;
 use App\Models\MaintenanceProgress;
 use Illuminate\Support\Facades\Log;
+use App\Mail\MaintenanceRequestMail;
 use App\Models\RequestBarangDetails;
 use App\Models\WorkOrderGantiVendor;
 use App\Models\WorkOrderMaintenance;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Models\RequestBarangStockBarang;
 use App\Models\WorkOrderMaintenanceDetail;
 
@@ -201,48 +206,64 @@ class HelpdeskController extends Controller
             ->selectRaw('tipe_id, merek_id, jenis_id, kualitas, SUM(jumlah) as total_jumlah')
             ->groupBy('tipe_id', 'merek_id', 'jenis_id', 'kualitas')
             ->get();
+        $clients = OnlineBilling::join('pelanggans', 'online_billings.pelanggan_id', '=', 'pelanggans.id')
+            ->orderBy('pelanggans.nama_pelanggan', 'asc')
+            ->orderBy('online_billings.nama_site', 'asc')
+            ->select('online_billings.*') // pastikan hanya ambil kolom dari tabel utama
+            ->with('pelanggan') // relasi tetap diload
+            ->get();
 
         // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('stockBarangs', 'jenisList', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('clients', 'stockBarangs', 'jenisList', 'notifications'));
 
         return $this->renderView('requestbarang_create', $data);
     }
 
+
+
+
+
     public function storerequest(Request $request)
     {
-        // Validasi input data
+        // Validasi input
         $validatedData = $request->validate([
+            'online_billing_id' => 'nullable|exists:online_billings,id',
+            'subject_manual' => 'nullable|string',
             'nama_penerima' => 'required|string|max:255',
             'alamat_penerima' => 'required|string|max:255',
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
-            'cart' => 'nullable|array', // Keranjang tidak wajib
+            'non_stock' => 'nullable|string',
+            'cart' => 'nullable|array',
         ]);
 
-        // Buat request barang baru di `request_barangs`
+        // Simpan request barang
         $requestBarang = RequestBarang::create([
+            'online_billing_id' => $validatedData['online_billing_id'] ?? null,
             'nama_penerima' => $validatedData['nama_penerima'],
             'alamat_penerima' => $validatedData['alamat_penerima'],
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+            'subject_manual' => $validatedData['subject_manual'] ?? null,
             'status' => 'pending',
-            'user_id' => Auth::user()->id,
+            'user_id' => Auth::id(),
         ]);
 
-        // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
+        // Simpan detail stock barang jika ada
         if (!empty($validatedData['cart'])) {
             foreach ($validatedData['cart'] as $jenis => $merekArray) {
                 foreach ($merekArray as $merek => $tipeArray) {
                     foreach ($tipeArray as $tipe => $kualitasArray) {
                         foreach ($kualitasArray as $kualitas => $item) {
-                            $stockBarang = StockBarang::whereHas('merek', fn($query) => $query->where('nama_merek', $merek))
-                                ->whereHas('tipe', fn($query) => $query->where('nama_tipe', $tipe))
+                            $stockBarang = StockBarang::whereHas('merek', fn($q) => $q->where('nama_merek', $merek))
+                                ->whereHas('tipe', fn($q) => $q->where('nama_tipe', $tipe))
                                 ->where('kualitas', $kualitas)
                                 ->first();
 
                             RequestBarangDetails::create([
                                 'request_barang_id' => $requestBarang->id,
-                                'stock_barang_id' => $stockBarang?->id, // Gunakan null-safe operator untuk menghindari error jika tidak ditemukan
+                                'stock_barang_id' => $stockBarang?->id,
                                 'merek' => $merek,
                                 'tipe' => $tipe,
                                 'kualitas' => $kualitas,
@@ -253,21 +274,84 @@ class HelpdeskController extends Controller
                 }
             }
         }
-        // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+
+        // Notifikasi ke GA
         $gaUsers = User::where('is_role', 2)->get();
-
-        // Buat notifikasi untuk setiap pengguna General Affair
         foreach ($gaUsers as $gaUser) {
-            $url = route('ga.request_barang.show', ['id' => $requestBarang->id]) . '#request';
-
             Notification::create([
                 'user_id' => $gaUser->id,
                 'message' => 'Request barang baru diajukan oleh HD: ' . Auth::user()->name,
-                'url' => $url, // URL dengan hash #request
+                'url' => route('ga.request_barang.show', ['id' => $requestBarang->id]) . '#request',
             ]);
         }
+
+        // Ambil semua barang stok
+        $detailBarang = RequestBarangDetails::where('request_barang_id', $requestBarang->id)->get();
+        $requestBarang->load('onlineBilling', 'user');
+
+        // Parse non-stock
+        $nonStockItems = [];
+        if (!empty($validatedData['non_stock'])) {
+            $lines = preg_split('/\r\n|\r|\n/', $validatedData['non_stock']);
+            foreach ($lines as $line) {
+                $parts = explode('-', $line);
+                $nama = trim($parts[0] ?? '');
+                $jumlah = trim($parts[1] ?? '1');
+                if ($nama) {
+                    $nonStockItems[] = [
+                        'nama' => $nama,
+                        'jumlah' => $jumlah,
+                    ];
+                }
+            }
+        }
+
+        // Kirim email
+        $recipients = ['rizalkrenz1@gmail.com', 'm.rizal@pc24.net.id'];
+
+        if (count($nonStockItems) > 0) {
+            // Jika ada non-stock, generate PDF
+            $pdfPath = storage_path('app/public/temp/surat_pengajuan_' . Str::uuid() . '.pdf');
+            $templatePath = storage_path('app/public/pdf/template_surat_pengajuan.pdf');
+
+            $pdf = new Fpdi();
+            $pdf->AddPage();
+            $pdf->setSourceFile($templatePath);
+            $tpl = $pdf->importPage(1);
+            $pdf->useTemplate($tpl);
+
+            $pdf->SetFont('Arial', '', 11);
+            $pdf->SetTextColor(0, 0, 0);
+
+            $y = 120;
+            $no = 1;
+
+
+            // Tambahkan perangkat non-stock
+            foreach ($nonStockItems as $item) {
+                $pdf->SetXY(12, $y);
+                $pdf->Cell(10, 94, $no++, 0, 0);
+                $pdf->SetXY(20, $y);
+                $pdf->Cell(110, 94, $item['nama'], 0, 0);
+                $pdf->SetXY(100, $y);
+                $pdf->Cell(20, 94, $item['jumlah'], 0, 1);
+                $y += 8;
+            }
+
+            $pdf->Output($pdfPath, 'F');
+
+            // Kirim email dengan lampiran
+            Mail::to($recipients)->send(new \App\Mail\PermintaanBarangMail($requestBarang, $detailBarang, $pdfPath));
+        } else {
+            // Tanpa lampiran
+            Mail::to($recipients)->send(new \App\Mail\PermintaanBarangMail($requestBarang, $detailBarang));
+        }
+
         return redirect()->route('hd.request_barang')->with('success', 'Request barang berhasil diajukan.');
     }
+
+
+
 
 
     // Menampilkan form edit untuk permintaan barang
@@ -308,6 +392,8 @@ class HelpdeskController extends Controller
             'alamat_penerima' => 'required|string|max:255',
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
             'cart' => 'nullable|array', // Keranjang tidak wajib
         ]);
 
@@ -318,6 +404,8 @@ class HelpdeskController extends Controller
             'alamat_penerima' => $validatedData['alamat_penerima'],
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+
         ]);
 
         // Hapus detail barang yang ada sebelumnya
@@ -476,7 +564,9 @@ class HelpdeskController extends Controller
             'no_spk' => 'required|string|unique:work_order_maintenances',
             'online_billing_id' => 'required|exists:online_billings,id',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
 
+            'tanggal_maintenance' => 'required|date',
             'cart' => 'nullable|array', // Keranjang tidak wajib
 
             // tambahkan validasi lain sesuai kebutuhan
@@ -500,9 +590,11 @@ class HelpdeskController extends Controller
         $getMaintenance = WorkOrderMaintenance::create([
             'online_billing_id' => $validated['online_billing_id'],
             'no_spk' => $validated['no_spk'],
+            'tanggal_maintenance' => $validated['tanggal_maintenance'],
             'admin_id' => Auth::user()->id,
             'status' => 'Pending', // Default status
             'keterangan' => $validated['keterangan'],
+            'non_stock' => $validated['non_stock'],
 
         ]);
         // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
@@ -577,6 +669,16 @@ class HelpdeskController extends Controller
                 'url' => $url, // URL dengan hash #instalasi
             ]);
         }
+        // Ambil semua detail barang dari request_barang_id ini
+        $detailBarang = WorkOrderMaintenanceDetail::where('work_order_maintenance_id', $getMaintenance->id)->get();
+
+        // Load relasi onlineBilling untuk email
+        $getMaintenance->load('onlineBilling', 'admin');
+
+        // Kirim email ke tim terkait
+        $recipients = ['rizalkrenz1@gmail.com', 'm.rizal@pc24.net.id', 'fahrizavary4321@gmail.com'];
+        Mail::to($recipients)->send(new \App\Mail\MaintenanceRequestMail($getMaintenance, $detailBarang));
+
         return redirect()->route('hd.maintenance')->with('success', 'Work order berhasil diterbitkan.');
     }
 
@@ -639,6 +741,8 @@ class HelpdeskController extends Controller
             'online_billing_id' => 'required|exists:online_billings,id',
             'keterangan' => 'nullable|string',
             'cart' => 'nullable|array',
+            'non_stock' => 'nullable|string',
+
 
             // tambahkan validasi lain sesuai kebutuhan
         ]);
@@ -649,6 +753,7 @@ class HelpdeskController extends Controller
         $workOrder->update([
             'online_billing_id' => $validatedData['online_billing_id'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
 
         ]);
         LogActivity::add('Maintenance', $workOrder->onlineBilling->nama_site, 'edit');
