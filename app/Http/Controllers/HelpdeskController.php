@@ -291,28 +291,33 @@ class HelpdeskController extends Controller
 
         // Parse non-stock
         $nonStockItems = [];
+
         if (!empty($validatedData['non_stock'])) {
             $lines = preg_split('/\r\n|\r|\n/', $validatedData['non_stock']);
             foreach ($lines as $line) {
-                $parts = explode('-', $line);
-                $nama = trim($parts[0] ?? '');
-                $jumlah = trim($parts[1] ?? '1');
+                $parts = explode(',', $line);
+
+                $nama   = trim($parts[0] ?? '');
+                $jumlah = isset($parts[1]) ? trim($parts[1]) : '';
+                $satuan = isset($parts[2]) ? trim($parts[2]) : '';
+
                 if ($nama) {
                     $nonStockItems[] = [
-                        'nama' => $nama,
+                        'nama'   => $nama,
                         'jumlah' => $jumlah,
+                        'satuan' => $satuan,
                     ];
                 }
             }
         }
 
+
         // Kirim email
         $recipients = ['rizalkrenz1@gmail.com', 'm.rizal@pc24.net.id'];
 
         if (count($nonStockItems) > 0) {
-            // Jika ada non-stock, generate PDF
             $pdfPath = storage_path('app/public/temp/surat_pengajuan_' . Str::uuid() . '.pdf');
-            $templatePath = storage_path('app/public/pdf/template_surat_pengajuan.pdf');
+            $templatePath = storage_path('app/public/pdf/form_pengajuan.pdf');
 
             $pdf = new Fpdi();
             $pdf->AddPage();
@@ -320,38 +325,57 @@ class HelpdeskController extends Controller
             $tpl = $pdf->importPage(1);
             $pdf->useTemplate($tpl);
 
-            $pdf->SetFont('Arial', '', 11);
+            $pdf->SetFont('Times', '', 12);
             $pdf->SetTextColor(0, 0, 0);
 
-            $y = 120;
+            // Data surat (jika ingin menulis Hari, Tgl, Lokasi, dll)
+            $pdf->SetXY(79, 45); // Hari, Tgl
+            $tanggal = Carbon::now()->translatedFormat('l, d F Y');
+            $pdf->Write(71, $tanggal);
+
+            $pdf->SetXY(70, 51); // Lokasi Penempatan Perangkat
+            $pdf->Write(5, $requestBarang->lokasi);
+
+            $pdf->SetXY(70, 57); // Site
+            $pdf->Write(5, $requestBarang->site);
+
+            $pdf->SetXY(70, 63); // Jenis Pekerjaan
+            $pdf->Write(5, $requestBarang->jenis_pekerjaan);
+
+            // Loop isi tabel
+            $cellHeight = 45; // tinggi cell disesuaikan dengan tinggi baris di template
+
+            $y = 97;
             $no = 1;
 
-
-            // Tambahkan perangkat non-stock
             foreach ($nonStockItems as $item) {
-                $pdf->SetXY(12, $y);
-                $pdf->Cell(10, 94, $no++, 0, 0);
-                $pdf->SetXY(20, $y);
-                $pdf->Cell(110, 94, $item['nama'], 0, 0);
-                $pdf->SetXY(100, $y);
-                $pdf->Cell(20, 94, $item['jumlah'], 0, 1);
-                $y += 8;
+                $pdf->SetXY(23, $y); // No
+                $pdf->Cell(15, $cellHeight, $no++, 0, 0,);
+
+                $pdf->SetXY(30, $y); // Nama Barang
+                $pdf->Cell(66, $cellHeight, $item['nama'], 0, 0);
+
+                $pdf->SetXY(98, $y); // Qty
+                $pdf->Cell(66, $cellHeight, $item['jumlah'] ?? '', 0, 0,);
+
+                $pdf->SetXY(136, $y); // Satuan
+                $pdf->Cell(66, $cellHeight, $item['satuan'] ?? '', 0, 1,);
+
+                $y += 5.2;
             }
 
-            $pdf->Output($pdfPath, 'F');
 
-            // Kirim email dengan lampiran
+            // Output PDF dan kirim
+            $pdf->Output($pdfPath, 'F');
             Mail::to($recipients)->send(new \App\Mail\PermintaanBarangMail($requestBarang, $detailBarang, $pdfPath));
         } else {
-            // Tanpa lampiran
+            // Kirim email tanpa PDF jika tidak ada barang non-stock
             Mail::to($recipients)->send(new \App\Mail\PermintaanBarangMail($requestBarang, $detailBarang));
         }
 
+
         return redirect()->route('hd.request_barang')->with('success', 'Request barang berhasil diajukan.');
     }
-
-
-
 
 
     // Menampilkan form edit untuk permintaan barang
@@ -381,8 +405,6 @@ class HelpdeskController extends Controller
 
         return $this->renderView('requestbarang_edit', $data);
     }
-
-
 
     public function updateRequest(Request $request, $id)
     {

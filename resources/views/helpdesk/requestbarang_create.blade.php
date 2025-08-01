@@ -102,9 +102,9 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row">
-                                                <label for="subject_manual" class="col-sm-4 col-form-label">Subject Kebutuhan (Manual)</label>
+                                                <label for="subject_manual" class="col-sm-4 col-form-label">Input Site (Manual)</label>
                                                 <div class="col-sm-8">
-                                                    <input type="text" id="subject_manual" name="subject_manual" class="form-control" placeholder="Contoh: Permintaan Barang untuk Area Bandung">
+                                                    <input type="text" id="subject_manual" name="subject_manual" class="form-control" placeholder="Contoh: Lokasi Neucentrix Balikpapan">
                                                 </div>
                                             </div>
 
