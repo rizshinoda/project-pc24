@@ -3405,6 +3405,8 @@ class AdminController extends Controller
             'harga_sewa_hidden' => 'required|integer',
             'harga_instalasi_hidden' => 'required|integer',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
             'cart' => 'nullable|array', // Keranjang tidak wajib
             // tambahkan validasi lain sesuai kebutuhan
         ]);
@@ -3452,6 +3454,7 @@ class AdminController extends Controller
             'harga_sewa' => $hargaSewa,  // Simpan harga sewa (angka murni)
             'harga_instalasi' => $hargaInstalasi, // Simpan harga instalasi (angka murni)
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
 
         ]);
         LogActivity::add(
