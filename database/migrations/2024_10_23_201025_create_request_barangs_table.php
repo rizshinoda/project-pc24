@@ -20,6 +20,9 @@ return new class extends Migration
             $table->string('no_penerima');
             $table->text('keterangan')->nullable();
             $table->string('non_stock')->nullable();
+            $table->string('penempatan_barang')->nullable();
+            $table->string('kebutuhan')->nullable();
+
             $table->enum('status', ['pending', 'approved', 'rejected', 'shipped', 'completed'])->default('pending');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // User yang request
             $table->foreign('online_billing_id')->references('id')->on('online_billings')->onDelete('cascade');

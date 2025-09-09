@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Jenis;
 use App\Models\Status;
 use setasign\Fpdi\Fpdi;
+use App\Models\NomorSurat;
 use App\Models\StockBarang;
 use Illuminate\Support\Str;
 use App\Helpers\LogActivity;
@@ -220,9 +221,6 @@ class HelpdeskController extends Controller
     }
 
 
-
-
-
     public function storerequest(Request $request)
     {
         // Validasi input
@@ -234,6 +232,8 @@ class HelpdeskController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'penempatan_barang' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
             'cart' => 'nullable|array',
         ]);
 
@@ -245,6 +245,8 @@ class HelpdeskController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'penempatan_barang' => $validatedData['penempatan_barang'],
+            'kebutuhan' => $validatedData['kebutuhan'],
             'subject_manual' => $validatedData['subject_manual'] ?? null,
             'status' => 'pending',
             'user_id' => Auth::id(),
@@ -311,73 +313,102 @@ class HelpdeskController extends Controller
             }
         }
 
-
         // Kirim email
         $recipients = ['rizalkrenz1@gmail.com', 'm.rizal@pc24.net.id'];
 
-        if (count($nonStockItems) > 0) {
-            $pdfPath = storage_path('app/public/temp/surat_pengajuan_' . Str::uuid() . '.pdf');
-            $templatePath = storage_path('app/public/pdf/form_pengajuan.pdf');
+        // Kirim email tanpa PDF jika tidak ada barang non-stock
+        Mail::to($recipients)->send(new \App\Mail\PermintaanBarangMail($requestBarang, $detailBarang));
 
-            $pdf = new Fpdi();
-            $pdf->AddPage();
-            $pdf->setSourceFile($templatePath);
-            $tpl = $pdf->importPage(1);
-            $pdf->useTemplate($tpl);
-
-            $pdf->SetFont('Times', '', 12);
-            $pdf->SetTextColor(0, 0, 0);
-
-            // Data surat (jika ingin menulis Hari, Tgl, Lokasi, dll)
-            $pdf->SetXY(79, 45); // Hari, Tgl
-            $tanggal = Carbon::now()->translatedFormat('l, d F Y');
-            $pdf->Write(71, $tanggal);
-
-            $pdf->SetXY(70, 51); // Lokasi Penempatan Perangkat
-            $pdf->Write(5, $requestBarang->lokasi);
-
-            $pdf->SetXY(70, 57); // Site
-            $pdf->Write(5, $requestBarang->site);
-
-            $pdf->SetXY(70, 63); // Jenis Pekerjaan
-            $pdf->Write(5, $requestBarang->jenis_pekerjaan);
-
-            // Loop isi tabel
-            $cellHeight = 45; // tinggi cell disesuaikan dengan tinggi baris di template
-
-            $y = 97;
-            $no = 1;
-
-            foreach ($nonStockItems as $item) {
-                $pdf->SetXY(23, $y); // No
-                $pdf->Cell(15, $cellHeight, $no++, 0, 0,);
-
-                $pdf->SetXY(30, $y); // Nama Barang
-                $pdf->Cell(66, $cellHeight, $item['nama'], 0, 0);
-
-                $pdf->SetXY(98, $y); // Qty
-                $pdf->Cell(66, $cellHeight, $item['jumlah'] ?? '', 0, 0,);
-
-                $pdf->SetXY(136, $y); // Satuan
-                $pdf->Cell(66, $cellHeight, $item['satuan'] ?? '', 0, 1,);
-
-                $y += 5.2;
-            }
-
-
-            // Output PDF dan kirim
-            $pdf->Output($pdfPath, 'F');
-            Mail::to($recipients)->send(new \App\Mail\PermintaanBarangMail($requestBarang, $detailBarang, $pdfPath));
-        } else {
-            // Kirim email tanpa PDF jika tidak ada barang non-stock
-            Mail::to($recipients)->send(new \App\Mail\PermintaanBarangMail($requestBarang, $detailBarang));
-        }
 
 
         return redirect()->route('hd.request_barang')->with('success', 'Request barang berhasil diajukan.');
     }
 
+    public function printSuratRequest($id)
+    {
+        $RequestBarang = RequestBarang::findOrFail($id);
+        $tanggalRequest = now()->format('d-m-Y');
+        $formattedDate = Carbon::parse($tanggalRequest)->translatedFormat('l, d F Y');
+        $templatePath = storage_path('app/public/pdf/form_pengajuan.pdf');
 
+        $pdf = new FPDI();
+        $pdf->AddPage();
+        $pdf->setSourceFile($templatePath);
+        $templateId = $pdf->importPage(1);
+        $pdf->useTemplate($templateId, 0, 0, 210);
+        // Setelah nomor surat, atur ulang font ke normal (non-bold)
+        $pdf->SetFont('Times', '', 12); // Regular 12pt
+        $pdf->SetTextColor(0, 0, 0);
+
+        $y = 80; // posisi awal Y
+
+        // Hari, Tgl
+        $pdf->SetXY(79, $y);
+        $pdf->Cell(0, 0, Carbon::now()->translatedFormat('l, d F Y'), 0, 1);
+
+        // Lokasi Penempatan
+        $y += 5;
+        $pdf->SetXY(79, $y);
+        $pdf->Cell(0, 0, $RequestBarang->penempatan_barang, 0, 1);
+
+        // Site
+        $y += 5;
+        $pdf->SetXY(79, $y);
+        $pdf->Cell(0, 0, $RequestBarang->subject_manual, 0, 1);
+
+        // Jenis Pekerjaan
+        $y += 5;
+        $pdf->SetXY(79, $y);
+        $pdf->Cell(0, 0, $RequestBarang->kebutuhan, 0, 1);
+
+        if (!empty($RequestBarang['non_stock'])) {
+            $lines = preg_split('/\r\n|\r|\n/', $RequestBarang['non_stock']);
+            foreach ($lines as $line) {
+                $parts = explode(',', $line);
+
+                $nama   = trim($parts[0] ?? '');
+                $jumlah = isset($parts[1]) ? trim($parts[1]) : '';
+                $satuan = isset($parts[2]) ? trim($parts[2]) : '';
+
+                if ($nama) {
+                    $nonStockItems[] = [
+                        'nama'   => $nama,
+                        'jumlah' => $jumlah,
+                        'satuan' => $satuan,
+                    ];
+                }
+            }
+        }
+
+        // Loop isi tabel
+        $cellHeight = 45; // tinggi cell disesuaikan dengan tinggi baris di template
+
+        $y = 97;
+        $no = 1;
+
+        foreach ($nonStockItems as $item) {
+            $pdf->SetXY(23, $y); // No
+            $pdf->Cell(15, $cellHeight, $no++, 0, 0,);
+
+            $pdf->SetXY(30, $y); // Nama Barang
+            $pdf->Cell(66, $cellHeight, $item['nama'], 0, 0);
+
+            $pdf->SetXY(98, $y); // Qty
+            $pdf->Cell(66, $cellHeight, $item['jumlah'] ?? '', 0, 0,);
+
+            $pdf->SetXY(136, $y); // Satuan
+            $pdf->Cell(66, $cellHeight, $item['satuan'] ?? '', 0, 1,);
+
+            $y += 5.2;
+        }
+
+        return response()->stream(function () use ($pdf) {
+            echo $pdf->Output('S'); // ambil PDF sebagai string dan echo ke output
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="surat_request.pdf"',
+        ]);
+    }
     // Menampilkan form edit untuk permintaan barang
 
     public function editrequest($id)
@@ -415,6 +446,8 @@ class HelpdeskController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'penempatan_barang' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
         ]);
@@ -427,6 +460,8 @@ class HelpdeskController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'penempatan_barang' => $validatedData['penempatan_barang'],
+            'kebutuhan' => $validatedData['kebutuhan'],
 
         ]);
 
@@ -1101,6 +1136,8 @@ class HelpdeskController extends Controller
             'search' => $search,
             'month' => $month,
             'year' => $year,
+            'provinsi' => $provinsi
+
         ]);
 
         // Ambil notifikasi yang belum dibaca

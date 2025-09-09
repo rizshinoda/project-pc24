@@ -1193,6 +1193,8 @@ class NaController extends Controller
             'search' => $search,
             'month' => $month,
             'year' => $year,
+            'provinsi' => $provinsi
+
         ]);
 
         // Ambil notifikasi yang belum dibaca

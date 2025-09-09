@@ -19,6 +19,8 @@ class RequestBarang extends Model
         'no_penerima',
         'keterangan',
         'non_stock',
+        'penempatan_barang',
+        'kebutuhan',
         'status',
         'user_id',
     ];

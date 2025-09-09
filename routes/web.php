@@ -192,6 +192,8 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::get('admin/OB/{id}', [AdminController::class, 'showOB'])->name('admin.OB_show');
     Route::get('admin/OB/edit/{id}', [AdminController::class, 'editOB'])->name('admin.OB_edit');
     Route::put('admin/OB/update/{id}', [AdminController::class, 'updateOB'])->name('admin.OB_update');
+    Route::get('admin/OB/monitoring/{id}', [AdminController::class, 'showMonitoring'])->name('admin.OB_monitoring');
+    Route::post('admin/OB/monitoring/{id}', [AdminController::class, 'updateMonitoring'])->name('admin.OB_updatemonitoring');
 
     Route::get('admin/sitedismantle', [AdminController::class, 'sitedismantle'])->name('admin.sitedismantle');
     Route::get('admin/sitedismantle{id}', [AdminController::class, 'showsitedismantle'])->name('admin.showsitedismantle');
@@ -205,6 +207,7 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::post('admin/requestbarang/add-to-cart', [AdminController::class, 'addToCart'])->name('admin.request_barang.add_to_cart');
     Route::get('admin/requestbarang/{id}/edit', [AdminController::class, 'editrequest'])->name('admin.request_barang.edit');
     Route::put('admin/requestbarang/{id}/update', [AdminController::class, 'updateRequest'])->name('admin.request_barang.update');
+
 
     Route::get('admin/chat', Index::class)->name('admin.chat.index');
     Route::get('admin/chat/{query}', Chat::class)->name('admin.chat');
@@ -287,6 +290,8 @@ Route::group(['middleware' => ['ga', SessionTimeout::class]], function () {
     Route::patch('notifications/{id}/mark-as-read/ga', [GaController::class, 'markAsReadGa'])->name('notifications.markAsReadGa');
     Route::get('ga/request_barang/{id}/createshipped', [GaController::class, 'requestcreateShipped'])->name('ga.request.create.shipped');
     Route::post('ga/request_barang/{id}/storeshipped', [GaController::class, 'requeststoreShipped'])->name('ga.request.store.shipped');
+    Route::get('ga/requestbarang/{id}/print/requestbarang', [GaController::class, 'printSuratRequest'])->name('ga.request_barang.print');
+
 
     Route::get('ga/dismantle', [GaController::class, 'dismantle'])->name('ga.dismantle');
     Route::get('ga/dismantle/show/{id}', [GaController::class, 'dismantleShow'])->name('ga.dismantle_show');
@@ -330,6 +335,7 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
     Route::get('helpdesk/requestbarang/{id}/edit', [HelpdeskController::class, 'editrequest'])->name('hd.request_barang.edit');
     Route::put('helpdesk/requestbarang/{id}/update', [HelpdeskController::class, 'updateRequest'])->name('hd.request_barang.update');
     Route::patch('notifications/{id}/mark-as-read/hd', [HelpdeskController::class, 'markAsReadhd'])->name('notifications.markAsReadhd');
+    Route::get('helpdesk/requestbarang/{id}/print/requestbarang', [HelpdeskController::class, 'printSuratRequest'])->name('hd.request_barang.print');
 
 
     Route::get('helpdesk/maintenance', [HelpdeskController::class, 'maintenance'])->name('hd.maintenance');
@@ -352,6 +358,7 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
     Route::get('helpdesk/OB/{id}', [HelpdeskController::class, 'showOB'])->name('hd.OB_show');
     Route::get('helpdesk/sitedismantle', [HelpdeskController::class, 'sitedismantle'])->name('hd.sitedismantle');
     Route::get('helpdesk/sitedismantle{id}', [HelpdeskController::class, 'showsitedismantle'])->name('hd.showsitedismantle');
+
 
     Route::get('helpdesk/chat', Index::class)->name('helpdesk.chat.index');
     Route::get('helpdesk/chat/{query}', Chat::class)->name('helpdesk.chat');

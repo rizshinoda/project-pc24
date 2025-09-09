@@ -157,8 +157,22 @@
                             <div class="card h-100 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title">Detail Request:</h5>
-                                    <p><strong>Keterangan:</strong> {{ $requestBarang->keterangan }}</p>
+                                    @if ($requestBarang->onlineBilling)
+                                    <p><strong>Site:</strong> {{ $requestBarang->onlineBilling->nama_site}}</p>
+                                    <p><strong>Alamat:</strong> {{ $requestBarang->onlineBilling->alamat_pemasangan }}</p>
+                                    <p><strong>PIC:</strong> {{ $requestBarang->onlineBilling->nama_pic }} ({{ $requestBarang->onlineBilling->no_pic }})</p>
+                                    <p><strong>Layanan:</strong> {{ $requestBarang->onlineBilling->layanan }}</p>
+                                    <p><strong>Bandwidth:</strong> {{ $requestBarang->onlineBilling->bandwidth }} {{$requestBarang->onlineBilling->satuan}}</p>
+
+                                    @elseif ($requestBarang->subject_manual)
+                                    <p><strong>Site:</strong> {{ $requestBarang->subject_manual }}</p>
+                                    @endif
+
                                     <p><strong>Barang non stock:</strong> {{ $requestBarang->non_stock }}</p>
+                                    <p><strong>Penempatan Barang:</strong> {{ $requestBarang->penempatan_barang }}</p>
+                                    <p><strong>Kebutuhan:</strong> {{ $requestBarang->kebutuhan }}</p>
+                                    <p><strong>Keterangan:</strong> {{ $requestBarang->keterangan }}</p>
+                                    <a href="{{route('ga.request_barang.print', $requestBarang->id )}}" class="btn btn-info mt-2">Print Surat</a>
 
                                 </div>
                             </div>

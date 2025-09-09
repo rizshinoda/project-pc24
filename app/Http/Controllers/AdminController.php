@@ -2185,6 +2185,7 @@ class AdminController extends Controller
         // Redirect dengan pesan sukses
         return redirect()->route('admin.dismantle')->with('success', 'Work order berhasil diperbarui.');
     }
+
     public function dismantleDestroy($id)
     {
         // Menghapus work order
@@ -2849,6 +2850,7 @@ class AdminController extends Controller
             'search' => $search,
             'month' => $month,
             'year' => $year,
+            'provinsi' => $provinsi
         ]);
 
         // Ambil notifikasi yang belum dibaca
@@ -2977,7 +2979,36 @@ class AdminController extends Controller
 
         return redirect()->route('admin.OB')->with('success', 'Online Billing berhasil diperbarui.');
     }
+    public function showMonitoring($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
 
+        // Ambil data online billing berdasarkan ID
+        $onlinebilling = OnlineBilling::findOrFail($id);
+        $site = OnlineBilling::findOrFail($id);
+
+        // Ambil status yang terkait dengan online_billing_id tertentu
+        $statuses = Status::where('online_billing_id', $id)->get(); // Menambahkan filter berdasarkan online_billing_id
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('site', 'statuses', 'onlinebilling', 'notifications'));
+
+        return $this->renderView('OB_show_monitoring', $data);
+    }
+
+    public function updateMonitoring(Request $request, $id)
+    {
+        $request->validate([
+            'cacti_link' => 'required|url'
+        ]);
+
+        $site = OnlineBilling::findOrFail($id);
+        $site->cacti_link = $request->cacti_link;
+        $site->save();
+
+        return back()->with('success', 'Link Cacti berhasil disimpan.');
+    }
     public function reaktifasi($id)
     {
         $onlinebilling = OnlineBilling::findOrFail($id);

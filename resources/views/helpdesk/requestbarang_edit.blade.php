@@ -112,7 +112,7 @@
                                             <div class="form-group row">
                                                 <label for="keterangan" class="col-sm-4 col-form-label">Keterangan</label>
                                                 <div class="col-sm-8">
-                                                    <textarea id="keterangan" name="keterangan" class="form-control" placeholder="Masukkan Keterangan" rows="4">{{ $requestBarang->keterangan }}</textarea>
+                                                    <textarea id="keterangan" name="keterangan" class="form-control" rows="4">{{ $requestBarang->keterangan }}</textarea>
                                                 </div>
                                             </div>
 
@@ -206,17 +206,31 @@
                                                     </table>
                                                 </div>
                                             </div>
+
+                                            <br>
+                                            <button style="text-align: center;" type="submit" class="btn btn-info">Update Permintaan</button>
+                                            <a href="{{ route('hd.request_barang') }}" class="btn btn-light">Kembali</a>
+
+                                        </div>
+                                        <div class="col-md-6">
                                             <div class="form-group row">
                                                 <label for="non_stock" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
                                                 <div class="col-sm-8">
                                                     <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $requestBarang->non_stock) }}</textarea>
                                                 </div>
                                             </div>
-
-
-                                            <button style="text-align: center;" type="submit" class="btn btn-info">Update Permintaan</button>
-                                            <a href="{{ route('hd.request_barang') }}" class="btn btn-light">Kembali</a>
-
+                                            <div class="form-group row">
+                                                <label for="keterangan" class="col-sm-4 col-form-label">Penempatan Barang</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="penempatan_barang" name="penempatan_barang" class="form-control" rows="4">{{ $requestBarang->penempatan_barang }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="keterangan" class="col-sm-4 col-form-label">Kebutuhan</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="kebutuhan" name="kebutuhan" class="form-control" rows="4">{{ $requestBarang->kebutuhan }}</textarea>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>

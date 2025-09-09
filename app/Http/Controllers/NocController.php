@@ -729,6 +729,7 @@ class NocController extends Controller
         $search = $request->get('search');
         $month = $request->get('month');
         $year = $request->get('year');
+        $provinsi = $request->get('provinsi'); // Ambil provinsi
 
         // Query untuk mendapatkan data survey dengan eager loading
         $query = WorkOrderDowngrade::with([
@@ -769,6 +770,8 @@ class NocController extends Controller
             'search' => $search,
             'month' => $month,
             'year' => $year,
+            'provinsi' => $provinsi
+
         ]);
 
         // Ambil notifikasi yang belum dibaca

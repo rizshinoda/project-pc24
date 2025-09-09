@@ -211,6 +211,9 @@
                                     <a href="{{ route('admin.relokasi_create', $onlinebilling->id) }}" class="btn btn-info btn-sm ">
                                         Relokasi
                                     </a>
+                                    <!-- <a href="{{ route('admin.OB_monitoring', $onlinebilling->id) }}" class="btn btn-primary btn-sm ">
+                                        Monitoring
+                                    </a> -->
                                 </div>
                             </div>
                         </div>

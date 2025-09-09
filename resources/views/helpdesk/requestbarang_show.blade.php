@@ -120,11 +120,15 @@
                                     <p><strong>Bandwidth:</strong> {{ $requestBarang->onlineBilling->bandwidth }} {{$requestBarang->onlineBilling->satuan}}</p>
 
                                     @elseif ($requestBarang->subject_manual)
-                                    <p><strong>Subject Kebutuhan:</strong> {{ $requestBarang->subject_manual }}</p>
+                                    <p><strong>Site:</strong> {{ $requestBarang->subject_manual }}</p>
                                     @endif
 
-                                    <p><strong>Keterangan:</strong> {{ $requestBarang->keterangan }}</p>
                                     <p><strong>Barang non stock:</strong> {{ $requestBarang->non_stock }}</p>
+                                    <p><strong>Penempatan Barang:</strong> {{ $requestBarang->penempatan_barang }}</p>
+                                    <p><strong>Kebutuhan:</strong> {{ $requestBarang->kebutuhan }}</p>
+                                    <p><strong>Keterangan:</strong> {{ $requestBarang->keterangan }}</p>
+                                    <a href="{{route('hd.request_barang.print', $requestBarang->id )}}" class="btn btn-info mt-2">Print Surat</a>
+
                                 </div>
                             </div>
                         </div>

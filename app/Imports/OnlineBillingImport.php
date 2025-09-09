@@ -27,7 +27,7 @@ class OnlineBillingImport implements ToModel, WithHeadingRow, WithChunkReading
     }
     public function headingRow(): int
     {
-        return 4; // karena header dimulai di baris ke-4
+        return 1; // karena header dimulai di baris ke-4
     }
     // ───────────────────── VALIDASI PER BARIS ─────────────────────────
     private function excelDateToDate($excelDate)

@@ -93,18 +93,18 @@
             @endif
 
 
-
+            <tr>
+                <td><strong>Nama Penerima</strong></td>
+                <td>:</td>
+                <td>{{ $requestBarang->nama_penerima }}</td>
+            </tr>
 
             <tr>
                 <td><strong>Nomor WA Penerima</strong></td>
                 <td>:</td>
                 <td>{{ $requestBarang->no_penerima }}</td>
             </tr>
-            <tr>
-                <td><strong>Nama Penerima</strong></td>
-                <td>:</td>
-                <td>{{ $requestBarang->nama_penerima }}</td>
-            </tr>
+
             <tr>
                 <td><strong>Alamat Penerima</strong></td>
                 <td>:</td>
