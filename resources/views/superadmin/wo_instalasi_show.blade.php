@@ -110,6 +110,7 @@
                                     <p><strong>Tanggal RFS:</strong> {{ \Carbon\Carbon::parse($getInstall->tanggal_rfs)->translatedFormat('d M Y') }}</p>
                                     <p><strong>Durasi:</strong> {{ $getInstall->durasi }} {{ $getInstall->nama_durasi }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getInstall->keterangan }}</p>
+                                    <p><strong>Barang non stock:</strong> {{ $getInstall->non_stock }}</p>
 
                                 </div>
                             </div>

@@ -33,7 +33,8 @@ class OnlineBilling extends Model
         'harga_sewa',
         'admin_id',
         'status',
-        'sid_vendor'
+        'sid_vendor',
+        'cacti_link'
     ];
 
     public function admin()

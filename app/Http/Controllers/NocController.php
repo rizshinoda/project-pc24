@@ -729,6 +729,7 @@ class NocController extends Controller
         $search = $request->get('search');
         $month = $request->get('month');
         $year = $request->get('year');
+        $provinsi = $request->get('provinsi'); // Ambil provinsi
 
         // Query untuk mendapatkan data survey dengan eager loading
         $query = WorkOrderDowngrade::with([
@@ -769,6 +770,8 @@ class NocController extends Controller
             'search' => $search,
             'month' => $month,
             'year' => $year,
+            'provinsi' => $provinsi
+
         ]);
 
         // Ambil notifikasi yang belum dibaca
@@ -1590,6 +1593,8 @@ class NocController extends Controller
             'alamat_penerima' => 'required|string|max:255',
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
             'cart' => 'nullable|array',
         ]);
 
@@ -1599,6 +1604,8 @@ class NocController extends Controller
             'alamat_penerima' => $validatedData['alamat_penerima'],
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+
             'status' => 'pending',
             'user_id' => Auth::user()->id,
         ]);
@@ -1689,6 +1696,8 @@ class NocController extends Controller
             'alamat_penerima' => 'required|string|max:255',
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
             'cart' => 'nullable|array',
         ]);
 
@@ -1699,6 +1708,8 @@ class NocController extends Controller
             'alamat_penerima' => $validatedData['alamat_penerima'],
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+
         ]);
 
         // Hapus detail barang yang ada sebelumnya

@@ -120,6 +120,8 @@
                                     <p><strong>No Order: </strong> {{ $getMaintenance->no_spk }}</p>
                                     <p><strong>Diterbitkan oleh:</strong> {{ $getMaintenance->admin->name }}</p>
                                     <p><strong>Tanggal Diterbitkan:</strong> {{ $getMaintenance->created_at->translatedFormat('d M Y, H:i:s') }}</p>
+                                    <p><strong>Tanggal Maintenance:</strong>{{ \Carbon\Carbon::parse($getMaintenance->tanggal_maintenance)->translatedFormat('d M Y') }}
+
                                     <p><strong>Status:</strong>
                                         @if($getMaintenance->status=='Pending')
                                         <span class="badge badge-pill badge-danger">Pending</span>
@@ -200,6 +202,7 @@
                                     <p><strong>Nomer PIC:</strong> {{ $getMaintenance->onlineBilling->no_pic }}</p>
                                     <p><strong>Alamat Baru:</strong> {{ $getMaintenance->alamat_pemasangan_baru }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getMaintenance->keterangan }}</p>
+                                    <p><strong>Barang non stock:</strong> {{ $getMaintenance->non_stock }}</p>
 
                                 </div>
                             </div>

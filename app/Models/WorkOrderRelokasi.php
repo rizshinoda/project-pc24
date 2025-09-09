@@ -15,6 +15,7 @@ class WorkOrderRelokasi extends Model
         'satuan',
         'status',
         'keterangan',
+        'non_stock',
         'admin_id',
 
     ];

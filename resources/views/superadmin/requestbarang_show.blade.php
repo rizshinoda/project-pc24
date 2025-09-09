@@ -29,29 +29,53 @@
                         </h3>
 
                     </div>
-                    <div class="col-md-4 mb-1">
-                        <div class="card fixed-card d-flex h-100">
-                            <div class="card-body ">
-                                <h5 class="card-title">Details:</h5>
-                                <!-- resources/views/user/request_barang/create.blade.php -->
-                                <p><strong>Nama Penerima:</strong> {{ $requestBarang->nama_penerima }}</p>
-                                <p><strong>Alamat Penerima:</strong> {{ $requestBarang->alamat_penerima }}</p>
-                                <p><strong>No Penerima:</strong> {{ $requestBarang->no_penerima }}</p>
-                                <p><strong>Keterangan:</strong> {{ $requestBarang->keterangan }}</p>
-                                <p><strong>Request by</strong> {{ $requestBarang->user->name }}</p>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Penerima:</h5>
+                                    <p><strong>Nama:</strong> {{ $requestBarang->nama_penerima }}</p>
+                                    <p><strong>Alamat:</strong> {{ $requestBarang->alamat_penerima }}</p>
+                                    <p><strong>No HP:</strong> {{ $requestBarang->no_penerima }}</p>
+                                    <p><strong>Request by:</strong> {{ $requestBarang->user->name }}</p>
+                                    <p><strong>Status:</strong>
+                                        @if($requestBarang->status == 'pending')
+                                        <span class="badge badge-pill badge-danger">Pending</span>
+                                        @elseif($requestBarang->status == 'approved')
+                                        <span class="badge badge-pill badge-info">Approved</span>
+                                        @elseif($requestBarang->status == 'rejected')
+                                        <span class="badge badge-pill badge-warning">Rejected</span>
+                                        @elseif($requestBarang->status == 'completed')
+                                        <span class="badge badge-pill badge-success">Completed</span>
+                                        @elseif($requestBarang->status == 'shipped')
+                                        <span class="badge badge-pill badge-primary">Shipped</span>
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
-                                <p><strong>Status:</strong> @if($requestBarang->status=='pending')
-                                    <span class="badge badge-pill badge-danger">Pending</span>
-                                    @elseif($requestBarang->status=='approved')
-                                    <span class="badge badge-pill badge-info">Approved</span>
-                                    @elseif($requestBarang->status=='rejected')
-                                    <span class="badge badge-pill badge-warning">Rejected</span>
-                                    @elseif($requestBarang->status=='completed')
-                                    <span class="badge badge-pill badge-success">Completed</span>
-                                    @elseif($requestBarang->status=='shipped')
-                                    <span class="badge badge-pill badge-primary">Shipped</span>
+                        <div class="col-12 col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Detail Request:</h5>
+                                    @if ($requestBarang->onlineBilling)
+                                    <p><strong>Site:</strong> {{ $requestBarang->onlineBilling->nama_site}}</p>
+                                    <p><strong>Alamat:</strong> {{ $requestBarang->onlineBilling->alamat_pemasangan }}</p>
+                                    <p><strong>PIC:</strong> {{ $requestBarang->onlineBilling->nama_pic }} ({{ $requestBarang->onlineBilling->no_pic }})</p>
+                                    <p><strong>Layanan:</strong> {{ $requestBarang->onlineBilling->layanan }}</p>
+                                    <p><strong>Bandwidth:</strong> {{ $requestBarang->onlineBilling->bandwidth }} {{$requestBarang->onlineBilling->satuan}}</p>
+
+                                    @elseif ($requestBarang->subject_manual)
+                                    <p><strong>Site:</strong> {{ $requestBarang->subject_manual }}</p>
                                     @endif
-                                </p>
+
+                                    <p><strong>Barang non stock:</strong> {{ $requestBarang->non_stock }}</p>
+                                    <p><strong>Penempatan Barang:</strong> {{ $requestBarang->penempatan_barang }}</p>
+                                    <p><strong>Kebutuhan:</strong> {{ $requestBarang->kebutuhan }}</p>
+                                    <p><strong>Keterangan:</strong> {{ $requestBarang->keterangan }}</p>
+
+                                </div>
                             </div>
                         </div>
                     </div>

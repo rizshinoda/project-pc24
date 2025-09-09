@@ -40,6 +40,8 @@ return new class extends Migration
             $table->unsignedInteger('harga_sewa')->nullable(); // Harga sewa dalam integer
             $table->unsignedInteger('harga_instalasi')->nullable(); // Harga instalasi dalam integer
             $table->string('keterangan')->nullable();
+            $table->string('non_stock')->nullable();
+
             $table->timestamps();
 
             // Relasi ke tabel users (admin dan psb)

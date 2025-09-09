@@ -112,6 +112,7 @@
                                     <p><strong>Nomer PIC:</strong> {{ $getMaintenance->onlineBilling->no_pic }}</p>
                                     <p><strong>Alamat Baru:</strong> {{ $getMaintenance->alamat_pemasangan_baru }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getMaintenance->keterangan }}</p>
+                                    <p><strong>Barang non stock:</strong> {{ $getMaintenance->non_stock }}</p>
 
                                 </div>
                             </div>

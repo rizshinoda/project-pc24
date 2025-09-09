@@ -2505,6 +2505,8 @@ class PsbController extends Controller
             'search' => $search,
             'month' => $month,
             'year' => $year,
+            'provinsi' => $provinsi
+
         ]);
 
         // Ambil notifikasi yang belum dibaca
@@ -2855,6 +2857,8 @@ class PsbController extends Controller
             'alamat_penerima' => 'required|string|max:255',
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
             'cart' => 'nullable|array',
 
         ]);
@@ -2865,6 +2869,8 @@ class PsbController extends Controller
             'alamat_penerima' => $validatedData['alamat_penerima'],
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+
             'status' => 'pending',
             'user_id' => Auth::user()->id,
         ]);
@@ -2949,6 +2955,8 @@ class PsbController extends Controller
             'alamat_penerima' => 'required|string|max:255',
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
             'cart' => 'nullable|array',
         ]);
 
@@ -2959,6 +2967,8 @@ class PsbController extends Controller
             'alamat_penerima' => $validatedData['alamat_penerima'],
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+
         ]);
 
         // Hapus detail barang yang ada sebelumnya

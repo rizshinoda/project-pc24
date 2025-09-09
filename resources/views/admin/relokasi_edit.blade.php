@@ -260,7 +260,12 @@
                                                     </table>
                                                 </div>
                                             </div>
-
+                                            <div class="form-group row">
+                                                <label for="non_stock" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $workOrder->non_stock) }}</textarea>
+                                                </div>
+                                            </div>
                                         </div>
 
                                     </div>

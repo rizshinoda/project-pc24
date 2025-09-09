@@ -113,7 +113,12 @@
                                                 </div>
                                             </div>
 
-
+                                            <div class="form-group row">
+                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Tanggal Maintenance</label>
+                                                <div class="col-sm-8">
+                                                    <input type="date" class="form-control" id="tanggal_maintenance" name="tanggal_maintenance" required>
+                                                </div>
+                                            </div>
 
 
 
@@ -200,7 +205,12 @@
 
                                                 </div>
                                             </div>
-
+                                            <div class="form-group row">
+                                                <label for="no_penerima" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="5" cols="40"></textarea>
+                                                </div>
+                                            </div>
                                         </div>
 
                                     </div>

@@ -39,7 +39,7 @@ return new class extends Migration
             $table->string('sid_vendor')->nullable(); // Deskripsi durasi, misalnya "3 Bulan"
             $table->timestamps();
             $table->enum('status', ['active', 'dismantle'])->default('active');
-
+            $table->string('cacti_link')->nullable();
             // Relasi ke tabel users (admin dan psb)
             $table->foreign('admin_id')->references('id')->on('users')->onDelete('cascade');
         });

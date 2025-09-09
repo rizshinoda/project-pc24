@@ -223,7 +223,12 @@
                                                     </table>
                                                 </div>
                                             </div>
-
+                                            <div class="form-group row">
+                                                <label for="non_stock" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $requestBarang->non_stock) }}</textarea>
+                                                </div>
+                                            </div>
 
                                             <button style="text-align: center;" type="submit" class="btn btn-info">Update Permintaan</button>
                                             <a href="{{ route('noc.request_barang',) }}" class="btn btn-light">Kembali</a>
