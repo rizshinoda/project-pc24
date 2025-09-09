@@ -80,7 +80,7 @@ class OnlineBillingImport implements ToModel, WithHeadingRow, WithChunkReading
             'durasi'            => $row['durasi'] ?? null,
             'nama_durasi'       => $row['nama_durasi'] ?? null,
             'harga_sewa'        => $row['bulanan'] ?? null,
-            'sid_vendor'        => $row['id_vendor'] ?? null,
+            'sid_vendor'        => $row['sid_vendor'] ?? null,
             'admin_id'          => Auth::id() ?? 1,
             'status'            => $row['status'] ?? 'active',
         ]);
