@@ -18,7 +18,7 @@ providers:
 certificatesResolvers:
   myresolver:
     acme:
-      email: admin@pc24.co.id # ganti dengan email aktif kamu
+      email: rizalkrenz1@gmail.com # ganti dengan email aktif kamu
       storage: /acme.json
       httpChallenge:
         entryPoint: web
