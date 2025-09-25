@@ -36,19 +36,6 @@ jobs:
             echo "DB_CONTAINER=db-production" >> $GITHUB_ENV
             echo "VOLUME_APP_CODE=app-code-production" >> $GITHUB_ENV
           fi
-      - name: Ensure traefik network exists
-        run: |
-          if ! docker network ls | grep -q traefik-network; then
-            docker network create traefik-network
-          fi
-
-      - name: Ensure acme.json exists (Traefik SSL)
-        run: |
-          mkdir -p $PROJECT_ROOT/docker/traefik
-          if [ ! -f $PROJECT_ROOT/docker/traefik/acme.json ]; then
-            echo "{}" > $PROJECT_ROOT/docker/traefik/acme.json
-          fi
-          chmod 600 $PROJECT_ROOT/docker/traefik/acme.json
 
       - name: Stop old containers
         run: docker compose -f $COMPOSE_FILE down || true

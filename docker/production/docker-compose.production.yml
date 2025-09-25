@@ -34,20 +34,16 @@ services:
   nginx:
     image: nginx:alpine
     container_name: nginx-production
+    ports:
+      - "8001:80"
     volumes:
       - app-code-production:/var/www
       - storage-production:/var/www/storage/app/public
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.production.rule=Host(`a2.pc24.co.id`)"
-      - "traefik.http.routers.production.entrypoints=websecure"
-      - "traefik.http.routers.production.tls.certresolver=myresolver"
     networks:
       - app-network
-      - traefik-network
 
 volumes:
   app-code-production:
@@ -57,5 +53,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-  traefik-network:
-    external: true
