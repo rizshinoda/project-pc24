@@ -69,7 +69,6 @@
 
             </nav>
             <!-- partial -->
-
             <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
@@ -127,7 +126,7 @@
                                     <p><strong>Penempatan Barang:</strong> {{ $requestBarang->penempatan_barang }}</p>
                                     <p><strong>Kebutuhan:</strong> {{ $requestBarang->kebutuhan }}</p>
                                     <p><strong>Keterangan:</strong> {{ $requestBarang->keterangan }}</p>
-                                    <a href="{{route('hd.request_barang.print', $requestBarang->id )}}" class="btn btn-info mt-2">Print Surat</a>
+                                    <!-- <a href="{{route('hd.request_barang.print', $requestBarang->id )}}" class="btn btn-info mt-2">Print Surat</a> -->
 
                                 </div>
                             </div>

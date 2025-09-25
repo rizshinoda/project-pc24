@@ -96,7 +96,7 @@
                                     <p><strong>Alamat:</strong> {{ $onlinebilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $onlinebilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $onlinebilling->no_pic }}</p>
-                                    <p><strong>Vendor:</strong> {{ $onlinebilling->vendor?->nama_vendor }}</p>
+                                    <p><strong>Vendor:</strong> {{ $onlinebilling->vendor?->nama_vendor }} ({{ $onlinebilling->sid_vendor }})</p>
                                     <p><strong>Status:</strong> @if($onlinebilling->status=='active')
                                         <span class="badge badge-pill badge-success">Aktif</span>
                                         @else($onlinebilling->status=='dismantle')

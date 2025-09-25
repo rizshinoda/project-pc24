@@ -10,7 +10,7 @@ use Carbon\Carbon;
 class SessionTimeout
 {
     // Timeout dalam detik (contoh: 600 detik = 10 menit)
-    protected $timeout = 1200;
+    protected $timeout = 1800;
 
     public function handle($request, Closure $next)
     {

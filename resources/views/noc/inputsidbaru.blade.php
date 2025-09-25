@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-    @include('admin.partials.style')
+    @include('noc.partials.style')
 </head>
 
 <body>
     <div class="container-scroller">
 
-        @include('admin.partials.navbar')
+        @include('noc.partials.navbar')
         <div class="container-fluid page-body-wrapper">
             <!-- partial:partials/_sidebar.html -->
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -20,7 +20,6 @@
                                 <span class="login-status online"></span>
                                 <!--change to offline or busy as needed-->
                             </div>
-
                             <div class="nav-profile-text d-flex flex-column">
                                 <span class="font-weight-bold mb-2">{{ Auth::user()->name }}</span>
                                 <span class="text-secondary text-small">{{ $roleText }}</span>
@@ -29,77 +28,55 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                        <a class="nav-link" href="{{ url('noc/dashboard') }}">
                             <span class="menu-title">Dashboard</span>
                             <i class="mdi mdi-home menu-icon"></i>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic1" aria-expanded="false" aria-controls="ui-basic1">
-                            <span class="menu-title">Tambah Data</span>
-                            <i class="menu-arrow"></i>
-                            <i class="mdi mdi-format-list-bulleted menu-icon"></i>
-                        </a>
-                        <div class="collapse" id="ui-basic1">
-                            <ul class="nav flex-column sub-menu">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.pelanggan')}}">Data Pelanggan</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.namavendor')}}">Data Vendor</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.instansi')}}">Data Instansi</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic2" aria-expanded="false" aria-controls="ui-basic2">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
                             <span class="menu-title">Work Order</span>
                             <i class="menu-arrow"></i>
                             <i class="mdi mdi-format-list-bulleted menu-icon"></i>
                         </a>
-                        <div class="collapse" id="ui-basic2">
+                        <div class="collapse" id="ui-basic">
                             <ul class="nav flex-column sub-menu">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.survey')}}">Survey</a>
+                                    <a class="nav-link" href="{{url('noc/instalasi')}}">Instalasi</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.instalasi')}}">Instalasi</a>
+                                    <a class="nav-link" href="{{url('noc/maintenance')}}">Maintenance</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.upgrade')}}">Upgrade</a>
+                                    <a class="nav-link" href="{{url('noc/upgrade')}}">Upgrade</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.downgrade')}}">Downgrade</a>
+                                    <a class="nav-link" href="{{url('noc/downgrade')}}">Downgrade</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.dismantle')}}">Dismantle</a>
+                                    <a class="nav-link" href="{{url('noc/gantivendor')}}">Ganti Vendor</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.relokasi')}}">Relokasi</a>
+                                    <a class="nav-link" href="{{url('noc/dismantle')}}">Dismantle</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.gantivendor')}}">Ganti Vendor</a>
+                                    <a class="nav-link" href="{{url('noc/relokasi')}}">Relokasi</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.request_barang')}}">Request Barang</a>
+                                    <a class="nav-link" href="{{url('noc/requestbarang')}}">Request Barang</a>
                                 </li>
-
                             </ul>
                         </div>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link" href="{{route('admin.OB')}}">
+                        <a class="nav-link" href="{{url('noc/OB')}}">
                             <span class="menu-title">Online Billing</span>
                             <i class="mdi mdi-database-outline menu-icon"></i>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.sitedismantle') }}">
+                        <a class="nav-link" href="{{ route('noc.sitedismantle') }}">
                             <span class="menu-title">Site Dismantle</span>
                             <i class="mdi mdi-delete-circle menu-icon"></i>
                         </a>
@@ -137,28 +114,28 @@
                                 @endif -->
 
                                 {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('admin.gantivendor.store', ['id' => $getGantivendor->id]) }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route('noc.gantivendor.storesidbaru', ['id' => $getGantivendor->id]) }}" method="POST" enctype="multipart/form-data">
                                     @csrf
 
                                     <div class="row">
                                         <div class="col-md-6">
+
                                             <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Vendor</label>
+                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">SID Baru</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="vendor_id" name="vendor_id" required>
-                                                        <option value="">Pilih Vendor</option>
-                                                        @foreach ($vendors as $vendor)
-                                                        <option value="{{ $vendor->id }}">{{ $vendor->nama_vendor }}</option>
-                                                        @endforeach
-                                                    </select>
+                                                    <input type="text" class="form-control" id="sid_baru" name="sid_baru" required>
                                                 </div>
                                             </div>
+
+
+
                                         </div>
+
                                     </div>
                                     <br>
                                     <!-- Tombol submit -->
                                     <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.gantivendor.show', $getGantivendor->id) }}" class="btn btn-light mt-1">Kembali</a>
+                                    <a href="{{ route('noc.gantivendor.show', $getGantivendor->id) }}" class="btn btn-light mt-1">Kembali</a>
 
                                 </form>
                             </div>
@@ -178,7 +155,7 @@
         </div>
 
     </div>
-    @include('admin.partials.script')
+    @include('noc.partials.script')
 </body>
 
 </html>

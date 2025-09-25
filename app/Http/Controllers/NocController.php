@@ -1256,6 +1256,39 @@ class NocController extends Controller
         // Render view berdasarkan role
         return $this->renderView('gantivendor_show', $data);
     }
+    public function inputsidbaru($id)
+    {
+        $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
+
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('notifications', 'getGantivendor'));
+
+        // Menampilkan form untuk membuat work order baru dengan nomor SPK baru
+        return $this->renderView('inputsidbaru', $data);
+    }
+
+    public function storeinputsidbaru(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'sid_baru' => 'nullable|string', // Vendor harus valid dan ada di tabel vendors
+        ]);
+
+        // Temukan Work Order berdasarkan ID
+        $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
+
+
+        // Update kolom vendor_baru dengan nama vendor yang dipilih
+        $getGantivendor->sid_baru = $request->sid_baru;
+        $getGantivendor->save();
+
+        // Redirect dengan pesan sukses
+        return redirect()->route('noc.gantivendor.show', $id)->with('success', 'SID Baru berhasil disimpan.');
+    }
     public function addProgressGantivendor($id)
     {
         // Ambil notifikasi yang belum dibaca
@@ -1286,6 +1319,14 @@ class NocController extends Controller
 
         // Set status default atau complete sesuai tombol yang ditekan
         if ($request->has('action') && $request->action === 'complete') {
+            // ✅ Cek apakah sid_baru sudah diisi
+            if (empty($getGantivendor->sid_baru)) {
+                return redirect()
+                    ->route('noc.gantivendor.show', $id) // arahkan tetap ke halaman detail WO
+                    ->withErrors(['sid_baru' => 'SID Baru wajib diisi sebelum menyelesaikan WO Ganti Vendor.'])
+                    ->withInput();
+            }
+
             $progress->status = 'Completed'; // Ubah status progress jadi Completed
 
             // Ubah status survey menjadi Completed
@@ -1303,6 +1344,7 @@ class NocController extends Controller
             $onlineBilling = $getGantivendor->onlineBilling; // Relasi ke onlineBilling
             if ($onlineBilling) {
                 $onlineBilling->vendor_id = $getGantivendor->vendor_id; // Ganti vendor_id dengan vendor_id baru
+                $onlineBilling->sid_vendor = $getGantivendor->sid_baru;
                 $onlineBilling->save();
             }
             // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)

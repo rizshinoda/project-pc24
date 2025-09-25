@@ -1042,6 +1042,40 @@ class NaController extends Controller
         // Render view berdasarkan role
         return $this->renderView('gantivendor_show', $data);
     }
+
+    public function inputsidbaru($id)
+    {
+        $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
+
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('notifications', 'getGantivendor'));
+
+        // Menampilkan form untuk membuat work order baru dengan nomor SPK baru
+        return $this->renderView('inputsidbaru', $data);
+    }
+
+    public function storeinputsidbaru(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'sid_baru' => 'nullable|string', // Vendor harus valid dan ada di tabel vendors
+        ]);
+
+        // Temukan Work Order berdasarkan ID
+        $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
+
+
+        // Update kolom vendor_baru dengan nama vendor yang dipilih
+        $getGantivendor->sid_baru = $request->sid_baru;
+        $getGantivendor->save();
+
+        // Redirect dengan pesan sukses
+        return redirect()->route('na.gantivendor.show', $id)->with('success', 'SID Baru berhasil disimpan.');
+    }
     public function addProgressGantivendor($id)
     {
         // Ambil notifikasi yang belum dibaca
@@ -1072,6 +1106,14 @@ class NaController extends Controller
 
         // Set status default atau complete sesuai tombol yang ditekan
         if ($request->has('action') && $request->action === 'complete') {
+
+            // ✅ Cek apakah sid_baru sudah diisi
+            if (empty($getGantivendor->sid_baru)) {
+                return redirect()
+                    ->route('na.gantivendor.show', $id) // arahkan tetap ke halaman detail WO
+                    ->withErrors(['sid_baru' => 'SID Baru wajib diisi sebelum menyelesaikan WO Ganti Vendor.'])
+                    ->withInput();
+            }
             $progress->status = 'Completed'; // Ubah status progress jadi Completed
 
             // Ubah status survey menjadi Completed
@@ -1084,6 +1126,15 @@ class NaController extends Controller
             if ($status) {
                 $status->status = 'Completed';
                 $status->save();
+            }
+
+            // **Update vendor_id di OnlineBilling**
+            $onlineBilling = $getGantivendor->onlineBilling; // Relasi ke onlineBilling
+            if ($onlineBilling) {
+                $onlineBilling->vendor_id = $getGantivendor->vendor_id; // Ganti vendor_id dengan vendor_id baru
+                $onlineBilling->sid_vendor = $getGantivendor->sid_baru;
+
+                $onlineBilling->save();
             }
             // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
             $helpdeskUsers = User::where('is_role', 3)->get();

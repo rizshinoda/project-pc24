@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('no_spk')->unique();
             $table->string('keterangan')->nullable();
             $table->unsignedBigInteger('vendor_id')->nullable();
+            $table->string('sid_baru')->nullable(); // Deskripsi durasi, misalnya "3 Bulan"
             $table->unsignedBigInteger('admin_id'); // Admin yang membuat work order
             $table->enum('status', ['Pending', 'On Progress', 'Completed', 'Rejected'])->default('Pending');
             $table->timestamps();

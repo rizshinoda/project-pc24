@@ -172,7 +172,7 @@
                                     <p><strong>Alamat:</strong> {{ $getGantivendor->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getGantivendor->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getGantivendor->onlineBilling->no_pic }}</p>
-                                    <p><strong>Vendor:</strong> {{ $getGantivendor->onlineBilling->vendor?->nama_vendor }}</p>
+                                    <p><strong>Vendor:</strong> {{ $getGantivendor->onlineBilling->vendor?->nama_vendor }} ({{$getGantivendor->onlineBilling->sid_vendor}})</p>
                                     <p><strong>Keterangan:</strong> {{ $getGantivendor->keterangan }}</p>
 
                                 </div>
@@ -193,6 +193,8 @@
                                                     <th style=" text-align: center; vertical-align: middle;">No</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Nama Vendor</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Contact</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">SID Baru</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -200,9 +202,13 @@
                                                     <td style=" text-align: center; vertical-align: middle;">1</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ optional($getGantivendor->vendor)->nama_vendor ?? 'Belum Dipilih' }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ optional($getGantivendor->vendor)->contact ?? '-' }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;"> {{ $getGantivendor->sid_baru ?? 'Belum diisi' }}</td>
+
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <p style="font-size: small;"><em>*Kolom SID Baru, wajib diisi</em></p>
+
                                     </div>
                                 </div>
                             </div>

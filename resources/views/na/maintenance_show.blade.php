@@ -173,7 +173,7 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">Site: </h5>
-                                    <p><strong>Nama Perusahaan:</strong> {{ $getMaintenance->onlineBilling->instansi->nama_instansi }}</p>
+                                    <p><strong>Nama Perusahaan:</strong> {{ $getMaintenance->onlineBilling->instansi?->nama_instansi }}</p>
                                     <p><strong>Nama Site:</strong> {{ $getMaintenance->onlineBilling->nama_site }}</p>
                                     <p><strong>Alamat:</strong> {{ $getMaintenance->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getMaintenance->onlineBilling->nama_pic }}</p>

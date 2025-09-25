@@ -1212,6 +1212,16 @@ class GaController extends Controller
         $getMaintenance->status = 'Shipped'; // Update status WO menjadi Shipped
         $getMaintenance->save();
 
+        // Cari entri terkait di tabel statuses
+        $status = Status::where('work_orderable_id', $getMaintenance->id)
+            ->where('process', 'Maintenance') // Pastikan prosesnya adalah 'Upgrade'
+            ->first();
+
+        // Perbarui status di tabel statuses jika entri ditemukan
+        if ($status) {
+            $status->status = 'Shipped'; // Sesuaikan dengan status baru
+            $status->save();
+        }
         // Upload dan simpan banyak foto jika ada
         if ($request->hasFile('foto')) {
             foreach ($request->file('foto') as $foto) {
@@ -1635,6 +1645,16 @@ class GaController extends Controller
         $getRelokasi->status = 'Shipped'; // Update status WO menjadi Shipped
         $getRelokasi->save();
 
+        // Cari entri terkait di tabel statuses
+        $status = Status::where('work_orderable_id', $getRelokasi->id)
+            ->where('process', 'Relokasi') // Pastikan prosesnya adalah 'Upgrade'
+            ->first();
+
+        // Perbarui status di tabel statuses jika entri ditemukan
+        if ($status) {
+            $status->status = 'Shipped'; // Sesuaikan dengan status baru
+            $status->save();
+        }
         // Upload dan simpan banyak foto jika ada
         if ($request->hasFile('foto')) {
             foreach ($request->file('foto') as $foto) {

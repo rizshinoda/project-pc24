@@ -2798,7 +2798,7 @@ class AdminController extends Controller
         $getGantivendor->save();
 
         // Redirect dengan pesan sukses
-        return redirect()->route('admin.gantivendor')->with('success', 'Nama Vendor berhasil disimpan.');
+        return redirect()->route('admin.gantivendor.show', $id)->with('success', 'Nama Vendor berhasil disimpan.');
     }
     public function OB(Request $request)
     {
@@ -3070,7 +3070,6 @@ class AdminController extends Controller
         // Render view berdasarkan role
         return $this->renderView('requestbarang', $data);
     }
-
 
     public function createrequest()
     {

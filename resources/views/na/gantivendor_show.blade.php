@@ -102,6 +102,17 @@
                             </button>
                         </div>
                         @endif
+
+                        @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @foreach ($errors->all() as $error)
+                            {{ $error }}
+                            @endforeach
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        @endif
                     </div>
 
 
@@ -164,12 +175,12 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">Site: </h5>
-                                    <p><strong>Nama Perusahaan:</strong> {{ $getGantivendor->onlineBilling->instansi->nama_instansi }}</p>
+                                    <p><strong>Nama Perusahaan:</strong> {{ $getGantivendor->onlineBilling->instansi?->nama_instansi }}</p>
                                     <p><strong>Nama Site:</strong> {{ $getGantivendor->onlineBilling->nama_site }}</p>
                                     <p><strong>Alamat:</strong> {{ $getGantivendor->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getGantivendor->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getGantivendor->onlineBilling->no_pic }}</p>
-                                    <p><strong>Vendor:</strong> {{ $getGantivendor->onlineBilling->vendor->nama_vendor }}</p>
+                                    <p><strong>Vendor:</strong> {{ $getGantivendor->onlineBilling->vendor->nama_vendor }} ({{$getGantivendor->onlineBilling->sid_vendor}})</p>
                                     <p><strong>Keterangan:</strong> {{ $getGantivendor->keterangan }}</p>
 
                                 </div>
@@ -182,7 +193,10 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Vendor Baru</h4>
-
+                                    @if ($getGantivendor->status === 'On Progress')
+                                    <a href="{{ route('na.gantivendor.inputsidbaru', $getGantivendor->id) }}" class="btn btn-info mb-3">
+                                        Input SID Baru</a>
+                                    @endif
                                     <div class="table-responsive">
                                         <table class="table table-hover">
                                             <thead>
@@ -190,6 +204,8 @@
                                                     <th style=" text-align: center; vertical-align: middle;">No</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Nama Vendor</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Contact</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">SID Baru</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -197,9 +213,13 @@
                                                     <td style=" text-align: center; vertical-align: middle;">1</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ optional($getGantivendor->vendor)->nama_vendor ?? 'Belum Dipilih' }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ optional($getGantivendor->vendor)->contact ?? '-' }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;"> {{ $getGantivendor->sid_baru ?? 'Belum diisi' }}</td>
+
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <p style="font-size: small;"><em>*Kolom SID Baru, wajib diisi</em></p>
+
                                     </div>
                                 </div>
                             </div>

@@ -129,6 +129,8 @@
                                                     <th style=" text-align: center; vertical-align: middle;">No</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Nama Vendor</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Contact</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">SID Baru</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -136,9 +138,13 @@
                                                     <td style=" text-align: center; vertical-align: middle;">1</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ optional($getGantivendor->vendor)->nama_vendor ?? 'Belum Dipilih' }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ optional($getGantivendor->vendor)->contact ?? '-' }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;"> {{ $getGantivendor->sid_baru ?? '-' }}</td>
+
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <p style="font-size: small;"><em>*Kolom SID Baru, wajib diisi</em></p>
+
                                     </div>
                                 </div>
                             </div>
@@ -150,7 +156,7 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title">Progres Ganti Vendor</h4>
+                                    <h4 class="card-title">Progress Ganti Vendor</h4>
 
                                     <div class=" table-responsive">
                                         <table class="table table-hover">

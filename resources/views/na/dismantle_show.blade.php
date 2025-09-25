@@ -163,7 +163,7 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">Site: </h5>
-                                    <p><strong>Nama Perusahaan:</strong> {{ $getDismantle->onlineBilling->instansi->nama_instansi }}</p>
+                                    <p><strong>Nama Perusahaan:</strong> {{ $getDismantle->onlineBilling->instansi?->nama_instansi }}</p>
                                     <p><strong>Nama Site:</strong> {{ $getDismantle->onlineBilling->nama_site }}</p>
                                     <p><strong>Alamat:</strong> {{ $getDismantle->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getDismantle->onlineBilling->nama_pic }}</p>
