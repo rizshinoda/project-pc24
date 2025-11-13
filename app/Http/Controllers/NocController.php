@@ -476,11 +476,11 @@ class NocController extends Controller
             }
         } else {
             $progress->status = 'On Progress'; // Default status progress jika belum complete
-            // Update status di tabel WorkOrderInstall
-            if ($getMaintenance->status !== 'Completed') { // Hanya jika status belum Completed
-                $getMaintenance->status = 'On Progress';
-                $getMaintenance->save();
-            }
+            // // Update status di tabel WorkOrderInstall
+            // if ($getMaintenance->status !== 'Completed') { // Hanya jika status belum Completed
+            //     $getMaintenance->status = 'On Progress';
+            //     $getMaintenance->save();
+            // }
         }
 
         // Menyimpan ID user PSB yang sedang login
@@ -1636,6 +1636,7 @@ class NocController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array',
         ]);
@@ -1647,6 +1648,7 @@ class NocController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
 
             'status' => 'pending',
             'user_id' => Auth::user()->id,
@@ -1739,6 +1741,7 @@ class NocController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array',
         ]);
@@ -1751,6 +1754,7 @@ class NocController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
 
         ]);
 

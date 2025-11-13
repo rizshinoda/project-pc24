@@ -104,30 +104,39 @@
                         {{ session('success') }}
                     </div>
                     @endif
+                    <div class="row justify-content-center">
+                        <div class="col-md-6"> <!-- Lebar form setengah halaman -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <a href="{{ route('psb.dismantle_show', $getDismantle->id) }}" class="btn btn-sm btn-info"> <i class="fa fa-arrow-left"></i></a>
 
-                    {{-- Form untuk mengupload multiple foto --}}
-                    <form action="{{ route('psb_dismantle_add_progress', $getDismantle->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="form-group">
-                            <label for="keterangan">Keterangan Progress</label>
-                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan') }}</textarea>
+                                    <h4 class="mb-5 text-center">Update Progress Dismantle</h4>
+                                    {{-- Form untuk mengupload multiple foto --}}
+                                    <form action="{{ route('psb_dismantle_add_progress', $getDismantle->id) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label for="keterangan">Keterangan Progress</label>
+                                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan') }}</textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="foto">Upload Foto Progress</label>
+                                            <input type="file" name="foto[]" id="foto" class="form-control" multiple>
+                                        </div>
+
+                                        <div class="form-group text-center">
+
+                                            <!-- Tombol untuk tambah progress -->
+                                            <button type="submit" name="action" value="add_progress" class="btn btn-info">Tambah Progress</button>
+
+                                            <!-- Tombol untuk selesaikan survey -->
+                                            <button type="submit" name="action" value="complete" class="btn btn-success">Selesaikan Proses Dismantle</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="foto">Upload Foto Progress</label>
-                            <input type="file" name="foto[]" id="foto" class="form-control" multiple>
-                        </div>
-
-                        <div class="form-group">
-                            <a href="{{ route('psb.dismantle_show', $getDismantle->id) }}" class="btn btn-info"><i class="fa fa-arrow-left"></i> Kembali</a>
-
-                            <!-- Tombol untuk tambah progress -->
-                            <button type="submit" name="action" value="add_progress" class="btn btn-info">Tambah Progress</button>
-
-                            <!-- Tombol untuk selesaikan survey -->
-                            <button type="submit" name="action" value="complete" class="btn btn-success pull-right">Selesaikan Proses Dismantle</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
 
 

@@ -98,11 +98,12 @@
 
                     </div>
 
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Form Input Vendor</h4>
-                                <!-- {{-- Menampilkan pesan error jika ada --}}
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Form Input SID Vendor</h4>
+                                    <!-- {{-- Menampilkan pesan error jika ada --}}
                                 @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul>
@@ -113,36 +114,32 @@
                                 </div>
                                 @endif -->
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('na.gantivendor.storesidbaru', ['id' => $getGantivendor->id]) }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">SID Baru</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="sid_baru" name="sid_baru" required>
-                                                </div>
-                                            </div>
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="{{ route('na.gantivendor.storesidbaru', ['id' => $getGantivendor->id]) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
 
-
+                                        <div class="form-group ">
+                                            <label for="alamat_pelanggan">SID Baru</label>
+                                            <input type="text" class="form-control" id="sid_baru" name="sid_baru" required>
                                         </div>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('na.gantivendor.show', $getGantivendor->id) }}" class="btn btn-light mt-1">Kembali</a>
 
-                                </form>
+
+
+                                        <br>
+                                        <!-- Tombol submit -->
+                                        <button type="submit" class="btn btn-info">Submit</button>
+                                        <a href="{{ route('na.gantivendor.show', $getGantivendor->id) }}" class="btn btn-light mt-1">Kembali</a>
+
+                                    </form>
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
+
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>

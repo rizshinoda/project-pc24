@@ -103,6 +103,7 @@
 
             <!-- Main Panel -->
             <div class="main-panel">
+
                 <div class="content-wrapper">
                     <div class="page-header">
                         <h3 class="page-title">
@@ -110,6 +111,7 @@
                                 <i class="mdi mdi-home"></i>
                             </span> Detail Work Order
                         </h3>
+
                         {{-- Alert untuk menampilkan pesan sukses --}}
                         @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -127,6 +129,8 @@
                             </button>
                         </div>
                         @endif
+
+
                     </div>
 
 
@@ -229,6 +233,47 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="container mt-4">
+                        @php
+                        // Tahapan normal
+                        $steps = ['Pending', 'On Progress', 'Shipped', 'Completed'];
+
+                        // Ambil status dari progress
+                        $currentStatus = ucfirst($getInstall->status ?? 'Pending');
+
+                        // Cek apakah status termasuk flow gagal
+                        $isCanceledOrRejected = in_array(strtolower($currentStatus), ['canceled', 'cancelled', 'rejected']);
+                        $currentStep = array_search($currentStatus, $steps);
+                        if ($currentStep === false) $currentStep = 0;
+                        @endphp
+
+                        @if($isCanceledOrRejected)
+                        {{-- Tampilan khusus untuk status gagal --}}
+                        <div class="alert alert-danger text-center fw-bold py-4 rounded">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            Work Order <span class="text-uppercase">{{ $currentStatus }}</span>
+                        </div>
+                        @else
+                        {{-- Progress bar normal --}}
+                        <div class="stepper">
+                            @foreach($steps as $index => $step)
+                            <div class="step 
+                    {{ $index < $currentStep ? 'completed' : '' }} 
+                    {{ $index == $currentStep ? 'active' : '' }}">
+                                <div class="step-circle">
+                                    @if($index < $currentStep)
+                                        <i class="bi bi-check-lg"></i>
+                                        @else
+                                        {{ $index + 1 }}
+                                        @endif
+                                </div>
+                                <div class="step-label">{{ $step }}</div>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
                     </div>
 
                     <!-- Card untuk tabel progress survey -->

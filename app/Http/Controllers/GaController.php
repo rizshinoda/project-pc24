@@ -1236,8 +1236,6 @@ class GaController extends Controller
             }
         }
 
-
-
         return redirect()->route('ga.maintenance_show', $id)->with('success', 'Status berhasil diubah menjadi Shipped.');
     }
 

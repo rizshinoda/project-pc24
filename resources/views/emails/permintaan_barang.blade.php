@@ -92,7 +92,11 @@
             </tr>
             @endif
 
-
+            <tr>
+                <td><strong>Kebutuhan</strong></td>
+                <td>:</td>
+                <td>{{ $requestBarang->kebutuhan }}</td>
+            </tr>
             <tr>
                 <td><strong>Nama Penerima</strong></td>
                 <td>:</td>

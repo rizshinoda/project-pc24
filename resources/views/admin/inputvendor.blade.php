@@ -120,12 +120,12 @@
 
 
                     </div>
-
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Form Input Vendor</h4>
-                                <!-- {{-- Menampilkan pesan error jika ada --}}
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Form Input Vendor</h4>
+                                    <!-- {{-- Menampilkan pesan error jika ada --}}
                                 @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul>
@@ -136,34 +136,34 @@
                                 </div>
                                 @endif -->
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('admin.gantivendor.store', ['id' => $getGantivendor->id]) }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="{{ route('admin.gantivendor.store', ['id' => $getGantivendor->id]) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Vendor</label>
-                                                <div class="col-sm-8">
-                                                    <select class="form-control" id="vendor_id" name="vendor_id" required>
-                                                        <option value="">Pilih Vendor</option>
-                                                        @foreach ($vendors as $vendor)
-                                                        <option value="{{ $vendor->id }}">{{ $vendor->nama_vendor }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
+
+                                        <div class="form-group ">
+                                            <label for="alamat_pelanggan">Nama Vendor</label>
+
+                                            <select class="form-control" id="vendor_id" name="vendor_id" required>
+                                                <option value="">Pilih Vendor</option>
+                                                @foreach ($vendors as $vendor)
+                                                <option value="{{ $vendor->id }}">{{ $vendor->nama_vendor }}</option>
+                                                @endforeach
+                                            </select>
+
                                         </div>
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.gantivendor.show', $getGantivendor->id) }}" class="btn btn-light mt-1">Kembali</a>
 
-                                </form>
+                                        <br>
+                                        <div class="text-center">
+                                            <!-- Tombol submit -->
+                                            <button type="submit" class="btn btn-info">Submit</button>
+                                            <a href="{{ route('admin.gantivendor.show', $getGantivendor->id) }}" class="btn btn-light mt-1">Kembali</a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <footer class="footer">

@@ -169,16 +169,54 @@
                                     @endif
 
                                     <p><strong>Barang non stock:</strong> {{ $requestBarang->non_stock }}</p>
-                                    <p><strong>Penempatan Barang:</strong> {{ $requestBarang->penempatan_barang }}</p>
                                     <p><strong>Kebutuhan:</strong> {{ $requestBarang->kebutuhan }}</p>
                                     <p><strong>Keterangan:</strong> {{ $requestBarang->keterangan }}</p>
-                                    <a href="{{route('ga.request_barang.print', $requestBarang->id )}}" class="btn btn-info mt-2">Print Surat</a>
+                                    <!-- <a href="{{route('ga.request_barang.print', $requestBarang->id )}}" class="btn btn-info mt-2">Print Surat</a> -->
 
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="container mt-4">
+                        @php
+                        // Tahapan normal
+                        $steps = ['Pending', 'Approved', 'Shipped', 'Completed'];
 
+                        // Ambil status dari progress
+                        $currentStatus = ucfirst($requestBarang->status ?? 'Pending');
+
+                        // Cek apakah status termasuk flow gagal
+                        $isCanceledOrRejected = in_array(strtolower($currentStatus), ['canceled', 'cancelled', 'rejected']);
+                        $currentStep = array_search($currentStatus, $steps);
+                        if ($currentStep === false) $currentStep = 0;
+                        @endphp
+
+                        @if($isCanceledOrRejected)
+                        {{-- Tampilan khusus untuk status gagal --}}
+                        <div class="alert alert-danger text-center fw-bold py-4 rounded">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            Work Order <span class="text-uppercase">{{ $currentStatus }}</span>
+                        </div>
+                        @else
+                        {{-- Progress bar normal --}}
+                        <div class="stepper">
+                            @foreach($steps as $index => $step)
+                            <div class="step 
+                    {{ $index < $currentStep ? 'completed' : '' }} 
+                    {{ $index == $currentStep ? 'active' : '' }}">
+                                <div class="step-circle">
+                                    @if($index < $currentStep)
+                                        <i class="bi bi-check-lg"></i>
+                                        @else
+                                        {{ $index + 1 }}
+                                        @endif
+                                </div>
+                                <div class="step-label">{{ $step }}</div>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
                     <!-- Card untuk tabel detail barang -->
                     <div class="row mt-4">
                         <div class="col-md-12">
@@ -327,9 +365,7 @@
                                     <div class=" d-flex justify-content-end">
                                         <form action="{{ route('ga.request_barang.completed', $requestBarang->id) }}" method="POST">
                                             @csrf
-                                            <button type="button" class="btn btn-success" onclick="confirmCompletion('{{ route('ga.request_barang.completed', $requestBarang->id) }}')">
-                                                <i class="fa fa-check"></i> Selesaikan Work Order
-                                            </button>
+
                                         </form>
                                     </div>
 
@@ -422,7 +458,9 @@
                                         </table>
                                     </div>
                                     <a href="{{ route('ga.request_barang') }}" class="btn btn-info mt-3"> <i class="fa fa-arrow-left"></i> Kembali</a>
-
+                                    <button type="button" class="btn btn-success pull-right mt-3" onclick="confirmCompletion('{{ route('ga.request_barang.completed', $requestBarang->id) }}')">
+                                        <i class="fa fa-check"></i> Selesaikan Work Order
+                                    </button>
 
                                 </div>
                             </div>

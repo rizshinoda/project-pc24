@@ -137,7 +137,7 @@
                                                 <td style="text-align: center; vertical-align: middle;">{{ $maintenance->no_spk }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $maintenance->created_at->format('d M Y') }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $maintenance->onlineBilling->pelanggan->nama_pelanggan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $maintenance->onlineBilling->instansi->nama_instansi}}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $maintenance->onlineBilling->instansi?->nama_instansi}}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $maintenance->onlineBilling->nama_site ?? 'Tidak Ada Nama Site' }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">
                                                     {{ \Illuminate\Support\Str::limit($maintenance->onlineBilling->alamat_pemasangan, 60, '...') }}

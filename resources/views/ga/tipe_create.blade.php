@@ -106,53 +106,51 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-danger text-white me-2">
                                 <i class="mdi mdi-home"></i>
-                            </span> Create Jenis
+                            </span> Create Tipe
                         </h3>
 
                     </div>
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Form Tambah Merek</h4>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Form Tambah Tipe</h4>
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('storeTipe') }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="{{ route('storeTipe') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Pilih Merek</label>
-                                                <div class="col-sm-8">
-                                                    <select class="form-control" id="merek_id" name="merek_id" required>
-                                                        <option value="">Pilih Merek</option>
-                                                        @foreach ($mereks as $merek)
-                                                        <option value="{{ $merek->id }}">{{ $merek->nama_merek }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Tipe</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="nama_tipe" name="nama_tipe" required>
-                                                </div>
-                                            </div>
+                                        <div class="form-group ">
+                                            <label for="alamat_pelanggan">Pilih Merek</label>
 
+                                            <select class="form-control" id="merek_id" name="merek_id" required>
+                                                <option value="">Pilih Merek</option>
+                                                @foreach ($mereks as $merek)
+                                                <option value="{{ $merek->id }}">{{ $merek->nama_merek }}</option>
+                                                @endforeach
+                                            </select>
 
+                                        </div>
+                                        <div class="form-group ">
+                                            <label for="alamat_pelanggan">Nama Tipe</label>
+
+                                            <input type="text" class="form-control" id="nama_tipe" name="nama_tipe" required>
 
                                         </div>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('ga.Tipe') }}" class="btn btn-light ">Kembali</a>
 
-                                </form>
+
+                                        <br>
+                                        <div class="text-center">
+                                            <!-- Tombol submit -->
+                                            <button type="submit" class="btn btn-info">Submit</button>
+                                            <a href="{{ route('ga.Tipe') }}" class="btn btn-light ">Kembali</a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <!-- content-wrapper ends -->

@@ -3100,6 +3100,7 @@ class AdminController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
         ]);
@@ -3111,6 +3112,7 @@ class AdminController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
 
             'status' => 'pending',
             'user_id' => Auth::user()->id,
@@ -3198,6 +3200,7 @@ class AdminController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
         ]);
@@ -3210,6 +3213,7 @@ class AdminController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
 
         ]);
 

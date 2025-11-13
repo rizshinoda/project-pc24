@@ -131,7 +131,7 @@
                                                 <td style="text-align: center; vertical-align: middle;">{{ $dismantle->no_spk }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $dismantle->created_at->format('d M Y') }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $dismantle->onlineBilling->pelanggan->nama_pelanggan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $dismantle->onlineBilling->instansi->nama_instansi}}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $dismantle->onlineBilling->instansi?->nama_instansi}}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $dismantle->onlineBilling->nama_site ?? 'Tidak Ada Nama Site' }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">
                                                     {{ \Illuminate\Support\Str::limit($dismantle->onlineBilling->alamat_pemasangan, 60, '...') }}

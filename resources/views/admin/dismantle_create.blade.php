@@ -121,61 +121,57 @@
 
 
                     </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Form Dismantle</h4>
+                                    {{-- Menampilkan pesan error jika ada --}}
+                                    @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    @endif
 
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Form Dismantle</h4>
-                                {{-- Menampilkan pesan error jika ada --}}
-                                @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                @endif
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="{{ route('admin.dismantle_store') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('admin.dismantle_store') }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
+                                        <div class="form-group ">
+                                            <label for="nama_site">No SPK</label>
 
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group row">
-                                                <label for="nama_site" class="col-sm-4 col-form-label">No SPK</label>
-                                                <div class="col-sm-8">
-                                                    <!-- Nomor SPK akan di-generate otomatis di server -->
-                                                    <input type="text" class="form-control" id="no_spk" name="no_spk" value="{{ $no_spk }}" readonly>
-
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="bandwidth" class="col-sm-4 col-form-label">Keterangan</label>
-                                                <div class="col-sm-8">
-                                                    <textarea name="keterangan" id="keterangan" class="form-control" rows="4"></textarea>
-                                                </div>
-
-
-                                                <!-- Kirimkan online_billing_id sebagai hidden -->
-                                                <input type="hidden" name="online_billing_id" value="{{ $onlineBilling->id }}">
-
-                                            </div>
+                                            <!-- Nomor SPK akan di-generate otomatis di server -->
+                                            <input type="text" class="form-control" id="no_spk" name="no_spk" value="{{ $no_spk }}" readonly>
 
 
                                         </div>
+                                        <div class="form-group ">
+                                            <label for="bandwidth">Keterangan</label>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.OB_show', $onlineBilling->id) }}" class="btn btn-light">Kembali</a>
+                                            <textarea name="keterangan" id="keterangan" class="form-control" rows="4"></textarea>
 
-                                </form>
+
+
+                                            <!-- Kirimkan online_billing_id sebagai hidden -->
+                                            <input type="hidden" name="online_billing_id" value="{{ $onlineBilling->id }}">
+
+
+
+                                        </div>
+                                        <br>
+                                        <!-- Tombol submit -->
+                                        <button type="submit" class="btn btn-info">Submit</button>
+                                        <a href="{{ route('admin.OB_show', $onlineBilling->id) }}" class="btn btn-light">Kembali</a>
+
+                                    </form>
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <footer class="footer">

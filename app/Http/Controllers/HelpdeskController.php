@@ -232,7 +232,6 @@ class HelpdeskController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
-            'penempatan_barang' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
             'cart' => 'nullable|array',
         ]);
@@ -245,7 +244,6 @@ class HelpdeskController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
-            'penempatan_barang' => $validatedData['penempatan_barang'],
             'kebutuhan' => $validatedData['kebutuhan'],
             'subject_manual' => $validatedData['subject_manual'] ?? null,
             'status' => 'pending',
@@ -448,7 +446,6 @@ class HelpdeskController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
-            'penempatan_barang' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
@@ -462,7 +459,6 @@ class HelpdeskController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
-            'penempatan_barang' => $validatedData['penempatan_barang'],
             'kebutuhan' => $validatedData['kebutuhan'],
 
         ]);

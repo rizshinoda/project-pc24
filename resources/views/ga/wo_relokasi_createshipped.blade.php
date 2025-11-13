@@ -117,28 +117,37 @@
                         {{ session('success') }}
                     </div>
                     @endif
+                    <div class="row justify-content-center">
+                        <div class="col-md-6"> <!-- Lebar form setengah halaman -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Progress Shipping Relokasi</h4>
+                                    {{-- Form untuk mengupload multiple foto --}}
+                                    <form action="{{ route('ga.relokasi.store.shipped', $getRelokasi->id) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
-                    {{-- Form untuk mengupload multiple foto --}}
-                    <form action="{{ route('ga.relokasi.store.shipped', $getRelokasi->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
+                                        <div class="form-group">
+                                            <label for="keterangan">Keterangan Pengiriman</label>
+                                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan', 'Perangkat dikirim ke Team Regional Terkait') }}</textarea>
+                                        </div>
 
-                        <div class="form-group">
-                            <label for="keterangan">Keterangan Pengiriman</label>
-                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan', 'Perangkat dikirim ke Team Regional Terkait') }}</textarea>
+                                        <div class="form-group">
+                                            <label for="foto">Upload Foto Resi (Opsional)</label>
+                                            <input type="file" name="foto[]" id="foto" class="form-control" multiple>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-primary">
+                                                Kirim Perangkat
+                                            </button>
+                                            <a href="{{ route('ga.relokasi.show', $getRelokasi->id) }}" class="btn btn-light ">Kembali</a>
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="foto">Upload Foto Resi (Opsional)</label>
-                            <input type="file" name="foto[]" id="foto" class="form-control" multiple>
-                        </div>
-
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">
-                                Kirim Perangkat
-                            </button>
-                        </div>
-                    </form>
-
+                    </div>
                 </div>
 
 

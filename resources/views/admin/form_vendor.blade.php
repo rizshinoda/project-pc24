@@ -120,12 +120,12 @@
 
 
                     </div>
-
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Tambah Vendor</h4>
-                                <!-- {{-- Menampilkan pesan error jika ada --}}
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Tambah Vendor</h4>
+                                    <!-- {{-- Menampilkan pesan error jika ada --}}
                                 @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul>
@@ -136,39 +136,32 @@
                                 </div>
                                 @endif -->
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('vendor.store') }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="{{ route('vendor.store') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
-                                    <div class="row">
-                                        <div class="col-md-6">
-
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Vendor</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="nama_vendor" name="nama_vendor" required>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Contact</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="contact" name="contact" required>
-                                                </div>
-                                            </div>
-
+                                        <div class="form-group">
+                                            <label for="nama_vendor">Nama Vendor</label>
+                                            <input type="text" class="form-control" id="nama_vendor" name="nama_vendor" required>
                                         </div>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.namavendor') }}" class="btn btn-light">Kembali</a>
+                                        <div class="form-group">
+                                            <label for="contact">Contact</label>
+                                            <input type="text" class="form-control" id="contact" name="contact" required>
+                                        </div>
 
-                                </form>
+                                        <br>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-info">Submit</button>
+
+                                            <a href="{{ route('admin.namavendor') }}" class="btn btn-light">Kembali</a>
+                                        </div>
+                                    </form>
+
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <footer class="footer">

@@ -556,10 +556,11 @@
 
                                     </div>
                                     <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.wo_survey_show', $getSurvey->id) }}" class="btn btn-light">Kembali</a>
-
+                                    <div class="text-center">
+                                        <!-- Tombol submit -->
+                                        <button type="submit" class="btn btn-info">Submit</button>
+                                        <a href="{{ route('admin.wo_survey_show', $getSurvey->id) }}" class="btn btn-light">Kembali</a>
+                                    </div>
                                 </form>
                             </div>
                         </div>

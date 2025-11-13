@@ -435,10 +435,11 @@
                                         </div>
                                     </div>
                                     <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Edit</button>
-                                    <a href="{{ route('admin.survey') }}" class="btn btn-light">Kembali</a>
-
+                                    <div class="text-center">
+                                        <!-- Tombol submit -->
+                                        <button type="submit" class="btn btn-info">Edit</button>
+                                        <a href="{{ route('admin.survey') }}" class="btn btn-light">Kembali</a>
+                                    </div>
                                 </form>
                             </div>
                         </div>

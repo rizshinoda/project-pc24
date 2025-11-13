@@ -120,12 +120,12 @@
 
 
                     </div>
-
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Edit Vendor</h4>
-                                <!-- {{-- Menampilkan pesan error jika ada --}}
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Edit Vendor</h4>
+                                    <!-- {{-- Menampilkan pesan error jika ada --}}
                                 @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul>
@@ -136,39 +136,37 @@
                                 </div>
                                 @endif -->
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('vendor.update', $vendors->id) }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="row">
-                                        <div class="col-md-6">
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="{{ route('vendor.update', $vendors->id) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PUT')
 
 
-                                            <div class=" form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Nama Vendor</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" name="nama_vendor" id="nama_vendor" class="form-control" value="{{ old('nama_vendor', $vendors->nama_vendor) }}" required>
-                                                </div>
-                                            </div>
+                                        <div class=" form-group ">
+                                            <label for="no_pelanggan">Nama Vendor</label>
 
-                                            <div class=" form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Contact</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" name="contact" id="contact" class="form-control" value="{{ old('contact', $vendors->contact) }}" required>
-                                                </div>
-                                            </div>
+                                            <input type="text" name="nama_vendor" id="nama_vendor" class="form-control" value="{{ old('nama_vendor', $vendors->nama_vendor) }}" required>
+
                                         </div>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.namavendor') }}" class="btn btn-light">Kembali</a>
+                                        <div class=" form-group ">
+                                            <label for="no_pelanggan">Contact</label>
 
-                                </form>
+                                            <input type="text" name="contact" id="contact" class="form-control" value="{{ old('contact', $vendors->contact) }}" required>
+
+                                        </div>
+
+                                        <br>
+                                        <div class="text-center">
+                                            <!-- Tombol submit -->
+                                            <button type="submit" class="btn btn-info">Submit</button>
+                                            <a href="{{ route('admin.namavendor') }}" class="btn btn-light">Kembali</a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <footer class="footer">

@@ -106,43 +106,41 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-danger text-white me-2">
                                 <i class="mdi mdi-home"></i>
-                            </span> Create Jenis
+                            </span> Create Merek
                         </h3>
 
                     </div>
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Form Tambah Merek</h4>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Form Tambah Merek</h4>
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('storeMerek') }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Merek</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="nama_merek" name="nama_merek" required>
-                                                </div>
-                                            </div>
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="{{ route('storeMerek') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
 
+                                        <div class="form-group">
+                                            <label for="alamat_pelanggan">Nama Merek</label>
+
+                                            <input type="text" class="form-control" id="nama_merek" name="nama_merek" required>
 
                                         </div>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('ga.Merek') }}" class="btn btn-light">Kembali</a>
 
-                                </form>
+
+                                        <br>
+                                        <div class="text-center">
+                                            <!-- Tombol submit -->
+                                            <button type="submit" class="btn btn-info">Submit</button>
+                                            <a href="{{ route('ga.Merek') }}" class="btn btn-light">Kembali</a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <!-- content-wrapper ends -->
