@@ -82,8 +82,10 @@ jobs:
             chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
             chmod -R 775 /var/www/storage /var/www/bootstrap/cache"
 
-      - name: Cache Laravel config
-        run: docker exec $APP_CONTAINER php artisan config:cache
+      - name: Optimize Laravel application
+        run: |
+          docker exec $APP_CONTAINER php artisan optimize:clear || true
+          docker exec $APP_CONTAINER php artisan optimize
 
       - name: Start Laravel queue worker
         run: |
