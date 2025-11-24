@@ -120,12 +120,12 @@
 
 
                     </div>
-
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Tambah SID</h4>
-                                <!-- {{-- Menampilkan pesan error jika ada --}}
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Tambah SID</h4>
+                                    <!-- {{-- Menampilkan pesan error jika ada --}}
                                 @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul>
@@ -136,34 +136,32 @@
                                 </div>
                                 @endif -->
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="#" method="POST" enctype="multipart/form-data">
-                                    @csrf
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">SID Vendor</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="sid_vendor" name="sid_vendor" required>
-                                                </div>
-                                            </div>
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="#" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
 
+                                        <div class="form-group ">
+                                            <label for="alamat_pelanggan">SID Vendor</label>
+
+                                            <input type="text" class="form-control" id="sid_vendor" name="sid_vendor" required>
 
                                         </div>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Input OB</button>
-                                    <a href="{{ route('admin.wo_instalasi_show', $getInstall->id) }}" class="btn btn-light ">Kembali</a>
 
-                                </form>
+
+
+                                        <br>
+                                        <div class="text-center">
+                                            <!-- Tombol submit -->
+                                            <button type="submit" class="btn btn-info">Input OB</button>
+                                            <a href="{{ route('admin.wo_instalasi_show', $getInstall->id) }}" class="btn btn-light ">Kembali</a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <footer class="footer">

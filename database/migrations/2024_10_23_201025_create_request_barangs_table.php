@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('no_penerima');
             $table->text('keterangan')->nullable();
             $table->string('non_stock')->nullable();
-            $table->string('penempatan_barang')->nullable();
             $table->string('kebutuhan')->nullable();
 
             $table->enum('status', ['pending', 'approved', 'rejected', 'shipped', 'completed'])->default('pending');

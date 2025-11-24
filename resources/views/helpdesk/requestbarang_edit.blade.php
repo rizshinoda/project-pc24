@@ -219,12 +219,7 @@
                                                     <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $requestBarang->non_stock) }}</textarea>
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label for="keterangan" class="col-sm-4 col-form-label">Penempatan Barang</label>
-                                                <div class="col-sm-8">
-                                                    <textarea id="penempatan_barang" name="penempatan_barang" class="form-control" rows="4">{{ $requestBarang->penempatan_barang }}</textarea>
-                                                </div>
-                                            </div>
+
                                             <div class="form-group row">
                                                 <label for="keterangan" class="col-sm-4 col-form-label">Kebutuhan</label>
                                                 <div class="col-sm-8">

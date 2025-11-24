@@ -10,7 +10,7 @@ use Carbon\Carbon;
 class SessionTimeout
 {
     // Timeout dalam detik (contoh: 600 detik = 10 menit)
-    protected $timeout = 1200;
+    protected $timeout = 1800;
 
     public function handle($request, Closure $next)
     {
@@ -21,7 +21,7 @@ class SessionTimeout
             if ($lastActivity && ($currentTime - $lastActivity > $this->timeout)) {
                 Auth::logout();
                 Session::flush();
-                return redirect('/login')->with('error', 'Session expired. Silakan login kembali.');
+                return redirect('/login')->with('error', 'Session expired. Silahkan login kembali.');
             }
 
             Session::put('lastActivityTime', $currentTime);

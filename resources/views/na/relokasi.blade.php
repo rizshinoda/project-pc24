@@ -203,7 +203,7 @@
                                                 <td style="text-align: center; vertical-align: middle;">{{ $relokasi->no_spk }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $relokasi->created_at->format('d M Y') }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $relokasi->onlineBilling->pelanggan->nama_pelanggan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $relokasi->onlineBilling->instansi->nama_instansi}}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $relokasi->onlineBilling->instansi?->nama_instansi}}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $relokasi->onlineBilling->nama_site ?? 'Tidak Ada Nama Site' }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">
                                                     {{ \Illuminate\Support\Str::limit($relokasi->onlineBilling->alamat_pemasangan, 60, '...') }}

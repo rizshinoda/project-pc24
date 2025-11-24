@@ -121,56 +121,53 @@
 
 
                     </div>
-
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Form Dismantle</h4>
-                                {{-- Menampilkan pesan error jika ada --}}
-                                @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                @endif
-
-                                {{-- Form untuk mengedit work order --}}
-                                <form action="{{ route('admin.dismantle_update', $workOrder->id) }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    @method('PUT') {{-- Gunakan method PUT untuk proses update --}}
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group row">
-                                                <label for="no_spk" class="col-sm-4 col-form-label">No SPK</label>
-                                                <div class="col-sm-8">
-                                                    <!-- Nomor SPK tidak bisa diubah -->
-                                                    <input type="text" class="form-control" id="no_spk" name="no_spk" value="{{ $workOrder->no_spk }}" readonly>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="keterangan" class="col-sm-4 col-form-label">Keterangan</label>
-                                                <div class="col-sm-8">
-                                                    <textarea name="keterangan" id="keterangan" class="form-control" rows="4">{{ $workOrder->keterangan }}</textarea>
-                                                </div>
-                                            </div>
-
-                                            <!-- Kirimkan online_billing_id sebagai hidden input -->
-                                            <input type="hidden" name="online_billing_id" value="{{ $workOrder->online_billing_id }}">
-                                        </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Form Dismantle</h4>
+                                    {{-- Menampilkan pesan error jika ada --}}
+                                    @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
                                     </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Update</button>
-                                    <a href="{{ route('admin.dismantle') }}" class="btn btn-light">Kembali</a>
-                                </form>
+                                    @endif
 
+                                    {{-- Form untuk mengedit work order --}}
+                                    <form action="{{ route('admin.dismantle_update', $workOrder->id) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PUT') {{-- Gunakan method PUT untuk proses update --}}
+
+
+                                        <div class="form-group ">
+                                            <label for="no_spk">No SPK</label>
+
+                                            <!-- Nomor SPK tidak bisa diubah -->
+                                            <input type="text" class="form-control" id="no_spk" name="no_spk" value="{{ $workOrder->no_spk }}" readonly>
+
+                                        </div>
+                                        <div class="form-group ">
+                                            <label for="keterangan">Keterangan</label>
+                                            <textarea name="keterangan" id="keterangan" class="form-control" rows="4">{{ $workOrder->keterangan }}</textarea>
+                                        </div>
+
+                                        <!-- Kirimkan online_billing_id sebagai hidden input -->
+                                        <input type="hidden" name="online_billing_id" value="{{ $workOrder->online_billing_id }}">
+
+                                        <br>
+                                        <!-- Tombol submit -->
+                                        <button type="submit" class="btn btn-info">Update</button>
+                                        <a href="{{ route('admin.dismantle') }}" class="btn btn-light">Kembali</a>
+                                    </form>
+
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <footer class="footer">

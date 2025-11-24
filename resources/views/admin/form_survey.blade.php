@@ -374,7 +374,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Nomer PIC</label>
+                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Nomor PIC</label>
                                                 <div class="col-sm-8">
                                                     <input type="text" class="form-control" id="no_pic" name="no_pic">
                                                 </div>
@@ -416,10 +416,11 @@
                                         </div>
                                     </div>
                                     <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.survey') }}" class="btn btn-light">Kembali</a>
-
+                                    <div class="text-center">
+                                        <!-- Tombol submit -->
+                                        <button type="submit" class="btn btn-info">Submit</button>
+                                        <a href="{{ route('admin.survey') }}" class="btn btn-light">Kembali</a>
+                                    </div>
                                 </form>
                             </div>
                         </div>

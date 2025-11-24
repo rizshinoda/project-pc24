@@ -14,6 +14,7 @@ class WorkOrderGantiVendor extends Model
         'keterangan',
         'status',
         'vendor_id',
+        'sid_baru',
         'admin_id',
 
     ];

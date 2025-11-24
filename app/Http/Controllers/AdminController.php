@@ -2798,7 +2798,7 @@ class AdminController extends Controller
         $getGantivendor->save();
 
         // Redirect dengan pesan sukses
-        return redirect()->route('admin.gantivendor')->with('success', 'Nama Vendor berhasil disimpan.');
+        return redirect()->route('admin.gantivendor.show', $id)->with('success', 'Nama Vendor berhasil disimpan.');
     }
     public function OB(Request $request)
     {
@@ -3071,7 +3071,6 @@ class AdminController extends Controller
         return $this->renderView('requestbarang', $data);
     }
 
-
     public function createrequest()
     {
         // Ambil notifikasi yang belum dibaca
@@ -3101,6 +3100,7 @@ class AdminController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
         ]);
@@ -3112,6 +3112,7 @@ class AdminController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
 
             'status' => 'pending',
             'user_id' => Auth::user()->id,
@@ -3199,6 +3200,7 @@ class AdminController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
         ]);
@@ -3211,6 +3213,7 @@ class AdminController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
 
         ]);
 

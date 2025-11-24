@@ -12,7 +12,6 @@
         <!-- Navbar -->
         @include('helpdesk.partials.navbar')
 
-
         <div class="container-fluid page-body-wrapper">
             <!-- Sidebar -->
             @include('helpdesk.partials.sidebar')

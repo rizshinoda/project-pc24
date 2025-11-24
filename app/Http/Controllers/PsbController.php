@@ -300,11 +300,11 @@ class PsbController extends Controller
             }
         } else {
             $progress->status = 'On Progress'; // Default status progress jika belum complete
-            // Update status di tabel WorkOrderInstall
-            if ($getInstall->status !== 'Completed') { // Hanya jika status belum Completed
-                $getInstall->status = 'On Progress';
-                $getInstall->save();
-            }
+            // // Update status di tabel WorkOrderInstall
+            // if ($getInstall->status !== 'Completed') { // Hanya jika status belum Completed
+            //     $getInstall->status = 'On Progress';
+            //     $getInstall->save();
+            // }
         }
 
         // Menyimpan ID user PSB yang sedang login
@@ -2235,20 +2235,20 @@ class PsbController extends Controller
         } else {
             $progress->status = 'On Progress'; // Default status progress jika belum complete
 
-            // Update status di tabel WorkOrderUpgrade jika belum Completed
-            if ($getRelokasi->status !== 'Completed') {
-                $getRelokasi->status = 'On Progress';
-                $getRelokasi->save();
-            }
+            // // Update status di tabel WorkOrderUpgrade jika belum Completed
+            // if ($getRelokasi->status !== 'Completed') {
+            //     $getRelokasi->status = 'On Progress';
+            //     $getRelokasi->save();
+            // }
 
-            // Perbarui status di tabel statuses
-            $status = Status::where('work_orderable_id', $getRelokasi->id)
-                ->where('process', 'Relokasi')
-                ->first();
-            if ($status) {
-                $status->status = 'On Progress';
-                $status->save();
-            }
+            // // Perbarui status di tabel statuses
+            // $status = Status::where('work_orderable_id', $getRelokasi->id)
+            //     ->where('process', 'Relokasi')
+            //     ->first();
+            // if ($status) {
+            //     $status->status = 'On Progress';
+            //     $status->save();
+            // }
         }
 
         // Menyimpan ID user PSB yang sedang login
@@ -2858,6 +2858,7 @@ class PsbController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array',
 
@@ -2870,6 +2871,7 @@ class PsbController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
 
             'status' => 'pending',
             'user_id' => Auth::user()->id,
@@ -2956,6 +2958,7 @@ class PsbController extends Controller
             'no_penerima' => 'required|string|max:20',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
 
             'cart' => 'nullable|array',
         ]);
@@ -2968,6 +2971,7 @@ class PsbController extends Controller
             'no_penerima' => $validatedData['no_penerima'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
 
         ]);
 

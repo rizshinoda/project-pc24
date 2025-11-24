@@ -227,20 +227,32 @@
 
                                                 </div>
                                             </div>
+
+
+
+                                        </div>
+
+                                        <div class="col-md-6">
                                             <div class="form-group row">
                                                 <label for="no_penerima" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
                                                 <div class="col-sm-8">
-                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4"></textarea>
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="5" cols="40"></textarea>
                                                 </div>
                                             </div>
-                                            <br>
-                                            <!-- Submit Button -->
-                                            <button style="text-align: center;" type="submit" class="btn btn-info">Kirim Permintaan</button>
-                                            <a href="{{ route('admin.request_barang') }}" class="btn btn-light">Kembali</a>
 
+                                            <div class="form-group row">
+                                                <label for="no_penerima" class="col-sm-4 col-form-label">Kebutuhan</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="kebutuhan" name="kebutuhan" class="form-control" rows="5" cols="40"></textarea>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-
+                                    <div class="text-center mt-5">
+                                        <!-- Submit Button -->
+                                        <button style="text-align: center;" type="submit" class="btn btn-info">Kirim Permintaan</button>
+                                        <a href="{{ route('admin.request_barang') }}" class="btn btn-light">Kembali</a>
+                                    </div>
 
                                 </form>
                             </div>

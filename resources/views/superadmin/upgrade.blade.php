@@ -132,7 +132,7 @@
                                                 <td style="text-align: center; vertical-align: middle;">{{ $upgrade->no_spk }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $upgrade->created_at->format('d M Y') }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $upgrade->onlineBilling->pelanggan->nama_pelanggan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $upgrade->onlineBilling->instansi->nama_instansi}}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $upgrade->onlineBilling->instansi?->nama_instansi}}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $upgrade->onlineBilling->nama_site ?? 'Tidak Ada Nama Site' }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">
                                                     {{ \Illuminate\Support\Str::limit($upgrade->onlineBilling->alamat_pemasangan, 60, '...') }}

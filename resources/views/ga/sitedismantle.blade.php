@@ -194,7 +194,7 @@
                                                 <td style=" text-align: center; vertical-align: middle;">{{$onlinebilling->firstItem()+ $key}} </td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->no_jaringan }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->pelanggan->nama_pelanggan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->instansi->nama_instansi }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->instansi?->nama_instansi }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->nama_site }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">
                                                     {{ \Illuminate\Support\Str::limit($OB->alamat_pemasangan, 60, '...') }}

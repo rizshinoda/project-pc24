@@ -110,49 +110,55 @@
      }
 
      .form-control {
-         border: 1px solid #000000;
+         border: 1px solid #ccc;
          border-radius: 8px;
          padding: 12px;
+         background-color: #fdfdfd;
+         color: #333;
+         font-size: 14px;
+         transition: all 0.3s ease;
+         /* Animasi halus saat hover/focus */
      }
 
-     select.form-control {
-         border: 1px solid #000000;
-         /* Border hitam */
-         border-radius: 8px;
-         /* Sudut membulat */
-         padding: 12px;
-         /* Padding sama dengan input */
-         /* Ukuran teks */
-         background-color: #fff;
-         /* Warna latar belakang putih */
-         color: #000;
-         /* Warna teks hitam */
-         appearance: none;
-         /* Menghilangkan tampilan default (di beberapa browser) */
-         -webkit-appearance: none;
-         /* Untuk Safari */
-         -moz-appearance: none;
-         /* Untuk Firefox */
-         cursor: pointer;
-         /* Menunjukkan ini bisa dipilih */
+     /* Efek saat hover */
+     .form-control:hover {
+         border-color: #888;
+         background-color: #f9f9f9;
      }
 
-     /* Tambahkan ikon panah ke bawah */
-     select.form-control {
-         background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23000" d="M2 5L0 0h4z"/></svg>');
-         background-repeat: no-repeat;
-         background-position: right 10px center;
-         background-size: 10px;
-         padding-right: 30px;
-         /* Agar tidak menutupi teks */
-     }
-
-     /* Saat combo box di-focus */
-     select.form-control:focus {
+     /* Efek saat fokus */
+     .form-control:focus {
          border-color: #007bff;
-         /* Biru saat fokus */
-         box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+         background-color: #fff;
+         box-shadow: 0 0 10px rgba(0, 123, 255, 0.25);
          outline: none;
+     }
+
+     select.form-control {
+         background-color: #fff;
+         color: #333;
+         border: 1px solid #ccc;
+         border-radius: 8px;
+         padding: 12px;
+         cursor: pointer;
+         transition: all 0.3s ease;
+
+         appearance: none;
+         -webkit-appearance: none;
+         -moz-appearance: none;
+
+         background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+         background-repeat: no-repeat;
+         background-position: right 12px center;
+         background-size: 16px;
+         padding-right: 36px;
+         /* supaya teks tidak menabrak icon */
+     }
+
+     /* Hover & Focus */
+     select.form-control:hover {
+         border-color: #007bff;
+         background-color: #f8faff;
      }
 
      .input-filled {
@@ -269,5 +275,93 @@
          width: 6px;
          /* Chrome */
 
+     }
+
+     .stepper {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         position: relative;
+         margin: 25px auto;
+         max-width: 750px;
+     }
+
+     .step {
+         text-align: center;
+         flex: 1;
+         position: relative;
+     }
+
+     /* Garis penghubung antar step */
+     .step:not(:last-child)::after {
+         content: '';
+         position: absolute;
+         top: 14px;
+         /* lebih kecil karena lingkaran lebih kecil */
+         right: -50%;
+         width: 100%;
+         height: 3px;
+         /* sebelumnya 4px */
+         background-color: #d6d6d6;
+         z-index: 0;
+         transition: background-color 0.3s ease;
+     }
+
+     /* Garis aktif (yang sudah dilewati) */
+     .step.completed:not(:last-child)::after {
+         background-color: #0d6efd;
+     }
+
+     /* Lingkaran step */
+     .step-circle {
+         width: 28px;
+         /* sebelumnya 40px */
+         height: 28px;
+         /* lebih kecil */
+         border-radius: 50%;
+         background-color: #d6d6d6;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         margin: 0 auto;
+         font-weight: bold;
+         color: white;
+         z-index: 1;
+         font-size: 13px;
+         position: relative;
+         transition: all 0.3s ease;
+     }
+
+     /* Step yang sudah selesai → warna biru dan ceklis */
+     .step.completed .step-circle {
+         background-color: #0d6efd;
+         color: white;
+     }
+
+     .step.completed .step-circle::before {
+         content: "✔";
+         position: absolute;
+         font-weight: 700;
+         font-size: 13px;
+         color: white;
+     }
+
+     /* Step aktif (sedang berlangsung) */
+     .step.active .step-circle {
+         background-color: #0d6efd;
+         box-shadow: 0 0 8px rgba(13, 110, 253, 0.5);
+     }
+
+     /* Label di bawah step */
+     .step-label {
+         margin-top: 6px;
+         font-size: 13px;
+         color: #6c757d;
+     }
+
+     .step.completed .step-label,
+     .step.active .step-label {
+         color: #0d6efd;
+         font-weight: 600;
      }
  </style>

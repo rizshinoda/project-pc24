@@ -124,26 +124,37 @@
                         {{ session('success') }}
                     </div>
                     @endif
+                    <div class="row justify-content-center">
+                        <div class="col-md-6"> <!-- Lebar form setengah halaman -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Progress Ganti Vendor</h4>
 
-                    {{-- Form untuk mengupload multiple foto --}}
-                    <form action="{{ route('admin_gantivendor_store_progress', $getGantivendor->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="form-group">
-                            <label for="keterangan">Keterangan Progress</label>
-                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan') }}</textarea>
+                                    {{-- Form untuk mengupload multiple foto --}}
+                                    <form action="{{ route('admin_gantivendor_store_progress', $getGantivendor->id) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label for="keterangan">Keterangan Progress</label>
+                                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan') }}</textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="foto">Upload Foto Progress</label>
+                                            <input type="file" name="foto[]" id="foto" class="form-control" multiple>
+                                        </div>
+
+                                        <div class="text-center">
+
+                                            <!-- Tombol untuk selesaikan survey -->
+                                            <button type="submit" name="action" value="complete" class="btn btn-success">Submit Reason</button>
+                                            <a href="{{ route('admin.gantivendor.show', $getGantivendor->id) }}" class="btn btn-light ">Kembali</a>
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="foto">Upload Foto Progress</label>
-                            <input type="file" name="foto[]" id="foto" class="form-control" multiple>
-                        </div>
-
-                        <div class="form-group">
-
-                            <!-- Tombol untuk selesaikan survey -->
-                            <button type="submit" name="action" value="complete" class="btn btn-success">Submit Reason</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
 
 

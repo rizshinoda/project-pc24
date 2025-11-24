@@ -47,46 +47,47 @@
                         @endif
 
                     </div>
-                    <div class="col-lg-6 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <ul class="list-group">
-                                    @foreach($logs as $log)
-                                    <li class="list-group-item d-flex align-items-start">
-                                        <div class="me-3 mt-1" style="min-width: 90px;">
-                                            <span class="badge rounded-pill {{ getLogBadgeColor($log->title) }}">
-                                                {{ $log->title }}
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold">{{ $log->description }}</div>
-                                            <small class="text-muted">
-                                                @switch($log->action)
-                                                @case('edit')
-                                                Diedit oleh {{ $log->user->name ?? 'System' }}
-                                                @break
-                                                @case('delete')
-                                                Dihapus oleh {{ $log->user->name ?? 'System' }}
-                                                @break
-                                                @case('cancel')
-                                                Dibatalkan oleh {{ $log->user->name ?? 'System' }}
-                                                @break
-                                                @default
-                                                Dibuat oleh {{ $log->user->name ?? 'System' }}
-                                                @endswitch
-                                                – {{ \Carbon\Carbon::parse($log->created_at)->translatedFormat('d F Y, H:i') }}
-                                            </small>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <ul class="list-group">
+                                        @foreach($logs as $log)
+                                        <li class="list-group-item d-flex align-items-start">
+                                            <div class="me-3 mt-1" style="min-width: 90px;">
+                                                <span class="badge rounded-pill {{ getLogBadgeColor($log->title) }}">
+                                                    {{ $log->title }}
+                                                </span>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold">{{ $log->description }}</div>
+                                                <small class="text-muted">
+                                                    @switch($log->action)
+                                                    @case('edit')
+                                                    Diedit oleh {{ $log->user->name ?? 'System' }}
+                                                    @break
+                                                    @case('delete')
+                                                    Dihapus oleh {{ $log->user->name ?? 'System' }}
+                                                    @break
+                                                    @case('cancel')
+                                                    Dibatalkan oleh {{ $log->user->name ?? 'System' }}
+                                                    @break
+                                                    @default
+                                                    Dibuat oleh {{ $log->user->name ?? 'System' }}
+                                                    @endswitch
+                                                    – {{ \Carbon\Carbon::parse($log->created_at)->translatedFormat('d F Y, H:i') }}
+                                                </small>
 
-                                        </div>
-                                    </li>
-                                    @endforeach
-                                </ul>
+                                            </div>
+                                        </li>
+                                        @endforeach
+                                    </ul>
 
 
+                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <!-- content-wrapper ends -->
                 <!-- partial:partials/_footer.html -->

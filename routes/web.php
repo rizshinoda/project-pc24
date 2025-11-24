@@ -402,7 +402,8 @@ Route::group(['middleware' => ['na', SessionTimeout::class]], function () {
     Route::get('na/gantivendor/{id}', [NaController::class, 'showgantivendor'])->name('na.gantivendor.show');
     Route::get('na/gantivendor/{id}/add-progress-gantivendor', [NaController::class, 'addProgressGantivendor'])->name('na_gantivendor_add_progress');
     Route::post('na/gantivendor/{id}/add-progress-gantivendor', [NaController::class, 'storeProgressGantivendor'])->name('na_gantivendor_store_progress');
-
+    Route::get('na/gantivendor/{id}/sidbaru', [NaController::class, 'inputsidbaru'])->name('na.gantivendor.inputsidbaru');
+    Route::post('na/gantivendor/{id}/sidbaru', [NaController::class, 'storeinputsidbaru'])->name('na.gantivendor.storesidbaru');
     Route::get('na/OB', [NaController::class, 'OB'])->name('na.OB');
     Route::get('na/OB/{id}', [NaController::class, 'showOB'])->name('na.OB_show');
 
@@ -451,6 +452,8 @@ Route::group(['middleware' => ['noc', SessionTimeout::class]], function () {
     Route::get('noc/gantivendor/{id}', [NocController::class, 'showgantivendor'])->name('noc.gantivendor.show');
     Route::get('noc/gantivendor/{id}/add-progress-gantivendor', [NocController::class, 'addProgressGantivendor'])->name('noc_gantivendor_add_progress');
     Route::post('noc/gantivendor/{id}/add-progress-gantivendor', [NocController::class, 'storeProgressGantivendor'])->name('noc_gantivendor_store_progress');
+    Route::get('noc/gantivendor/{id}/sidbaru', [NocController::class, 'inputsidbaru'])->name('noc.gantivendor.inputsidbaru');
+    Route::post('noc/gantivendor/{id}/sidbaru', [NocController::class, 'storeinputsidbaru'])->name('noc.gantivendor.storesidbaru');
 
     Route::get('noc/relokasi', [NocController::class, 'relokasi'])->name('noc.relokasi');
     Route::get('noc/relokasi/{id}', [NocController::class, 'showrelokasi'])->name('noc.relokasi.show');

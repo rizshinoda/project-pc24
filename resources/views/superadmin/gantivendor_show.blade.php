@@ -104,7 +104,7 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">Site: </h5>
-                                    <p><strong>Nama Perusahaan:</strong> {{ $getGantivendor->onlineBilling->instansi->nama_instansi }}</p>
+                                    <p><strong>Nama Perusahaan:</strong> {{ $getGantivendor->onlineBilling->instansi?->nama_instansi }}</p>
                                     <p><strong>Nama Site:</strong> {{ $getGantivendor->onlineBilling->nama_site }}</p>
                                     <p><strong>Alamat:</strong> {{ $getGantivendor->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getGantivendor->onlineBilling->nama_pic }}</p>
@@ -114,6 +114,46 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="container mt-4">
+                        @php
+                        // Tahapan normal
+                        $steps = ['Pending', 'On Progress', 'Completed'];
+
+                        // Ambil status dari progress
+                        $currentStatus = ucfirst($getGantivendor->status ?? 'Pending');
+
+                        // Cek apakah status termasuk flow gagal
+                        $isCanceledOrRejected = in_array(strtolower($currentStatus), ['canceled', 'cancelled', 'rejected']);
+                        $currentStep = array_search($currentStatus, $steps);
+                        if ($currentStep === false) $currentStep = 0;
+                        @endphp
+
+                        @if($isCanceledOrRejected)
+                        {{-- Tampilan khusus untuk status gagal --}}
+                        <div class="alert alert-danger text-center fw-bold py-4 rounded">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            Work Order <span class="text-uppercase">{{ $currentStatus }}</span>
+                        </div>
+                        @else
+                        {{-- Progress bar normal --}}
+                        <div class="stepper">
+                            @foreach($steps as $index => $step)
+                            <div class="step 
+                    {{ $index < $currentStep ? 'completed' : '' }} 
+                    {{ $index == $currentStep ? 'active' : '' }}">
+                                <div class="step-circle">
+                                    @if($index < $currentStep)
+                                        <i class="bi bi-check-lg"></i>
+                                        @else
+                                        {{ $index + 1 }}
+                                        @endif
+                                </div>
+                                <div class="step-label">{{ $step }}</div>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
                     </div>
                     <!-- Card untuk tabel progress survey -->
                     <div class="row mt-4">
@@ -129,6 +169,8 @@
                                                     <th style=" text-align: center; vertical-align: middle;">No</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Nama Vendor</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Contact</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">SID Baru</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -136,9 +178,13 @@
                                                     <td style=" text-align: center; vertical-align: middle;">1</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ optional($getGantivendor->vendor)->nama_vendor ?? 'Belum Dipilih' }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ optional($getGantivendor->vendor)->contact ?? '-' }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;"> {{ $getGantivendor->sid_baru ?? '-' }}</td>
+
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <p style="font-size: small;"><em>*Kolom SID Baru, wajib diisi</em></p>
+
                                     </div>
                                 </div>
                             </div>
@@ -150,7 +196,7 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title">Progres Ganti Vendor</h4>
+                                    <h4 class="card-title">Progress Ganti Vendor</h4>
 
                                     <div class=" table-responsive">
                                         <table class="table table-hover">

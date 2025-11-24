@@ -119,75 +119,59 @@
                         </h3>
                     </div>
 
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center"> Tambah Pelanggan</h4>
-                                <!-- {{-- Menampilkan pesan error jika ada --}}
-                                @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                @endif -->
+                    <div class="row justify-content-center">
+                        <div class="col-md-6"> <!-- Lebar form setengah halaman -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Tambah Pelanggan</h4>
+                                    <form action="{{ route('pelanggan.store') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('pelanggan.store') }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Pelanggan</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="nama_pelanggan" name="nama_pelanggan" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Nama Gedung</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="nama_gedung" name="nama_gedung">
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">No Pelanggan</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="no_pelanggan" name="no_pelanggan">
-                                                </div>
-                                            </div>
-
-
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Alamat</label>
-                                                <div class="col-sm-8">
-                                                    <textarea class="form-control" id="alamat" name="alamat" rows="4"></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Foto</label>
-                                                <div class="col-sm-8">
-                                                    <input type="file" class="form-control" id="foto" name="foto">
-                                                </div>
-                                            </div>
-
+                                        <div class="form-group">
+                                            <label for="nama_pelanggan">Nama Pelanggan</label>
+                                            <input type="text" class="form-control" id="nama_pelanggan" name="nama_pelanggan" required>
 
                                         </div>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.pelanggan') }}" class="btn btn-light">Kembali</a>
+                                        <div class="form-group ">
+                                            <label for="nama_gedung" ">Nama Gedung</label>
+                                           
+                                                <input type=" text" class="form-control" id="nama_gedung" name="nama_gedung">
 
-                                </form>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="no_pelanggan">No Pelanggan</label>
+
+                                            <input type="text" class="form-control" id="no_pelanggan" name="no_pelanggan">
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="alamat">Alamat</label>
+
+                                            <textarea class="form-control" id="alamat" name="alamat" rows="4"></textarea>
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="foto">Foto</label>
+
+                                            <input type="file" class="form-control" id="foto" name="foto">
+
+                                        </div>
+
+                                        <br>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-info">Submit</button>
+                                            <a href="{{ route('admin.pelanggan') }}" class="btn btn-light">Kembali</a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                        <!-- main-panel ends -->
                     </div>
+
                 </div>
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">

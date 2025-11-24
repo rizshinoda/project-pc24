@@ -169,7 +169,46 @@
                             </div>
                         </div>
                     </div>
+                    <div class="container mt-4">
+                        @php
+                        // Tahapan normal
+                        $steps = ['Pending', 'On Progress', 'Completed'];
 
+                        // Ambil status dari progress
+                        $currentStatus = ucfirst($getSurvey->status ?? 'Pending');
+
+                        // Cek apakah status termasuk flow gagal
+                        $isCanceledOrRejected = in_array(strtolower($currentStatus), ['canceled', 'cancelled', 'rejected']);
+                        $currentStep = array_search($currentStatus, $steps);
+                        if ($currentStep === false) $currentStep = 0;
+                        @endphp
+
+                        @if($isCanceledOrRejected)
+                        {{-- Tampilan khusus untuk status gagal --}}
+                        <div class="alert alert-danger text-center fw-bold py-4 rounded">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            Work Order <span class="text-uppercase">{{ $currentStatus }}</span>
+                        </div>
+                        @else
+                        {{-- Progress bar normal --}}
+                        <div class="stepper">
+                            @foreach($steps as $index => $step)
+                            <div class="step 
+                    {{ $index < $currentStep ? 'completed' : '' }} 
+                    {{ $index == $currentStep ? 'active' : '' }}">
+                                <div class="step-circle">
+                                    @if($index < $currentStep)
+                                        <i class="bi bi-check-lg"></i>
+                                        @else
+                                        {{ $index + 1 }}
+                                        @endif
+                                </div>
+                                <div class="step-label">{{ $step }}</div>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
                     <!-- Card untuk tabel progress survey -->
                     <div class="row mt-4">
                         <div class="col-md-12">
@@ -180,7 +219,7 @@
                                     <!-- Tombol Approve -->
                                     <form action="{{ route('psb.survey.approve', $getSurvey->id) }}" method="POST" style="display:inline;">
                                         @csrf
-                                        <button type="button" class="btn btn-success" onclick="confirmApproval('{{ route('psb.survey.approve', $getSurvey->id) }}')">
+                                        <button type="button" class="btn btn-success mb-2" onclick="confirmApproval('{{ route('psb.survey.approve', $getSurvey->id) }}')">
                                             <i class="fa fa-check"></i> Approve
                                         </button>
                                     </form>

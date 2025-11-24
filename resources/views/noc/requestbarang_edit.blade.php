@@ -223,6 +223,13 @@
                                                     </table>
                                                 </div>
                                             </div>
+
+
+                                            <button style="text-align: center;" type="submit" class="btn btn-info">Update Permintaan</button>
+                                            <a href="{{ route('noc.request_barang',) }}" class="btn btn-light">Kembali</a>
+
+                                        </div>
+                                        <div class="col-md-6">
                                             <div class="form-group row">
                                                 <label for="non_stock" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
                                                 <div class="col-sm-8">
@@ -230,9 +237,12 @@
                                                 </div>
                                             </div>
 
-                                            <button style="text-align: center;" type="submit" class="btn btn-info">Update Permintaan</button>
-                                            <a href="{{ route('noc.request_barang',) }}" class="btn btn-light">Kembali</a>
-
+                                            <div class="form-group row">
+                                                <label for="keterangan" class="col-sm-4 col-form-label">Kebutuhan</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="kebutuhan" name="kebutuhan" class="form-control" rows="4">{{ $requestBarang->kebutuhan }}</textarea>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>

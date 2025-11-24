@@ -120,12 +120,12 @@
 
 
                     </div>
-
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Edit Pelanggan</h4>
-                                <!-- {{-- Menampilkan pesan error jika ada --}}
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Edit Pelanggan</h4>
+                                    <!-- {{-- Menampilkan pesan error jika ada --}}
                                 @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul>
@@ -136,66 +136,62 @@
                                 </div>
                                 @endif -->
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('pelanggan.update', $pelanggans->id) }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="row">
-                                        <div class="col-md-6">
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="{{ route('pelanggan.update', $pelanggans->id) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PUT')
 
-                                            <!-- Nama Pelanggan -->
+                                        <!-- Nama Pelanggan -->
 
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Pelanggan</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="nama_pelanggan" name="nama_pelanggan" value="{{ old('nama_pelanggan', $pelanggans->nama_pelanggan) }}" required>
-                                                </div>
-                                            </div>
-                                            <!-- Alamat Pelanggan -->
+                                        <div class="form-group ">
+                                            <label for="alamat_pelanggan">Nama Pelanggan</label>
 
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Alamat</label>
-                                                <div class="col-sm-8">
-                                                    <textarea class="form-control" id="alamat" name="alamat" rows="4">{{$pelanggans->alamat}}</textarea>
-                                                </div>
-                                            </div>
-                                            <div class=" form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Nama Gedung</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="nama_gedung" name="nama_gedung" value="{{ old('nama_gedung', $pelanggans->nama_gedung) }}">
-                                                </div>
-                                            </div>
-                                            <!-- No Pelanggan -->
+                                            <input type="text" class="form-control" id="nama_pelanggan" name="nama_pelanggan" value="{{ old('nama_pelanggan', $pelanggans->nama_pelanggan) }}" required>
 
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">No Pelanggan</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="no_pelanggan" name="no_pelanggan" value="{{ old('no_pelanggan', $pelanggans->no_pelanggan) }}">
-                                                </div>
-                                            </div>
+                                        </div>
+                                        <!-- Alamat Pelanggan -->
 
+                                        <div class="form-group ">
+                                            <label for="no_pelanggan">Alamat</label>
 
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Foto</label>
-                                                <div class="col-sm-8">
-                                                    <input type="file" class="form-control" id="foto" name="foto">
-                                                    @if ($pelanggans->foto)
-                                                    <img src="{{ asset('storage/pelanggan/' . $pelanggans->foto) }}" alt="Foto Pelanggan" style="width: 100px; margin-top: 10px;">
-                                                    @endif
-                                                </div>
-                                            </div>
+                                            <textarea class="form-control" id="alamat" name="alamat" rows="4">{{$pelanggans->alamat}}</textarea>
+
+                                        </div>
+                                        <div class=" form-group ">
+                                            <label for="no_pelanggan">Nama Gedung</label>
+
+                                            <input type="text" class="form-control" id="nama_gedung" name="nama_gedung" value="{{ old('nama_gedung', $pelanggans->nama_gedung) }}">
+
+                                        </div>
+                                        <!-- No Pelanggan -->
+
+                                        <div class="form-group ">
+                                            <label for="no_pelanggan">No Pelanggan</label>
+                                            <input type="text" class="form-control" id="no_pelanggan" name="no_pelanggan" value="{{ old('no_pelanggan', $pelanggans->no_pelanggan) }}">
+
                                         </div>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.pelanggan') }}" class="btn btn-light">Kembali</a>
 
-                                </form>
+                                        <div class="form-group ">
+                                            <label for="no_pelanggan">Foto</label>
+                                            <input type="file" class="form-control" id="foto" name="foto">
+                                            @if ($pelanggans->foto)
+                                            <img src="{{ asset('storage/pelanggan/' . $pelanggans->foto) }}" alt="Foto Pelanggan" style="width: 100px; margin-top: 10px;">
+                                            @endif
+
+
+
+                                        </div>
+                                        <br>
+                                        <!-- Tombol submit -->
+                                        <button type="submit" class="btn btn-info">Submit</button>
+                                        <a href="{{ route('admin.pelanggan') }}" class="btn btn-light">Kembali</a>
+
+                                    </form>
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <footer class="footer">

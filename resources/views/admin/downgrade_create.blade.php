@@ -121,69 +121,64 @@
 
 
                     </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Form Downgrade</h4>
+                                    {{-- Menampilkan pesan error jika ada --}}
+                                    @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    @endif
 
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Form Downgrade</h4>
-                                {{-- Menampilkan pesan error jika ada --}}
-                                @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                @endif
+                                    {{-- Form untuk membuat work order --}}
+                                    <form action="{{ route('admin.downgrade_store') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
 
-                                {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('admin.downgrade_store') }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group row">
-                                                <label for="nama_site" class="col-sm-4 col-form-label">No SPK</label>
-                                                <div class="col-sm-8">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group ">
+                                                    <label for="nama_site">No SPK</label>
                                                     <!-- Nomor SPK akan di-generate otomatis di server -->
                                                     <input type="text" class="form-control" id="no_spk" name="no_spk" value="{{ $no_spk }}" readonly>
 
                                                 </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="bandwidth" class="col-sm-4 col-form-label">Bandwidth Baru</label>
-                                                <div class="col-sm-4">
-                                                    <input type="number" name="bandwidth_baru" id="bandwidth_baru" class="form-control" min="1" required>
+                                                <div class="form-group">
+                                                    <label for="bandwidth">Bandwidth Baru</label>
+                                                    <div class="input-group">
+                                                        <input type="number" name="bandwidth_baru" id="bandwidth_baru" class="form-control" min="1" required>
+                                                        <select class="form-control" id="satuan" name="satuan" required style="max-width: 130px;">
+                                                            <option value="" disabled selected>Pilih Satuan</option>
+                                                            <option value="Gbps">Gbps</option>
+                                                            <option value="Mbps">Mbps</option>
+                                                            <option value="Kbps">Kbps</option>
+                                                        </select>
+                                                        <input type="hidden" name="online_billing_id" value="{{ $onlineBilling->id }}">
+
+                                                    </div>
                                                 </div>
 
-                                                <div class="col-sm-4">
-                                                    <select class="form-control" id="satuan" name="satuan" required>
-                                                        <option value="" disabled selected>Pilih Satuan</option>
-                                                        <option value="Gbps">Gbps</option>
-                                                        <option value="Mbps">Mbps</option>
-                                                        <option value="Kbps">Kbps</option>
 
-                                                    </select>
-                                                </div>
-                                                <!-- Kirimkan online_billing_id sebagai hidden -->
-                                                <input type="hidden" name="online_billing_id" value="{{ $onlineBilling->id }}">
 
                                             </div>
-
 
                                         </div>
+                                        <br>
+                                        <!-- Tombol submit -->
+                                        <button type="submit" class="btn btn-info">Submit</button>
+                                        <a href="{{ route('admin.OB_show', $onlineBilling->id) }}" class="btn btn-light">Kembali</a>
 
-                                    </div>
-                                    <br>
-                                    <!-- Tombol submit -->
-                                    <button type="submit" class="btn btn-info">Submit</button>
-                                    <a href="{{ route('admin.OB_show', $onlineBilling->id) }}" class="btn btn-light">Kembali</a>
-
-                                </form>
+                                    </form>
+                                </div>
                             </div>
+                            <!-- main-panel ends -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <footer class="footer">
