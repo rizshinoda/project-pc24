@@ -85,6 +85,12 @@ jobs:
       - name: Cache Laravel config
         run: docker exec $APP_CONTAINER php artisan config:cache
 
+      - name: Start Laravel queue worker
+        run: |
+          docker exec -d $APP_CONTAINER bash -c "\
+            php artisan queue:restart && \
+            php artisan queue:work --sleep=3 --tries=3 --timeout=90"
+
       - name: Fix final permission on host
         run: |
           sudo chown -R $USER:$USER $PROJECT_ROOT || true
