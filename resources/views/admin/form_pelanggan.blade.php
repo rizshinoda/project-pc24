@@ -134,9 +134,9 @@
                                         </div>
 
                                         <div class="form-group ">
-                                            <label for="nama_gedung" ">Nama Gedung</label>
-                                           
-                                                <input type=" text" class="form-control" id="nama_gedung" name="nama_gedung">
+                                            <label for="nama_gedung">Nama Gedung</label>
+
+                                            <input type=" text" class="form-control" id="nama_gedung" name="nama_gedung">
 
                                         </div>
 
