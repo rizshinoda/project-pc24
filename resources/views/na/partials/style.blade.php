@@ -357,4 +357,9 @@
          color: #0d6efd;
          font-weight: 600;
      }
+
+     #stock-table {
+         position: relative;
+         z-index: 10;
+     }
  </style>
