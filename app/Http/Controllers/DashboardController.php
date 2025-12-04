@@ -1001,4 +1001,28 @@ class DashboardController extends Controller
 
         return $this->renderView('log', $data);
     }
+
+    public function userlist()
+    {
+
+        // Ambil semua user
+        $users = User::paginate(10);
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('users', 'notifications'));
+
+        return $this->renderView('userlist', $data);
+    }
+
+    public function unverify($id)
+    {
+
+        $users = User::findOrFail($id);
+        $users->status = 'non_active';
+        $users->save();
+
+        return back()->with('success', 'User dinonaktifkan!');
+    }
 }

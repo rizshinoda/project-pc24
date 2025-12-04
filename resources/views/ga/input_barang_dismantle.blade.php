@@ -111,87 +111,85 @@
                     </div>
 
 
-                    <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="mb-5 text-center">Form Input Barang Dismantle</h4>
-                                <!-- Alert untuk pesan sukses -->
-                                @if (session('success'))
-                                <div class="alert alert-success">
-                                    {{ session('success') }}
-                                </div>
-                                @endif
+                    <div class="row justify-content-center">
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-5 text-center">Form Input Barang Dismantle</h4>
+                                    <!-- Alert untuk pesan sukses -->
+                                    @if (session('success'))
+                                    <div class="alert alert-success">
+                                        {{ session('success') }}
+                                    </div>
+                                    @endif
 
-                                <form action="{{ route('ga_store_barang_dismantle', ['id' => $getDismantle->id]) }}" method="POST">
-                                    @csrf
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Jenis Barang</label>
-                                                <div class="col-sm-8">
-                                                    <select name="jenis_id" id="jenis_id" class="form-control" required>
-                                                        <option value="">Pilih Jenis</option>
-                                                        @foreach ($jenis as $j)
-                                                        <option value="{{ $j->id }}">{{ $j->nama_jenis }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Merek Barang</label>
-                                                <div class="col-sm-8">
-                                                    <select name="merek_id" id="merek_id" class="form-control" required>
-                                                        <option value="">Pilih Merek</option>
-                                                        @foreach ($mereks as $m)
-                                                        <option value="{{ $m->id }}">{{ $m->nama_merek }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
+                                    <form action="{{ route('ga_store_barang_dismantle', ['id' => $getDismantle->id]) }}" method="POST">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label for="alamat_pelanggan">Jenis Barang</label>
 
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Tipe Barang</label>
-                                                <div class="col-sm-8">
-                                                    <select name="tipe_id" id="tipe_id" class="form-control" required>
-                                                        <option value="">Pilih Tipe</option>
-                                                        @foreach ($tipes as $t)
-                                                        <option value="{{ $t->id }}">{{ $t->nama_tipe }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Serial Number</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="serial_number" name="serial_number" placeholder="Masukkan serial number">
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Jumlah</label>
-                                                <div class="col-sm-8">
-                                                    <input type="number" name="jumlah" value="1" class="form-control form-control-sm" min="1" placeholder="Jumlah (default 1)">
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group row">
-                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Kualitas</label>
-                                                <div class="col-sm-8">
-                                                    <select name="kualitas" class="form-control" required>
-                                                        <option value="baru">Baru</option>
-                                                        <option value="bekas">Bekas</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <button type="submit" class="btn btn-info">Tambah Barang</button>
-                                            <a href="{{ route('ga.dismantle_show', $getDismantle->id) }}" class="btn btn-light">Kembali</a>
+                                            <select name="jenis_id" id="jenis_id" class="form-control" required>
+                                                <option value="">Pilih Jenis</option>
+                                                @foreach ($jenis as $j)
+                                                <option value="{{ $j->id }}">{{ $j->nama_jenis }}</option>
+                                                @endforeach
+                                            </select>
 
                                         </div>
-                                    </div>
-                                </form>
+                                        <div class="form-group ">
+                                            <label for="alamat_pelanggan">Merek Barang</label>
+
+                                            <select name="merek_id" id="merek_id" class="form-control" required>
+                                                <option value="">Pilih Merek</option>
+                                                @foreach ($mereks as $m)
+                                                <option value="{{ $m->id }}">{{ $m->nama_merek }}</option>
+                                                @endforeach
+                                            </select>
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="alamat_pelanggan">Tipe Barang</label>
+
+                                            <select name="tipe_id" id="tipe_id" class="form-control" required>
+                                                <option value="">Pilih Tipe</option>
+                                                @foreach ($tipes as $t)
+                                                <option value="{{ $t->id }}">{{ $t->nama_tipe }}</option>
+                                                @endforeach
+                                            </select>
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="alamat_pelanggan">Serial Number</label>
+
+                                            <input type="text" class="form-control" id="serial_number" name="serial_number">
+
+                                        </div>
+                                        <div class="form-group ">
+                                            <label for="alamat_pelanggan">Jumlah</label>
+
+                                            <input type="number" name="jumlah" value="1" class="form-control form-control-sm" min="1">
+
+                                        </div>
+
+                                        <div class="form-group ">
+                                            <label for="alamat_pelanggan">Kualitas</label>
+
+                                            <select name="kualitas" class="form-control" required>
+                                                <option value="baru">Baru</option>
+                                                <option value="bekas">Bekas</option>
+                                            </select>
+
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-info">Tambah Barang</button>
+                                            <a href="{{ route('ga.dismantle_show', $getDismantle->id) }}" class="btn btn-light">Kembali</a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <!-- content-wrapper ends -->
@@ -199,7 +197,7 @@
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
+                        <span class="text-muted float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
                     </div>
                 </footer>
                 <!-- partial -->
