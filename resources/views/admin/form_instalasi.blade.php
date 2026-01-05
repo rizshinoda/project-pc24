@@ -203,15 +203,15 @@
                                                         <option value="METRO">METRO</option>
                                                         <option value="METRO-E">METRO-E</option>
                                                         <option value="VPN">VPN</option>
-                                                        <option value="LOCAL LOOP">LOCAL LOOP</option>
+                                                        <option value="LOCALLOOP">LOCALLOOP</option>
                                                         <option value="INTERCONECTION">INTERCONECTION</option>
                                                         <option value="CROSSCONNECT">CROSSCONNECT</option>
                                                         <option value="COLOCATION">COLOCATION</option>
                                                         <option value="INTERNET BROADBAND">INTERNET BROADBAND</option>
-                                                        <option value="DEDICATED">DEDICATED</option>
+                                                        <option value="INTERNET BROADBAND+IP">INTERNET BROADBAND+IP</option>
+                                                        <option value="INTERNET DEDICATED">INTERNET DEDICATED</option>
                                                         <option value="METRO - DARK FIBER">METRO - DARK FIBER</option>
                                                         <option value="IP TRANSIT">IP TRANSIT</option>
-                                                        <option value="INTERNET DEDICATED">INTERNET DEDICATED</option>
                                                         <option value="METRO P2MP">METRO P2MP</option>
                                                         <option value="DARK FIBER">DARK FIBER</option>
                                                         <option value="Internet Kuota">Internet Kuota</option>
@@ -223,7 +223,7 @@
 
                                             <!-- Input Durasi dan Nama Durasi -->
                                             <div class="form-group row">
-                                                <label for="bandwidth" class="col-sm-4 col-form-label">Bandwidth</label>
+                                                <label for="bandwidth" class="col-sm-4 col-form-label">Volume</label>
                                                 <div class="col-sm-4">
                                                     <input type="number" name="bandwidth" id="bandwidth" class="form-control" min="1" required>
                                                 </div>
@@ -234,6 +234,9 @@
                                                         <option value="Gbps">Gbps</option>
                                                         <option value="Mbps">Mbps</option>
                                                         <option value="Kbps">Kbps</option>
+                                                        <option value="RU(RACK UNIT)">RU(RACK UNIT)</option>
+                                                        <option value="CORE">CORE</option>
+                                                        <option value="PAIR">PAIR</option>
 
                                                     </select>
                                                 </div>
@@ -316,6 +319,80 @@
                                                 <label for="foto_pelanggan" class="col-sm-4 col-form-label">Foto Pelanggan</label>
                                                 <div class="col-sm-8">
                                                     <img id="foto" src="" alt="Foto Pelanggan" style="width: 200px; display: none;">
+                                                </div>
+                                            </div>
+                                            <!-- Dropdown Jenis Barang -->
+                                            <div class="form-group row">
+                                                <label for="jenis_id">Jenis Barang</label>
+                                                <div class="col-sm-8">
+                                                    <select id="jenis_id" name="jenis_id" class="form-control">
+                                                        <option value="">Pilih Jenis Barang</option>
+                                                        @foreach ($jenisList as $jenis)
+                                                        <option value="{{ $jenis->id }}">{{ $jenis->nama_jenis }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tabel Stok Barang -->
+
+                                            <!-- Tabel Stok Barang -->
+                                            <div class="form-group row">
+                                                <label>Data Barang</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" id="search" class="form-control w-50 h-46" />
+                                                    <table class="table table-bordered mt-2" id="stock-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align: center;">Merek</th>
+                                                                <th style="text-align: center;">Tipe</th>
+                                                                <th style="text-align: center;">Jumlah Tersedia</th>
+                                                                <th style="text-align: center;">Kualitas</th>
+                                                                <th style="text-align: center;">Jumlah Request</th>
+                                                                <th style="text-align: center;">Aksi</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="stock-table-body">
+                                                            @foreach ($stockBarangs as $stock)
+                                                            <tr data-jenis-id="{{ $stock->jenis_id }}">
+                                                                <td style="text-align: center;">{{ $stock->merek->nama_merek }}</td>
+                                                                <td style="text-align: center;">{{ $stock->tipe->nama_tipe }}</td>
+                                                                <td style="text-align: center;">{{ $stock->total_jumlah }}</td>
+                                                                <td style="text-align: center;">{{ $stock->kualitas }}</td>
+                                                                <td style="text-align: center;">
+                                                                    <input type="number" min="0" max="{{ $stock->total_jumlah }}" value="0" class="form-control quantity" />
+                                                                </td>
+                                                                <td style="text-align: center;">
+                                                                    <button type="button" class="btn btn-success add-to-cart" data-id="{{ $stock->id }}" data-merek="{{ $stock->merek->nama_merek }}" data-tipe="{{ $stock->tipe->nama_tipe }}" data-jumlah="{{ $stock->total_jumlah }}" data-kualitas="{{ $stock->kualitas }}">
+                                                                        <i class="fa fa-plus"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tabel Keranjang -->
+                                            <div class="form-group row">
+                                                <label>Keranjang</label>
+                                                <div class="col-sm-8">
+                                                    <table class="table table-bordered mt-2" id="cart-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align: center;">Merek</th>
+                                                                <th style="text-align: center;">Tipe</th>
+                                                                <th style="text-align: center;">Jumlah</th>
+                                                                <th style="text-align: center;">Kualitas</th>
+                                                                <th style="text-align: center;">Aksi</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="cart-table-body">
+                                                            <!-- Items added to the cart will be displayed here -->
+                                                        </tbody>
+                                                    </table>
+
                                                 </div>
                                             </div>
 
@@ -416,6 +493,8 @@
                                                         <option value="WIRELESS">WIRELESS</option>
                                                         <option value="M2M">M2M</option>
                                                         <option value="NONE">NONE</option>
+                                                        <option value="STARLINK">STARLINK</option>
+
 
                                                     </select>
                                                 </div>
@@ -453,91 +532,18 @@
                                                     <textarea class="form-control" id="keterangan" name="keterangan" rows="4"></textarea>
                                                 </div>
                                             </div>
+                                            <div class="form-group row">
+                                                <label for="no_penerima" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4"></textarea>
+                                                </div>
+                                            </div>
                                             <!-- Input Harga Instalasi -->
 
 
                                         </div>
-                                        <!-- Dropdown Jenis Barang -->
-                                        <div class="form-group row">
-                                            <label for="jenis_id" class="col-sm-2 col-form-label">Jenis Barang</label>
-                                            <div class="col-sm-4">
-                                                <select id="jenis_id" name="jenis_id" class="form-control">
-                                                    <option value="">Pilih Jenis Barang</option>
-                                                    @foreach ($jenisList as $jenis)
-                                                    <option value="{{ $jenis->id }}">{{ $jenis->nama_jenis }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
 
-                                        <!-- Tabel Stok Barang -->
 
-                                        <!-- Tabel Stok Barang -->
-                                        <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label">Data Barang</label>
-                                            <div class="col-sm-4">
-                                                <input type="text" id="search" class="form-control" />
-                                                <table class="table table-bordered mt-2" id="stock-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="text-align: center;">Merek</th>
-                                                            <th style="text-align: center;">Tipe</th>
-                                                            <th style="text-align: center;">Jumlah Tersedia</th>
-                                                            <th style="text-align: center;">Kualitas</th>
-                                                            <th style="text-align: center;">Jumlah Request</th>
-                                                            <th style="text-align: center;">Aksi</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="stock-table-body">
-                                                        @foreach ($stockBarangs as $stock)
-                                                        <tr data-jenis-id="{{ $stock->jenis_id }}">
-                                                            <td style="text-align: center;">{{ $stock->merek->nama_merek }}</td>
-                                                            <td style="text-align: center;">{{ $stock->tipe->nama_tipe }}</td>
-                                                            <td style="text-align: center;">{{ $stock->total_jumlah }}</td>
-                                                            <td style="text-align: center;">{{ $stock->kualitas }}</td>
-                                                            <td style="text-align: center;">
-                                                                <input type="number" min="0" max="{{ $stock->total_jumlah }}" value="0" class="form-control quantity" />
-                                                            </td>
-                                                            <td style="text-align: center;">
-                                                                <button type="button" class="btn btn-success add-to-cart" data-id="{{ $stock->id }}" data-merek="{{ $stock->merek->nama_merek }}" data-tipe="{{ $stock->tipe->nama_tipe }}" data-jumlah="{{ $stock->total_jumlah }}" data-kualitas="{{ $stock->kualitas }}">
-                                                                    <i class="fa fa-plus"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-
-                                        <!-- Tabel Keranjang -->
-                                        <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label">Keranjang</label>
-                                            <div class="col-sm-4">
-                                                <table class="table table-bordered mt-2" id="cart-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="text-align: center;">Merek</th>
-                                                            <th style="text-align: center;">Tipe</th>
-                                                            <th style="text-align: center;">Jumlah</th>
-                                                            <th style="text-align: center;">Kualitas</th>
-                                                            <th style="text-align: center;">Aksi</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="cart-table-body">
-                                                        <!-- Items added to the cart will be displayed here -->
-                                                    </tbody>
-                                                </table>
-
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row">
-                                            <label for="no_penerima" class="col-sm-2 col-form-label">Input Barang Non Stock</label>
-                                            <div class="col-sm-4">
-                                                <textarea id="non_stock" name="non_stock" class="form-control" rows="4"></textarea>
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <br>
@@ -558,7 +564,7 @@
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
+                        <span class="text-muted float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
                     </div>
                 </footer>
                 <!-- partial -->

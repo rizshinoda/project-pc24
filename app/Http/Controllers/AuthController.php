@@ -78,37 +78,53 @@ class AuthController extends Controller
     public function login_post(Request $request)
     {
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password], true)) {
-            if (!empty(Auth::user()->email_verified_at)) {
-                if (Auth::user()->is_role == 0) {
-                    return redirect()->intended('superadmin/dashboard');
-                } else if (Auth::user()->is_role == 1) {
-                    return redirect()->intended('admin/dashboard');
-                } else if (Auth::user()->is_role == 2) {
-                    return redirect()->intended('ga/dashboard');
-                } else if (Auth::user()->is_role == 3) {
-                    return redirect()->intended('helpdesk/dashboard');
-                } else if (Auth::user()->is_role == 4) {
-                    return redirect()->intended('noc/dashboard');
-                } else if (Auth::user()->is_role == 5) {
-                    return redirect()->intended('psb/dashboard');
-                } else if (Auth::user()->is_role == 6) {
-                    return redirect()->intended('na/dashboard');
+
+            $user = Auth::user();
+
+            // CEK STATUS USER
+            if ($user->status === 'non_active') {
+                Auth::logout();
+                return redirect()->back()->with('error', 'Akun ini sudah dinonaktifkan.');
+            }
+
+            // CEK EMAIL VERIFIED
+            if (!empty($user->email_verified_at)) {
+
+                // Redirect sesuai role
+                switch ($user->is_role) {
+                    case 0:
+                        return redirect()->intended('superadmin/dashboard');
+                    case 1:
+                        return redirect()->intended('admin/dashboard');
+                    case 2:
+                        return redirect()->intended('ga/dashboard');
+                    case 3:
+                        return redirect()->intended('helpdesk/dashboard');
+                    case 4:
+                        return redirect()->intended('noc/dashboard');
+                    case 5:
+                        return redirect()->intended('psb/dashboard');
+                    case 6:
+                        return redirect()->intended('na/dashboard');
                 }
             } else {
-                $user_id = Auth::user()->id;
+                // JIKA EMAIL BELUM VERIFIKASI
+                $user_id = $user->id;
                 Auth::logout();
+
                 $user = User::getSingle($user_id);
                 $user->remember_token = Str::random(50);
                 $user->save();
 
                 Mail::to($user->email)->send(new RegisterMail($user));
 
-                return redirect('login')->with('success', 'Silahkan Verifikasi Email terlebih dahulu');
+                return redirect('login')->with('success', 'Silahkan verifikasi email terlebih dahulu');
             }
         } else {
             return redirect()->back()->with('error', 'Masukkan email dan password yang benar');
         }
     }
+
 
     public function forgot()
     {

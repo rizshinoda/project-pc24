@@ -131,6 +131,13 @@
                                                 <input type="hidden" name="online_billing_id" value="{{ $onlineBilling->id }}">
 
                                             </div>
+
+                                            <div class="form-group row">
+                                                <label for="no_penerima" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="5" cols="40"></textarea>
+                                                </div>
+                                            </div>
                                             <!-- Dropdown Jenis Barang -->
                                             <div class="form-group row">
                                                 <label for="jenis_id" class="col-sm-4 col-form-label">Jenis Barang</label>
@@ -148,9 +155,9 @@
 
                                             <!-- Tabel Stok Barang -->
                                             <div class="form-group row">
-                                                <label class="col-sm-4 col-form-label">Data Barang</label>
+                                                <label>Data Barang</label>
                                                 <div class="col-sm-8">
-                                                    <input type="text" id="search" class="form-control" />
+                                                    <input type="text" id="search" class="form-control w-50 h-46" />
                                                     <table class="table table-bordered mt-2" id="stock-table">
                                                         <thead>
                                                             <tr>
@@ -186,7 +193,7 @@
 
                                             <!-- Tabel Keranjang -->
                                             <div class="form-group row">
-                                                <label class="col-sm-4 col-form-label">Keranjang</label>
+                                                <label>Keranjang</label>
                                                 <div class="col-sm-8">
                                                     <table class="table table-bordered mt-2" id="cart-table">
                                                         <thead>
@@ -205,12 +212,7 @@
 
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label for="no_penerima" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
-                                                <div class="col-sm-8">
-                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="5" cols="40"></textarea>
-                                                </div>
-                                            </div>
+
                                         </div>
 
                                     </div>
@@ -229,7 +231,7 @@
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
+                        <span class="text-muted float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
                     </div>
                 </footer>
                 <!-- partial -->

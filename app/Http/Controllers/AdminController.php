@@ -1659,7 +1659,7 @@ class AdminController extends Controller
         // Validasi data input
         $request->validate([
             'bandwidth_baru' => 'required|numeric|min:1',
-            'satuan' => 'required|in:Gbps,Mbps,Kbps',
+            'satuan' => 'required|in:Gbps,Mbps,Kbps,RU(RACK UNIT),CORE,PAIR',
             'online_billing_id' => 'required|exists:online_billings,id',
         ]);
 
@@ -1914,7 +1914,7 @@ class AdminController extends Controller
         // Validasi data input
         $request->validate([
             'bandwidth_baru' => 'required|numeric|min:1',
-            'satuan' => 'required|in:Gbps,Mbps,Kbps',
+            'satuan' => 'required|in:Gbps,Mbps,Kbps,RU(RACK UNIT),CORE,PAIR',
             'online_billing_id' => 'required|exists:online_billings,id',
         ]);
 

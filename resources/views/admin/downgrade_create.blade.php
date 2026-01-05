@@ -108,7 +108,6 @@
 
             </nav>
             <!-- partial -->
-
             <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
@@ -118,7 +117,6 @@
                                 <i class="mdi mdi-home"></i>
                             </span> Downgrade
                         </h3>
-
 
                     </div>
                     <div class="row justify-content-center">
@@ -150,7 +148,7 @@
 
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="bandwidth">Bandwidth Baru</label>
+                                                    <label for="bandwidth">Volume Baru</label>
                                                     <div class="input-group">
                                                         <input type="number" name="bandwidth_baru" id="bandwidth_baru" class="form-control" min="1" required>
                                                         <select class="form-control" id="satuan" name="satuan" required style="max-width: 130px;">
@@ -158,14 +156,14 @@
                                                             <option value="Gbps">Gbps</option>
                                                             <option value="Mbps">Mbps</option>
                                                             <option value="Kbps">Kbps</option>
+                                                            <option value="RU(RACK UNIT)">RU(RACK UNIT)</option>
+                                                            <option value="CORE">CORE</option>
+                                                            <option value="PAIR">PAIR</option>
                                                         </select>
                                                         <input type="hidden" name="online_billing_id" value="{{ $onlineBilling->id }}">
 
                                                     </div>
                                                 </div>
-
-
-
                                             </div>
 
                                         </div>
@@ -184,7 +182,7 @@
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
+                        <span class="text-muted float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
                     </div>
                 </footer>
                 <!-- partial -->

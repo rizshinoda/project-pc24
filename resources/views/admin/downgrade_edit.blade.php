@@ -157,6 +157,10 @@
                                                             <option value="Gbps" {{ $workOrder->satuan == 'Gbps' ? 'selected' : '' }}>Gbps</option>
                                                             <option value="Mbps" {{ $workOrder->satuan == 'Mbps' ? 'selected' : '' }}>Mbps</option>
                                                             <option value="Kbps" {{ $workOrder->satuan == 'Kbps' ? 'selected' : '' }}>Kbps</option>
+                                                            <option value="RU(RACK UNIT)" {{ $workOrder->satuan == 'RU(RACK UNIT)' ? 'selected' : '' }}>RU(RACK UNIT)</option>
+                                                            <option value="CORE" {{ $workOrder->satuan == 'CORE' ? 'selected' : '' }}>CORE</option>
+                                                            <option value="PAIR" {{ $workOrder->satuan == 'PAIR' ? 'selected' : '' }}>PAIR</option>
+
                                                         </select>
                                                         <input type="hidden" name="online_billing_id" value="{{ $workOrder->online_billing_id }}">
 
@@ -180,7 +184,7 @@
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
+                        <span class="text-muted float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
                     </div>
                 </footer>
                 <!-- partial -->

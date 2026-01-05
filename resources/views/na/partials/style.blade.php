@@ -242,26 +242,53 @@
      .container-scroller {
          display: flex;
          height: 100vh;
+         /* ✅ Tetap 100vh */
          overflow: hidden;
+         /* ✅ Tetap hidden */
      }
 
      .page-body-wrapper {
          display: flex;
          flex: 1;
          overflow: hidden;
+         /* ✅ Tetap hidden */
+         height: 100%;
+         /* ✅ Tambahkan ini */
      }
 
      .main-panel {
          flex: 1;
          overflow-y: auto;
-         height: 100vh;
+         /* ✅ Tetap auto - ini yang scroll */
+         height: 100%;
+         /* ✅ Ubah dari 100vh ke 100% */
+         display: flex;
+         /* ✅ Tambahkan */
+         flex-direction: column;
+         /* ✅ Tambahkan */
+     }
+
+     .content-wrapper {
+         flex: 1 0 auto;
+         /* ✅ Flex grow, no shrink, auto basis */
+         padding-bottom: 20px;
+         /* Optional: spacing sebelum footer */
+     }
+
+     .footer {
+         flex-shrink: 0;
+         /* ✅ Footer tidak menciut */
+         margin-top: auto;
+         /* ✅ Push ke bawah */
      }
 
      .sidebar {
          overflow-y: auto;
          scrollbar-width: thin;
-
-         /* Firefox */
+         height: 100vh;
+         /* ✅ Sidebar full height */
+         flex-shrink: 0;
+         /* ✅ Sidebar tidak menciut */
      }
 
      .sidebar::-webkit-scrollbar {

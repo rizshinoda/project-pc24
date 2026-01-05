@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    @include('admin.partials.style')
+    @include('ga.partials.style')
 </head>
 
 <body>

@@ -52,14 +52,14 @@ class OnlineBillingImport implements ToModel, WithHeadingRow, WithChunkReading
         $vendor = vendor::firstOrCreate(['nama_vendor' => $row['nama_vendor']]);
         /* 2.  Work‑order: kolom boleh kosong */
         $workOrderId = null;
-        $instansi = null;
+        $instansi = Instansi::firstOrCreate(['nama_instansi' => $row['nama_instansi']]);
 
         /* 3.  Simpan OnlineBilling */
         return new OnlineBilling([
             'work_order_install_id' => $workOrderId,      // nullable
             'pelanggan_id' => $pelanggan->id,
             'vendor_id'    => $vendor->id,
-            'instansi_id'  => $instansi,
+            'instansi_id'  => $instansi->id,
 
             'nama_site'         => $row['nama_perusahaan'],
             'alamat_pemasangan' => $row['alamat'] ?? null,

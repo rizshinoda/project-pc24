@@ -169,6 +169,12 @@
                                                 </div>
 
                                             </div>
+                                            <div class="form-group row">
+                                                <label for="non_stock" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $workOrder->non_stock) }}</textarea>
+                                                </div>
+                                            </div>
                                             <!-- Dropdown Jenis Barang -->
                                             <div class="form-group row">
                                                 <label for="jenis_id" class="col-sm-4 col-form-label">Jenis Barang</label>
@@ -181,11 +187,11 @@
                                                     </select>
                                                 </div>
                                             </div>
-
+                                            <!-- Tabel Stok Barang -->
                                             <div class="form-group row">
-                                                <label class="col-sm-4 col-form-label">Data Barang</label>
+                                                <label>Data Barang</label>
                                                 <div class="col-sm-8">
-                                                    <input type="text" id="search" class="form-control" />
+                                                    <input type="text" id="search" class="form-control w-50 h-46" />
                                                     <table class="table table-bordered mt-2" id="stock-table">
                                                         <thead>
                                                             <tr>
@@ -219,8 +225,9 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Tabel Keranjang -->
                                             <div class="form-group row">
-                                                <label class="col-sm-4 col-form-label">Keranjang</label>
+                                                <label>Keranjang</label>
                                                 <div class="col-sm-8">
                                                     <table class="table table-bordered mt-2" id="cart-table">
                                                         <thead>
@@ -233,39 +240,14 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody id="cart-table-body">
-
-                                                            @foreach ($WorkOrderRelokasiDetail as $detail)
-                                                            <tr data-unique-key="{{ $detail->id }}">
-                                                                <td style="text-align: center;">{{ $detail->merek }}</td>
-                                                                <td style="text-align: center;">{{ $detail->tipe }}</td>
-                                                                <td style="text-align: center;">
-                                                                    <input type="number"
-                                                                        name="cart[{{ $detail->id }}][total_jumlah]"
-                                                                        value="{{ $detail->jumlah }}"
-                                                                        class="form-control cart-quantity"
-                                                                        min="1"
-                                                                        max="{{ $detail->stock_max }}"
-                                                                        style="width: 80px; text-align: center;" />
-                                                                </td>
-                                                                <td style="text-align: center;">{{ $detail->kualitas }}</td>
-                                                                <td style="text-align: center;">
-                                                                    <button type="button" class="btn btn-danger remove-from-cart" data-id="{{ $detail->id }}">
-                                                                        <i class="fa fa-close"></i>
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            @endforeach
-
+                                                            <!-- Items added to the cart will be displayed here -->
                                                         </tbody>
                                                     </table>
+
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label for="non_stock" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
-                                                <div class="col-sm-8">
-                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $workOrder->non_stock) }}</textarea>
-                                                </div>
-                                            </div>
+
+
                                         </div>
 
                                     </div>
@@ -284,7 +266,7 @@
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
+                        <span class="text-muted float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
                     </div>
                 </footer>
                 <!-- partial -->

@@ -166,7 +166,7 @@
                                     <p><strong>Alamat:</strong> {{ $getDismantle->onlineBilling->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getDismantle->onlineBilling->layanan }}</p>
                                     <p>
-                                        <strong>Bandwidth:</strong>
+                                        <strong>Volume:</strong>
                                         {{ $getDismantle->onlineBilling->bandwidth }}
                                     </p>
                                     <p><strong>Vlan:</strong> {{ $getDismantle->onlineBilling->vlan }}</p>
@@ -339,11 +339,7 @@
                                     @if ($getDismantle->status === 'On Progress')
 
                                     <a href="{{ route('ga.inputbarang_dismantle', $getDismantle->id) }}" class="btn btn-info mb-3">Input Barang</a>
-                                    <form action="{{ route('dismantle.complete', $getDismantle->id) }}" method="POST" class="pull-right">
-                                        @csrf
 
-
-                                    </form>
                                     @endif
                                     <div class=" table-responsive">
 
@@ -393,9 +389,17 @@
                                     <a href="{{ route('ga.dismantle') }}" class="btn btn-info mt-3">
                                         <i class="fa fa-arrow-left"></i> Kembali
                                     </a>
-                                    <button type="submit" class="btn btn-success mt-3 pull-right">
-                                        <i class="fa fa-check"></i> Selesaikan Work Order
-                                    </button>
+                                    @if ($getDismantle->status === 'On Progress')
+
+                                    <form action="{{ route('dismantle.complete', $getDismantle->id) }}" method="POST" class="pull-right">
+                                        @csrf
+
+                                        <button type="submit" class="btn btn-success mt-3 pull-right">
+                                            <i class="fa fa-check"></i> Selesaikan Work Order
+                                        </button>
+
+                                    </form>
+                                    @endif
 
                                 </div>
                             </div>
@@ -408,7 +412,7 @@
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
+                        <span class="text-muted float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
                     </div>
                 </footer>
                 <!-- partial -->

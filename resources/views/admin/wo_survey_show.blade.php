@@ -168,7 +168,7 @@
                                     <p><strong>Nama Gedung:</strong> {{ $getSurvey->pelanggan->nama_gedung}}</p>
                                     <p><strong>Alamat:</strong> {{ $getSurvey->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getSurvey->layanan }}</p>
-                                    <p><strong>Bandwidth:</strong> {{ $getSurvey->bandwidth }} {{ $getSurvey->satuan }}</p>
+                                    <p><strong>Volume:</strong> {{ $getSurvey->bandwidth }} {{ $getSurvey->satuan }}</p>
                                     <p><strong>NNI:</strong> {{ $getSurvey->nni }}</p>
                                     <p><strong>Vlan:</strong> {{ $getSurvey->vlan }}</p>
                                 </div>
@@ -340,7 +340,7 @@
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
+                        <span class="text-muted float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
                     </div>
                 </footer>
                 <!-- partial -->

@@ -201,15 +201,15 @@
                                                         <option value="METRO">METRO</option>
                                                         <option value="METRO-E">METRO-E</option>
                                                         <option value="VPN">VPN</option>
-                                                        <option value="LOCAL LOOP">LOCAL LOOP</option>
+                                                        <option value="LOCALLOOP">LOCALLOOP</option>
                                                         <option value="INTERCONECTION">INTERCONECTION</option>
                                                         <option value="CROSSCONNECT">CROSSCONNECT</option>
                                                         <option value="COLOCATION">COLOCATION</option>
                                                         <option value="INTERNET BROADBAND">INTERNET BROADBAND</option>
-                                                        <option value="DEDICATED">DEDICATED</option>
+                                                        <option value="INTERNET BROADBAND+IP">INTERNET BROADBAND+IP</option>
+                                                        <option value="INTERNET DEDICATED">INTERNET DEDICATED</option>
                                                         <option value="METRO - DARK FIBER">METRO - DARK FIBER</option>
                                                         <option value="IP TRANSIT">IP TRANSIT</option>
-                                                        <option value="INTERNET DEDICATED">INTERNET DEDICATED</option>
                                                         <option value="METRO P2MP">METRO P2MP</option>
                                                         <option value="DARK FIBER">DARK FIBER</option>
                                                         <option value="Internet Kuota">Internet Kuota</option>
@@ -220,7 +220,7 @@
                                             </div>
                                             <!-- Input Durasi dan Nama Durasi -->
                                             <div class="form-group row">
-                                                <label for="bandwidth" class="col-sm-4 col-form-label">Bandwidth</label>
+                                                <label for="bandwidth" class="col-sm-4 col-form-label">Volume</label>
                                                 <div class="col-sm-4">
                                                     <input type="number" name="bandwidth" id="bandwidth" class="form-control" min="1" required>
                                                 </div>
@@ -231,6 +231,10 @@
                                                         <option value="Gbps">Gbps</option>
                                                         <option value="Mbps">Mbps</option>
                                                         <option value="Kbps">Kbps</option>
+                                                        <option value="RU(RACK UNIT)">RU(RACK UNIT)</option>
+                                                        <option value="CORE">CORE</option>
+                                                        <option value="PAIR">PAIR</option>
+
 
                                                     </select>
                                                 </div>
@@ -388,6 +392,8 @@
                                                         <option value="WIRELESS">WIRELESS</option>
                                                         <option value="M2M">M2M</option>
                                                         <option value="NONE">NONE</option>
+                                                        <option value="STARLINK">STARLINK</option>
+
 
                                                     </select>
                                                 </div>
@@ -430,7 +436,7 @@
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
                         <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
+                        <span class="text-muted float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with Rizal<i class="mdi mdi-heart text-danger"></i></span>
                     </div>
                 </footer>
                 <!-- partial -->

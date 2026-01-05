@@ -46,6 +46,8 @@ Route::post('reset_post/{token}', [AuthController::class, 'postReset']);
 Route::group(['middleware' => ['superadmin', SessionTimeout::class]], function () {
     Route::get('superadmin/dashboard', [DashboardController::class, 'dashboard'])->name('superadmin.dashboard');
     Route::get('superadmin/userlist', [DashboardController::class, 'userlist'])->name('superadmin.userlist');
+    Route::get('superadmin/userlist/{id}', [DashboardController::class, 'unverify'])->name('superadmin.unverify');
+
     Route::delete('superadmin/delete/{id}', [DashboardController::class, 'destroy'])->name('userlist.destroy');
 
     Route::get('superadmin/survey', [DashboardController::class, 'survey'])->name('superadmin.survey');

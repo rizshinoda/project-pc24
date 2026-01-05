@@ -9,7 +9,7 @@
                 </div>
                 <div class="nav-profile-text d-flex flex-column">
                     <span class="font-weight-bold mb-2">{{ Auth::user()->name }}</span>
-                    <span class="text-secondary text-small">Observer</span>
+                    <span class="text-secondary text-small">{{ $roleText }}</span>
                 </div>
                 <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
             </a>
@@ -76,6 +76,12 @@
             <a class="nav-link" href="{{ url('superadmin/log') }}">
                 <span class="menu-title">Log</span>
                 <i class="mdi mdi-usb-c-port menu-icon"></i>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url('superadmin/userlist') }}">
+                <span class="menu-title">User List</span>
+                <i class="mdi mdi-account-circle menu-icon"></i>
             </a>
         </li>
 

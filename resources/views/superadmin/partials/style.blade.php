@@ -110,49 +110,55 @@
      }
 
      .form-control {
-         border: 1px solid #000000;
+         border: 1px solid #ccc;
          border-radius: 8px;
          padding: 12px;
+         background-color: #fdfdfd;
+         color: #333;
+         font-size: 14px;
+         transition: all 0.3s ease;
+         /* Animasi halus saat hover/focus */
      }
 
-     select.form-control {
-         border: 1px solid #000000;
-         /* Border hitam */
-         border-radius: 8px;
-         /* Sudut membulat */
-         padding: 12px;
-         /* Padding sama dengan input */
-         /* Ukuran teks */
-         background-color: #fff;
-         /* Warna latar belakang putih */
-         color: #000;
-         /* Warna teks hitam */
-         appearance: none;
-         /* Menghilangkan tampilan default (di beberapa browser) */
-         -webkit-appearance: none;
-         /* Untuk Safari */
-         -moz-appearance: none;
-         /* Untuk Firefox */
-         cursor: pointer;
-         /* Menunjukkan ini bisa dipilih */
+     /* Efek saat hover */
+     .form-control:hover {
+         border-color: #888;
+         background-color: #f9f9f9;
      }
 
-     /* Tambahkan ikon panah ke bawah */
-     select.form-control {
-         background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23000" d="M2 5L0 0h4z"/></svg>');
-         background-repeat: no-repeat;
-         background-position: right 10px center;
-         background-size: 10px;
-         padding-right: 30px;
-         /* Agar tidak menutupi teks */
-     }
-
-     /* Saat combo box di-focus */
-     select.form-control:focus {
+     /* Efek saat fokus */
+     .form-control:focus {
          border-color: #007bff;
-         /* Biru saat fokus */
-         box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+         background-color: #fff;
+         box-shadow: 0 0 10px rgba(0, 123, 255, 0.25);
          outline: none;
+     }
+
+     select.form-control {
+         background-color: #fff;
+         color: #333;
+         border: 1px solid #ccc;
+         border-radius: 8px;
+         padding: 12px;
+         cursor: pointer;
+         transition: all 0.3s ease;
+
+         appearance: none;
+         -webkit-appearance: none;
+         -moz-appearance: none;
+
+         background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+         background-repeat: no-repeat;
+         background-position: right 12px center;
+         background-size: 16px;
+         padding-right: 36px;
+         /* supaya teks tidak menabrak icon */
+     }
+
+     /* Hover & Focus */
+     select.form-control:hover {
+         border-color: #007bff;
+         background-color: #f8faff;
      }
 
      .input-filled {
@@ -237,26 +243,53 @@
      .container-scroller {
          display: flex;
          height: 100vh;
+         /* ✅ Tetap 100vh */
          overflow: hidden;
+         /* ✅ Tetap hidden */
      }
 
      .page-body-wrapper {
          display: flex;
          flex: 1;
          overflow: hidden;
+         /* ✅ Tetap hidden */
+         height: 100%;
+         /* ✅ Tambahkan ini */
      }
 
      .main-panel {
          flex: 1;
          overflow-y: auto;
-         height: 100vh;
+         /* ✅ Tetap auto - ini yang scroll */
+         height: 100%;
+         /* ✅ Ubah dari 100vh ke 100% */
+         display: flex;
+         /* ✅ Tambahkan */
+         flex-direction: column;
+         /* ✅ Tambahkan */
+     }
+
+     .content-wrapper {
+         flex: 1 0 auto;
+         /* ✅ Flex grow, no shrink, auto basis */
+         padding-bottom: 20px;
+         /* Optional: spacing sebelum footer */
+     }
+
+     .footer {
+         flex-shrink: 0;
+         /* ✅ Footer tidak menciut */
+         margin-top: auto;
+         /* ✅ Push ke bawah */
      }
 
      .sidebar {
          overflow-y: auto;
          scrollbar-width: thin;
-
-         /* Firefox */
+         height: 100vh;
+         /* ✅ Sidebar full height */
+         flex-shrink: 0;
+         /* ✅ Sidebar tidak menciut */
      }
 
      .sidebar::-webkit-scrollbar {
