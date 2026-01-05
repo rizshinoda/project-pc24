@@ -189,7 +189,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Tabel Stok Barang -->
 
                                             <!-- Tabel Stok Barang -->
                                             <div class="form-group row">

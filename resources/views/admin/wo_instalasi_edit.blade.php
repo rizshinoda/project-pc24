@@ -202,15 +202,16 @@
                                                         <option value="METRO" {{ old('layanan', $getInstall->layanan) == 'METRO' ? 'selected' : '' }}>METRO</option>
                                                         <option value="METRO-E" {{ old('layanan', $getInstall->layanan) == 'METRO-E' ? 'selected' : '' }}>METRO-E</option>
                                                         <option value="VPN" {{ old('layanan', $getInstall->layanan) == 'VPN' ? 'selected' : '' }}>VPN</option>
-                                                        <option value="LOCAL LOOP" {{ old('layanan', $getInstall->layanan) == 'LOCAL LOOP' ? 'selected' : '' }}>LOCAL LOOP</option>
+                                                        <option value="LOCALLOOP" {{ old('layanan', $getInstall->layanan) == 'LOCALLOOP' ? 'selected' : '' }}>LOCALLOOP</option>
                                                         <option value="INTERCONECTION" {{ old('layanan', $getInstall->layanan) == 'INTERCONECTION' ? 'selected' : '' }}>INTERCONECTION</option>
                                                         <option value="CROSSCONNECT" {{ old('layanan', $getInstall->layanan) == 'CROSSCONNECT' ? 'selected' : '' }}>CROSSCONNECT</option>
                                                         <option value="COLOCATION" {{ old('layanan', $getInstall->layanan) == 'COLOCATION' ? 'selected' : '' }}>COLOCATION</option>
                                                         <option value="INTERNET BROADBAND" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND' ? 'selected' : '' }}>INTERNET BROADBAND</option>
-                                                        <option value="DEDICATED" {{ old('layanan', $getInstall->layanan) == 'DEDICATED' ? 'selected' : '' }}>DEDICATED</option>
+                                                        <option value="INTERNET DEDICATED" {{ old('layanan', $getInstall->layanan) == 'INTERNET DEDICATED' ? 'selected' : '' }}>INTERNET DEDICATED</option>
+                                                        <option value="INTERNET BROADBAND+IP" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND+IP' ? 'selected' : '' }}>INTERNET BROADBAND+IP</option>
+
                                                         <option value="METRO - DARK FIBER" {{ old('layanan', $getInstall->layanan) == 'METRO - DARK FIBER' ? 'selected' : '' }}>METRO - DARK FIBER</option>
                                                         <option value="IP TRANSIT" {{ old('layanan', $getInstall->layanan) == 'IP TRANSIT' ? 'selected' : '' }}>IP TRANSIT</option>
-                                                        <option value="INTERNET DEDICATED" {{ old('layanan', $getInstall->layanan) == 'INTERNET DEDICATED' ? 'selected' : '' }}>INTERNET DEDICATED</option>
                                                         <option value="METRO P2MP" {{ old('layanan', $getInstall->layanan) == 'METRO P2MP' ? 'selected' : '' }}>METRO P2MP</option>
                                                         <option value="DARK FIBER" {{ old('layanan', $getInstall->layanan) == 'DARK FIBER' ? 'selected' : '' }}>DARK FIBER</option>
                                                         <option value="Internet Kuota" {{ old('layanan', $getInstall->layanan) == 'Internet Kuota' ? 'selected' : '' }}>Internet Kuota</option>
@@ -221,7 +222,7 @@
                                             </div>
                                             <!-- Edit Bandwidth dan Satuan -->
                                             <div class="form-group row">
-                                                <label for="bandwidth" class="col-sm-4 col-form-label">Bandwidth</label>
+                                                <label for="bandwidth" class="col-sm-4 col-form-label">Volume</label>
 
                                                 <!-- Input Bandwidth -->
                                                 <div class="col-sm-4">
@@ -241,6 +242,10 @@
                                                         <option value="Gbps" {{ old('satuan', $getInstall->satuan) == 'Gbps' ? 'selected' : '' }}>Gbps</option>
                                                         <option value="Mbps" {{ old('satuan', $getInstall->satuan) == 'Mbps' ? 'selected' : '' }}>Mbps</option>
                                                         <option value="Kbps" {{ old('satuan', $getInstall->satuan) == 'Kbps' ? 'selected' : '' }}>Kbps</option>
+                                                        <option value="RU(RACK UNIT)" {{ old('satuan', $getInstall->satuan) == 'RU(RACK UNIT)' ? 'selected' : '' }}>RU(RACK UNIT)</option>
+                                                        <option value="CORE" {{ old('satuan', $getInstall->satuan) == 'CORE' ? 'selected' : '' }}>CORE</option>
+                                                        <option value="PAIR" {{ old('satuan', $getInstall->satuan) == 'PAIR' ? 'selected' : '' }}>PAIR</option>
+
                                                     </select>
                                                 </div>
                                             </div>
@@ -345,7 +350,96 @@
                                                     @endif
                                                 </div>
                                             </div>
+                                            <div class="form-group row">
+                                                <label for="jenis_id">Jenis Barang</label>
+                                                <div class="col-sm-8">
+                                                    <select id="jenis_id" name="jenis_id" class="form-control">
+                                                        <option value="">Pilih Jenis Barang</option>
+                                                        @foreach ($jenisList as $jenis)
+                                                        <option value="{{ $jenis->id }}" {{ $jenis->id == $getInstall->jenis_id ? 'selected' : '' }}>{{ $jenis->nama_jenis }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
 
+                                            <div class="form-group row">
+                                                <label>Data Barang</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" id="search" class="form-control" />
+                                                    <table class="table table-bordered mt-2" id="stock-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align: center;">Merek</th>
+                                                                <th style="text-align: center;">Tipe</th>
+                                                                <th style="text-align: center;">Jumlah Tersedia</th>
+                                                                <th style="text-align: center;">Kualitas</th>
+                                                                <th style="text-align: center;">Jumlah Request</th>
+                                                                <th style="text-align: center;">Aksi</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="stock-table-body">
+                                                            @foreach ($stockBarangs as $stock)
+                                                            <tr data-jenis-id="{{ $stock->jenis_id }}">
+                                                                <td style="text-align: center;">{{ $stock->merek->nama_merek }}</td>
+                                                                <td style="text-align: center;">{{ $stock->tipe->nama_tipe }}</td>
+                                                                <td style="text-align: center;">{{ $stock->total_jumlah }}</td>
+                                                                <td style="text-align: center;">{{ $stock->kualitas }}</td>
+                                                                <td style="text-align: center;">
+                                                                    <input type="number" min="0" max="{{ $stock->total_jumlah }}" value="0" class="form-control quantity" />
+                                                                </td>
+                                                                <td style="text-align: center;">
+                                                                    <button type="button" class="btn btn-success add-to-cart" data-id="{{ $stock->id }}" data-merek="{{ $stock->merek->nama_merek }}" data-tipe="{{ $stock->tipe->nama_tipe }}" data-jumlah="{{ $stock->total_jumlah }}" data-kualitas="{{ $stock->kualitas }}">
+                                                                        <i class="fa fa-plus"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label>Keranjang</label>
+                                                <div class="col-sm-8">
+                                                    <table class="table table-bordered mt-2" id="cart-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align: center;">Merek</th>
+                                                                <th style="text-align: center;">Tipe</th>
+                                                                <th style="text-align: center;">Jumlah</th>
+                                                                <th style="text-align: center;">Kualitas</th>
+                                                                <th style="text-align: center;">Aksi</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="cart-table-body">
+
+                                                            @foreach ($WorkOrderInstallDetail as $detail)
+                                                            <tr data-unique-key="{{ $detail->id }}">
+                                                                <td style="text-align: center;">{{ $detail->merek }}</td>
+                                                                <td style="text-align: center;">{{ $detail->tipe }}</td>
+                                                                <td style="text-align: center;">
+                                                                    <input type="number"
+                                                                        name="cart[{{ $detail->id }}][total_jumlah]"
+                                                                        value="{{ $detail->jumlah }}"
+                                                                        class="form-control cart-quantity"
+                                                                        min="1"
+                                                                        max="{{ $detail->stock_max }}"
+                                                                        style="width: 80px; text-align: center;" />
+                                                                </td>
+                                                                <td style="text-align: center;">{{ $detail->kualitas }}</td>
+                                                                <td style="text-align: center;">
+                                                                    <button type="button" class="btn btn-danger remove-from-cart" data-id="{{ $detail->id }}">
+                                                                        <i class="fa fa-close"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="col-md-6">
@@ -444,6 +538,7 @@
                                                         <option value="WIRELESS" {{ old('media', $getInstall->media) == 'WIRELESS' ? 'selected' : '' }}>WIRELESS</option>
                                                         <option value="M2M" {{ old('media', $getInstall->media) == 'M2M' ? 'selected' : '' }}>M2M</option>
                                                         <option value="NONE" {{ old('media', $getInstall->media) == 'NONE' ? 'selected' : '' }}>NONE</option>
+                                                        <option value="STARLINK" {{ old('media', $getInstall->media) == 'STARLINK' ? 'selected' : '' }}>STARLINK</option>
 
                                                     </select>
                                                 </div>
@@ -488,104 +583,15 @@
                                                     <textarea name="keterangan" id="keterangan" class="form-control" rows="4">{{ $getInstall->keterangan }}</textarea>
                                                 </div>
                                             </div>
-
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="jenis_id" class="col-sm-2 col-form-label">Jenis Barang</label>
-                                            <div class="col-sm-4">
-                                                <select id="jenis_id" name="jenis_id" class="form-control">
-                                                    <option value="">Pilih Jenis Barang</option>
-                                                    @foreach ($jenisList as $jenis)
-                                                    <option value="{{ $jenis->id }}" {{ $jenis->id == $getInstall->jenis_id ? 'selected' : '' }}>{{ $jenis->nama_jenis }}</option>
-                                                    @endforeach
-                                                </select>
+                                            <div class="form-group row">
+                                                <label for="non_stock" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $getInstall->non_stock) }}</textarea>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label">Data Barang</label>
-                                            <div class="col-sm-4">
-                                                <input type="text" id="search" class="form-control" />
-                                                <table class="table table-bordered mt-2" id="stock-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="text-align: center;">Merek</th>
-                                                            <th style="text-align: center;">Tipe</th>
-                                                            <th style="text-align: center;">Jumlah Tersedia</th>
-                                                            <th style="text-align: center;">Kualitas</th>
-                                                            <th style="text-align: center;">Jumlah Request</th>
-                                                            <th style="text-align: center;">Aksi</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="stock-table-body">
-                                                        @foreach ($stockBarangs as $stock)
-                                                        <tr data-jenis-id="{{ $stock->jenis_id }}">
-                                                            <td style="text-align: center;">{{ $stock->merek->nama_merek }}</td>
-                                                            <td style="text-align: center;">{{ $stock->tipe->nama_tipe }}</td>
-                                                            <td style="text-align: center;">{{ $stock->total_jumlah }}</td>
-                                                            <td style="text-align: center;">{{ $stock->kualitas }}</td>
-                                                            <td style="text-align: center;">
-                                                                <input type="number" min="0" max="{{ $stock->total_jumlah }}" value="0" class="form-control quantity" />
-                                                            </td>
-                                                            <td style="text-align: center;">
-                                                                <button type="button" class="btn btn-success add-to-cart" data-id="{{ $stock->id }}" data-merek="{{ $stock->merek->nama_merek }}" data-tipe="{{ $stock->tipe->nama_tipe }}" data-jumlah="{{ $stock->total_jumlah }}" data-kualitas="{{ $stock->kualitas }}">
-                                                                    <i class="fa fa-plus"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
 
-                                        <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label">Keranjang</label>
-                                            <div class="col-sm-4">
-                                                <table class="table table-bordered mt-2" id="cart-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="text-align: center;">Merek</th>
-                                                            <th style="text-align: center;">Tipe</th>
-                                                            <th style="text-align: center;">Jumlah</th>
-                                                            <th style="text-align: center;">Kualitas</th>
-                                                            <th style="text-align: center;">Aksi</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="cart-table-body">
-
-                                                        @foreach ($WorkOrderInstallDetail as $detail)
-                                                        <tr data-unique-key="{{ $detail->id }}">
-                                                            <td style="text-align: center;">{{ $detail->merek }}</td>
-                                                            <td style="text-align: center;">{{ $detail->tipe }}</td>
-                                                            <td style="text-align: center;">
-                                                                <input type="number"
-                                                                    name="cart[{{ $detail->id }}][total_jumlah]"
-                                                                    value="{{ $detail->jumlah }}"
-                                                                    class="form-control cart-quantity"
-                                                                    min="1"
-                                                                    max="{{ $detail->stock_max }}"
-                                                                    style="width: 80px; text-align: center;" />
-                                                            </td>
-                                                            <td style="text-align: center;">{{ $detail->kualitas }}</td>
-                                                            <td style="text-align: center;">
-                                                                <button type="button" class="btn btn-danger remove-from-cart" data-id="{{ $detail->id }}">
-                                                                    <i class="fa fa-close"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach
-
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="non_stock" class="col-sm-2 col-form-label">Input Barang Non Stock</label>
-                                            <div class="col-sm-4">
-                                                <textarea id="non_stock" name="non_stock" class="form-control" rows="4">{{ old('non_stock', $getInstall->non_stock) }}</textarea>
-                                            </div>
-                                        </div>
                                     </div>
                                     <br>
                                     <div class="text-center">

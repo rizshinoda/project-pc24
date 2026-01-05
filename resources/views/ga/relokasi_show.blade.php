@@ -190,7 +190,7 @@
                                     <p><strong>Alamat:</strong> {{ $getRelokasi->onlineBilling->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getRelokasi->onlineBilling->layanan }}</p>
                                     <p>
-                                        <strong>Bandwidth:</strong>
+                                        <strong>Volume:</strong>
                                         {{ $getRelokasi->onlineBilling->bandwidth }} {{ $getRelokasi->onlineBilling->satuan }}
 
                                     </p>

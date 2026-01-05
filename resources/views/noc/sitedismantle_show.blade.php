@@ -104,7 +104,6 @@
                         @endif
                     </div>
 
-
                     <!-- Menampilkan detail survey -->
                     <div class="row row-cols-1 row-cols-md-3 g-3">
                         <!-- Card 1: WO Info -->
@@ -145,7 +144,7 @@
                                     <p><strong>Nama Gedung:</strong> {{ $onlinebilling->pelanggan->nama_gedung}}</p>
                                     <p><strong>Alamat:</strong> {{ $onlinebilling->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $onlinebilling->layanan }}</p>
-                                    <p><strong>Bandwidth:</strong> {{ $onlinebilling->bandwidth }} {{ $onlinebilling->satuan }}</p>
+                                    <p><strong>Volume:</strong> {{ $onlinebilling->bandwidth }} {{ $onlinebilling->satuan }}</p>
                                     <p><strong>Vlan:</strong> {{ $onlinebilling->vlan }}</p>
                                 </div>
                             </div>

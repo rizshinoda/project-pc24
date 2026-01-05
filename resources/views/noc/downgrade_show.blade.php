@@ -150,7 +150,7 @@
                                     <p><strong>Alamat:</strong> {{ $getDowngrade->onlineBilling->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getDowngrade->onlineBilling->layanan }}</p>
                                     <p>
-                                        <strong>Bandwidth:</strong>
+                                        <strong>Volume:</strong>
                                         {{ $getDowngrade->onlineBilling->bandwidth }} {{ $getDowngrade->onlineBilling->satuan }}
                                         <span style="font-size: larger;">➔</span>
                                         {{ $getDowngrade->bandwidth_baru }} {{ $getDowngrade->satuan }}

@@ -317,3 +317,30 @@
         chart.render();
     });
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.querySelectorAll('.btn-unverify').forEach(button => {
+        button.addEventListener('click', function() {
+
+            let userId = this.getAttribute('data-id');
+
+            Swal.fire({
+                title: "Yakin ingin menonaktifkan user ini?",
+                text: "User tidak akan bisa login setelah akses dihapus!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Ya, nonaktifkan!",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('unverify-form-' + userId).submit();
+                }
+            });
+
+        });
+    });
+</script>

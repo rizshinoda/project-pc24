@@ -173,7 +173,7 @@
                                     <p><strong>Alamat:</strong> {{ $getUpgrade->onlineBilling->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getUpgrade->onlineBilling->layanan }}</p>
                                     <p>
-                                        <strong>Bandwidth:</strong>
+                                        <strong>Volume:</strong>
                                         {{ $getUpgrade->onlineBilling->bandwidth }} {{ $getUpgrade->onlineBilling->satuan }}
                                         <span style="font-size: larger;">➔</span>
                                         {{ $getUpgrade->bandwidth_baru }} {{ $getUpgrade->satuan }}

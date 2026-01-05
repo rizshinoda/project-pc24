@@ -157,7 +157,7 @@
                                     <p><strong>Alamat:</strong> {{ $getMaintenance->onlineBilling->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getMaintenance->onlineBilling->layanan }}</p>
                                     <p>
-                                        <strong>Bandwidth:</strong>
+                                        <strong>Volume:</strong>
                                         {{ $getMaintenance->onlineBilling->bandwidth }} {{ $getMaintenance->onlineBilling->satuan }}
 
                                     </p>

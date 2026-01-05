@@ -190,7 +190,7 @@
                                                 <th style="text-align: center; vertical-align: middle;">Nama <br> Site</th>
                                                 <th style="text-align: center; vertical-align: middle;">Alamat <br> Pemasangan</th>
                                                 <th style="text-align: center; vertical-align: middle;">Vlan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Bandwidth</th>
+                                                <th style="text-align: center; vertical-align: middle;">Volume</th>
                                                 <th style="text-align: center; vertical-align: middle;">Tanggal <br>Aktif</th>
                                                 <th style="text-align: center; vertical-align: middle;">Aksi</th>
                                             </tr>

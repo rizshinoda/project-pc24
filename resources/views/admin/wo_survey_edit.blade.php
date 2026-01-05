@@ -202,15 +202,16 @@
                                                         <option value="METRO" {{ old('layanan', $getSurvey->layanan) == 'METRO' ? 'selected' : '' }}>METRO</option>
                                                         <option value="METRO-E" {{ old('layanan', $getSurvey->layanan) == 'METRO-E' ? 'selected' : '' }}>METRO-E</option>
                                                         <option value="VPN" {{ old('layanan', $getSurvey->layanan) == 'VPN' ? 'selected' : '' }}>VPN</option>
-                                                        <option value="LOCAL LOOP" {{ old('layanan', $getSurvey->layanan) == 'LOCAL LOOP' ? 'selected' : '' }}>LOCAL LOOP</option>
+                                                        <option value="LOCALLOOP" {{ old('layanan', $getSurvey->layanan) == 'LOCALLOOP' ? 'selected' : '' }}>LOCALLOOP</option>
                                                         <option value="INTERCONECTION" {{ old('layanan', $getSurvey->layanan) == 'INTERCONECTION' ? 'selected' : '' }}>INTERCONECTION</option>
                                                         <option value="CROSSCONNECT" {{ old('layanan', $getSurvey->layanan) == 'CROSSCONNECT' ? 'selected' : '' }}>CROSSCONNECT</option>
                                                         <option value="COLOCATION" {{ old('layanan', $getSurvey->layanan) == 'COLOCATION' ? 'selected' : '' }}>COLOCATION</option>
                                                         <option value="INTERNET BROADBAND" {{ old('layanan', $getSurvey->layanan) == 'INTERNET BROADBAND' ? 'selected' : '' }}>INTERNET BROADBAND</option>
-                                                        <option value="DEDICATED" {{ old('layanan', $getSurvey->layanan) == 'DEDICATED' ? 'selected' : '' }}>DEDICATED</option>
+                                                        <option value="INTERNET DEDICATED" {{ old('layanan', $getSurvey->layanan) == 'INTERNET DEDICATED' ? 'selected' : '' }}>INTERNET DEDICATED</option>
+                                                        <option value="INTERNET BROADBAND+IP" {{ old('layanan', $getSurvey->layanan) == 'INTERNET BROADBAND+IP' ? 'selected' : '' }}>INTERNET BROADBAND+IP</option>
+
                                                         <option value="METRO - DARK FIBER" {{ old('layanan', $getSurvey->layanan) == 'METRO - DARK FIBER' ? 'selected' : '' }}>METRO - DARK FIBER</option>
                                                         <option value="IP TRANSIT" {{ old('layanan', $getSurvey->layanan) == 'IP TRANSIT' ? 'selected' : '' }}>IP TRANSIT</option>
-                                                        <option value="INTERNET DEDICATED" {{ old('layanan', $getSurvey->layanan) == 'INTERNET DEDICATED' ? 'selected' : '' }}>INTERNET DEDICATED</option>
                                                         <option value="METRO P2MP" {{ old('layanan', $getSurvey->layanan) == 'METRO P2MP' ? 'selected' : '' }}>METRO P2MP</option>
                                                         <option value="DARK FIBER" {{ old('layanan', $getSurvey->layanan) == 'DARK FIBER' ? 'selected' : '' }}>DARK FIBER</option>
                                                         <option value="Internet Kuota" {{ old('layanan', $getSurvey->layanan) == 'Internet Kuota' ? 'selected' : '' }}>Internet Kuota</option>
@@ -221,7 +222,7 @@
                                             </div>
                                             <!-- Edit Bandwidth dan Satuan -->
                                             <div class="form-group row">
-                                                <label for="bandwidth" class="col-sm-4 col-form-label">Bandwidth</label>
+                                                <label for="bandwidth" class="col-sm-4 col-form-label">Volume</label>
 
                                                 <!-- Input Bandwidth -->
                                                 <div class="col-sm-4">
@@ -241,6 +242,10 @@
                                                         <option value="Gbps" {{ old('satuan', $getSurvey->satuan) == 'Gbps' ? 'selected' : '' }}>Gbps</option>
                                                         <option value="Mbps" {{ old('satuan', $getSurvey->satuan) == 'Mbps' ? 'selected' : '' }}>Mbps</option>
                                                         <option value="Kbps" {{ old('satuan', $getSurvey->satuan) == 'Kbps' ? 'selected' : '' }}>Kbps</option>
+                                                        <option value="RU(RACK UNIT)" {{ old('satuan', $getSurvey->satuan) == 'RU(RACK UNIT)' ? 'selected' : '' }}>RU(RACK UNIT)</option>
+                                                        <option value="CORE" {{ old('satuan', $getSurvey->satuan) == 'CORE' ? 'selected' : '' }}>CORE</option>
+                                                        <option value="PAIR" {{ old('satuan', $getSurvey->satuan) == 'PAIR' ? 'selected' : '' }}>PAIR</option>
+
                                                     </select>
                                                 </div>
                                             </div>
@@ -408,6 +413,7 @@
                                                         <option value="WIRELESS" {{ old('media', $getSurvey->media) == 'WIRELESS' ? 'selected' : '' }}>WIRELESS</option>
                                                         <option value="M2M" {{ old('media', $getSurvey->media) == 'M2M' ? 'selected' : '' }}>M2M</option>
                                                         <option value="NONE" {{ old('media', $getSurvey->media) == 'NONE' ? 'selected' : '' }}>NONE</option>
+                                                        <option value="STARLINK" {{ old('media', $getSurvey->media) == 'STARLINK' ? 'selected' : '' }}>STARLINK</option>
 
                                                     </select>
 

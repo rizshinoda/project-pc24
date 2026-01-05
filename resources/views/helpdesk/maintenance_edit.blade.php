@@ -112,7 +112,14 @@
                                                     <input type="text" class="form-control" id="no_spk" name="no_spk" value="{{ $workOrder->no_spk }}" readonly>
                                                 </div>
                                             </div>
-
+                                            <!-- Tanggal Maintenance -->
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label">Tanggal Maintenance</label>
+                                                <div class="col-sm-8">
+                                                    <input type="date" name="tanggal_maintenance" class="form-control"
+                                                        value="{{ $workOrder->tanggal_maintenance }}" required>
+                                                </div>
+                                            </div>
                                             <div class="form-group row">
                                                 <label for="bandwidth" class="col-sm-4 col-form-label">Keterangan</label>
                                                 <div class="col-sm-8">

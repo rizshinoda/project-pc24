@@ -162,7 +162,7 @@
                                     <p><strong>Alamat:</strong> {{ $getGantivendor->onlineBilling->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getGantivendor->onlineBilling->layanan }}</p>
                                     <p>
-                                        <strong>Bandwidth:</strong>
+                                        <strong>Volume:</strong>
                                         {{ $getGantivendor->onlineBilling->bandwidth }} {{ $getGantivendor->onlineBilling->satuan }}
 
                                     </p>

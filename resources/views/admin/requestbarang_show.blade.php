@@ -155,7 +155,7 @@
                                     <p><strong>Alamat:</strong> {{ $requestBarang->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $requestBarang->onlineBilling->nama_pic }} ({{ $requestBarang->onlineBilling->no_pic }})</p>
                                     <p><strong>Layanan:</strong> {{ $requestBarang->onlineBilling->layanan }}</p>
-                                    <p><strong>Bandwidth:</strong> {{ $requestBarang->onlineBilling->bandwidth }} {{$requestBarang->onlineBilling->satuan}}</p>
+                                    <p><strong>Volume:</strong> {{ $requestBarang->onlineBilling->bandwidth }} {{$requestBarang->onlineBilling->satuan}}</p>
 
                                     @elseif ($requestBarang->subject_manual)
                                     <p><strong>Site:</strong> {{ $requestBarang->subject_manual }}</p>

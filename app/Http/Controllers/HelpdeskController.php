@@ -797,6 +797,7 @@ class HelpdeskController extends Controller
             'keterangan' => 'nullable|string',
             'cart' => 'nullable|array',
             'non_stock' => 'nullable|string',
+            'tanggal_maintenance' => 'required|date',
 
 
             // tambahkan validasi lain sesuai kebutuhan
@@ -809,6 +810,7 @@ class HelpdeskController extends Controller
             'online_billing_id' => $validatedData['online_billing_id'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'tanggal_maintenance' => $validatedData['tanggal_maintenance'],
 
         ]);
         LogActivity::add('Maintenance', $workOrder->onlineBilling->nama_site, 'edit');

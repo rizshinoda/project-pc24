@@ -176,7 +176,7 @@
                                     <p><strong>Nama Gedung:</strong> {{ $getInstall->pelanggan->nama_gedung}}</p>
                                     <p><strong>Alamat:</strong> {{ $getInstall->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getInstall->layanan }}</p>
-                                    <p><strong>Bandwidth:</strong> {{ $getInstall->bandwidth }} {{ $getInstall->satuan }}</p>
+                                    <p><strong>Volume:</strong> {{ $getInstall->bandwidth }} {{ $getInstall->satuan }}</p>
                                     <p><strong>NNI:</strong> {{ $getInstall->nni }}</p>
 
                                     <p><strong>Vlan:</strong> {{ $getInstall->vlan }}</p>

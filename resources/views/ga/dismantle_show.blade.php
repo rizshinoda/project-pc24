@@ -166,7 +166,7 @@
                                     <p><strong>Alamat:</strong> {{ $getDismantle->onlineBilling->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getDismantle->onlineBilling->layanan }}</p>
                                     <p>
-                                        <strong>Bandwidth:</strong>
+                                        <strong>Volume:</strong>
                                         {{ $getDismantle->onlineBilling->bandwidth }}
                                     </p>
                                     <p><strong>Vlan:</strong> {{ $getDismantle->onlineBilling->vlan }}</p>

@@ -77,7 +77,7 @@
                                     <p><strong>Nama Gedung:</strong> {{ $getSurvey->pelanggan->nama_gedung}}</p>
                                     <p><strong>Alamat:</strong> {{ $getSurvey->pelanggan->alamat}}</p>
                                     <p><strong>Layanan:</strong> {{ $getSurvey->layanan }}</p>
-                                    <p><strong>Bandwidth:</strong> {{ $getSurvey->bandwidth }} {{ $getSurvey->satuan }}</p>
+                                    <p><strong>Volume:</strong> {{ $getSurvey->bandwidth }} {{ $getSurvey->satuan }}</p>
                                     <p><strong>Vlan:</strong> {{ $getSurvey->vlan }}</p>
                                 </div>
                             </div>
