@@ -630,7 +630,7 @@ class PsbController extends Controller
         $getSurvey = WorkOrderSurvey::findOrFail($id);
         $tanggalSurvey = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalSurvey)->translatedFormat('l, d F Y');
-        $templatePath = storage_path('app/public/pdf/template_survey1.pdf');
+        $templatePath = resource_path('pdf/template_survey1.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -737,7 +737,7 @@ class PsbController extends Controller
         $getInstall->tanggal_instalasi = now()->toDateString();
         $getInstall->save();
         $formattedDate = Carbon::parse($getInstall->tanggal_instalasi)->translatedFormat('l, d F Y');
-        $templatePath = storage_path('app/public/pdf/template_instalasi.pdf');
+        $templatePath = resource_path('pdf/template_instalasi.pdf');
 
 
         $pdf = new FPDI();
@@ -846,7 +846,7 @@ class PsbController extends Controller
         $getMaintenance = WorkOrderMaintenance::findOrFail($id);
         $tanggalMaintenance = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalMaintenance)->translatedFormat('l, d F Y');
-        $templatePath = storage_path('app/public/pdf/template_maintenance.pdf');
+        $templatePath = resource_path('pdf/template_maintenance.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -955,7 +955,7 @@ class PsbController extends Controller
         $getUpgrade = WorkOrderUpgrade::findOrFail($id);
         $tanggalUpgrade = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalUpgrade)->translatedFormat('l, d F Y');
-        $templatePath = storage_path('app/public/pdf/template_upgrade.pdf');
+        $templatePath = resource_path('pdf/template_upgrade.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -1064,7 +1064,7 @@ class PsbController extends Controller
         $getDowngrade = WorkOrderDowngrade::findOrFail($id);
         $tanggalDowngrade = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalDowngrade)->translatedFormat('l, d F Y');
-        $templatePath = storage_path('app/public/pdf/template_downgrade.pdf');
+        $templatePath = resource_path('pdf/template_downgrade.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -1173,7 +1173,7 @@ class PsbController extends Controller
         $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
         $tanggalGantiVendor = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalGantiVendor)->translatedFormat('l, d F Y');
-        $templatePath = storage_path('app/public/pdf/template_gantivendor.pdf');
+        $templatePath = resource_path('pdf/template_gantivendor.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -1281,7 +1281,7 @@ class PsbController extends Controller
         $getDismantle = WorkOrderDismantle::findOrFail($id);
         $tanggalDismantle = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalDismantle)->translatedFormat('l, d F Y');
-        $templatePath = storage_path('app/public/pdf/template_dismantle.pdf');
+        $templatePath = resource_path('pdf/template_dismantle.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -1390,7 +1390,7 @@ class PsbController extends Controller
         $getRelokasi = WorkOrderRelokasi::findOrFail($id);
         $tanggalRelokasi = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalRelokasi)->translatedFormat('l, d F Y');
-        $templatePath = storage_path('app/public/pdf/template_relokasi.pdf');
+        $templatePath = resource_path('pdf/template_relokasi.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
