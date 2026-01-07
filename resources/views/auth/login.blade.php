@@ -139,7 +139,7 @@ $routes = [
 
                 <select class="custom-select custom-select-lg" name="is_role" required>
                     <option value="">Pilih Divisi</option>
-                    <option {{ old('is_role') == '0' ?  'selected' : ''}} value="0">Super Admin</option>
+                    <!-- <option {{ old('is_role') == '0' ?  'selected' : ''}} value="0">Super Admin</option> -->
                     <option {{ old('is_role') == '1' ?  'selected' : ''}} value="1">Admin</option>
                     <option {{ old('is_role') == '2' ?  'selected' : ''}} value="2">GA</option>
                     <option {{ old('is_role') == '3' ?  'selected' : ''}} value="3">Helpdesk</option>
