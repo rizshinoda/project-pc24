@@ -332,8 +332,10 @@
                                                                     <div class="modal-body d-flex flex-row flex-wrap justify-content-center">
                                                                         @foreach ($photos as $photo)
                                                                         <div class="m-2 d-flex flex-column align-items-center">
-                                                                            <img src="{{ asset('uploads/' . $photo->file_path) }}" alt="Foto Progress"
-                                                                                style="width: 200px; height: 200px; object-fit: cover; border-radius: 0;">
+                                                                            <img src="{{ asset('uploads/' . $photo->file_path) }}"
+                                                                                alt="Logo"
+                                                                                style="width: 150px; height: 150px; object-fit: contain; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+
                                                                             <a href="{{ asset('uploads/' . $photo->file_path) }}" download class="btn btn-info mt-2">Download Foto</a>
                                                                         </div>
                                                                         @endforeach

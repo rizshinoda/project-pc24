@@ -311,9 +311,18 @@ class HelpdeskController extends Controller
             }
         }
 
-        // Kirim email
-        $recipients = ['rizalkrenz1@gmail.com', 'm.rizal@pc24.net.id'];
+        // Ambil email user role GA
+        $recipients = User::where('is_role', 2)
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->toArray();
 
+        // Kirim email jika ada penerima
+        if (!empty($recipients)) {
+            Mail::to($recipients)->send(
+                new \App\Mail\PermintaanBarangMail($requestBarang, $detailBarang)
+            );
+        }
         // Kirim email tanpa PDF jika tidak ada barang non-stock
         Mail::to($recipients)->send(new \App\Mail\PermintaanBarangMail($requestBarang, $detailBarang));
 
@@ -730,9 +739,33 @@ class HelpdeskController extends Controller
         // Load relasi onlineBilling untuk email
         $getMaintenance->load('onlineBilling', 'admin');
 
-        // Kirim email ke tim terkait
-        $recipients = ['rizalkrenz1@gmail.com', 'm.rizal@pc24.net.id', 'fahrizavary4321@gmail.com'];
-        Mail::to($recipients)->send(new \App\Mail\MaintenanceRequestMail($getMaintenance, $detailBarang));
+        $gaUsers = User::where('is_role', 2)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($gaUsers as $ga) {
+            Mail::to($ga->email)->send(
+                new \App\Mail\MaintenanceRequestMail(
+                    $getMaintenance,
+                    $detailBarang,
+                    2 // GA
+                )
+            );
+        }
+        $psbUsers = User::where('is_role', 5)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($psbUsers as $psb) {
+            Mail::to($psb->email)->send(
+                new \App\Mail\MaintenanceRequestMail(
+                    $getMaintenance,
+                    $detailBarang,
+                    5 // PSB
+                )
+            );
+        }
+
 
         return redirect()->route('hd.maintenance')->with('success', 'Work order berhasil diterbitkan.');
     }
