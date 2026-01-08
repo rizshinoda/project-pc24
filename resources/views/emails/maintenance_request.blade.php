@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <html>
+@php
+$basePath = match ((int) $targetRole) {
+2 => '/ga/maintenance/show/',
+5 => '/psb/maintenance/show/',
+};
+@endphp
 
 <head>
     <meta charset="UTF-8">
@@ -102,8 +108,11 @@
     <p style="margin: 6px 0;"><strong>Note:</strong> {{ $getMaintenance->keterangan }}</p>
     @endif
 
-    <p style="margin: 6px 0;">📎 <a href="{{ url('/ga/maintenance/' . $getMaintenance->id) }}">Lihat Detail Permintaan</a></p>
-
+    <p style="margin: 6px 0;">
+        📎 <a href="{{ url($basePath . $getMaintenance->id) }}">
+            Lihat Detail Permintaan
+        </a>
+    </p>
     <br>
     <p style="margin-top: 10px;">Warm regards,<br>
         {{ $getMaintenance->admin->name ?? 'User Pengaju' }}

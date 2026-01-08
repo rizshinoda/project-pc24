@@ -12,11 +12,13 @@ class MaintenanceRequestMail extends Mailable
 
     public $getMaintenance;
     public $detailBarang;
+    public $targetRole; // ⬅️ TAMBAHKAN
 
-    public function __construct($getMaintenance, $detailBarang)
+    public function __construct($getMaintenance, $detailBarang, int $targetRole)
     {
         $this->getMaintenance = $getMaintenance;
-        $this->detailBarang = $detailBarang;
+        $this->detailBarang   = $detailBarang;
+        $this->targetRole     = $targetRole; // ⬅️ SIMPAN
     }
 
     public function build()
@@ -24,11 +26,15 @@ class MaintenanceRequestMail extends Mailable
         $client = $this->getMaintenance->onlineBilling;
 
         $namaPelanggan = $client?->pelanggan->nama_pelanggan ?? '-';
-        $namaSite = $client?->nama_site ?? '-';
+        $namaSite      = $client?->nama_site ?? '-';
 
-        $subject = 'Request SPK Alokasi Team & Perangkat U/ Client ' . $namaPelanggan . ' - ' . $namaSite;
+        $subject = 'Request SPK Alokasi Team & Perangkat U/ Client '
+            . $namaPelanggan . ' - ' . $namaSite;
 
-        return $this->from(config('mail.from.address'), $this->getMaintenance->admin->name)
+        return $this->from(
+            config('mail.from.address'),
+            $this->getMaintenance->admin->name
+        )
             ->subject($subject)
             ->view('emails.maintenance_request');
     }
