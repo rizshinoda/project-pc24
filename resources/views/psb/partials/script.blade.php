@@ -58,6 +58,16 @@
         }
     });
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const alertDanger = document.querySelector('.alert-danger');
+
+        if (alertDanger) {
+            setTimeout(function() {
+                alertDanger.style.display = 'none';
+            }, 5000);
+        }
+    });
+
     function markAsReadAndRedirect(notificationId, url) {
         // Kirim form untuk menandai notifikasi sebagai dibaca
         document.getElementById('mark-as-read-form-' + notificationId).submit();

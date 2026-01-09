@@ -316,4 +316,25 @@
         let chart = new ApexCharts(document.querySelector("#traffic-chart"), options);
         chart.render();
     });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const alertSuccess = document.querySelector('.alert-success');
+        if (alertSuccess) {
+            // Menghilangkan alert setelah 5 detik
+            setTimeout(function() {
+                alertSuccess.style.display = 'none';
+            }, 5000);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const alertDanger = document.querySelector('.alert-danger');
+
+        if (alertDanger) {
+            setTimeout(function() {
+                alertDanger.style.display = 'none';
+            }, 5000);
+        }
+    });
 </script>

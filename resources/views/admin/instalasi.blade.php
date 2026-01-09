@@ -213,11 +213,11 @@
                                                 <th style="text-align: center; vertical-align: middle;">Nomor Work <br> Order</th>
                                                 <th style="text-align: center; vertical-align: middle;">Tanggal <br> Dibuat</th>
                                                 <th style="text-align: center; vertical-align: middle;">Nama <br> Pelanggan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Perusahaan</th>
                                                 <th style="text-align: center; vertical-align: middle;">Nama <br> Site</th>
                                                 <th style="text-align: center; vertical-align: middle;">Alamat <br> Pemasangan</th>
                                                 <th style="text-align: center; vertical-align: middle;">Volume</th>
                                                 <th style="text-align: center; vertical-align: middle;">Status</th>
+                                                <th style="text-align: center; vertical-align: middle;">Berita Acara</th>
                                                 <th style="text-align: center; vertical-align: middle;">Aksi</th>
                                             </tr>
                                         </thead>
@@ -228,7 +228,6 @@
                                                 <td style="text-align: center; vertical-align: middle;" id="no_spk">{{ $install->no_spk }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $install->created_at->format('d M Y') }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $install->pelanggan->nama_pelanggan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $install->instansi->nama_instansi }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $install->nama_site }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">
                                                     {{ \Illuminate\Support\Str::limit($install->alamat_pemasangan, 60, '...') }}
@@ -251,6 +250,22 @@
 
 
                                                 </td>
+
+                                                <td style="text-align: center; vertical-align: middle;">
+                                                    @php
+                                                    $baStatus = $install->beritaAcara?->status;
+                                                    @endphp
+
+                                                    @if ($baStatus === 'sent')
+                                                    <span class="badge badge-pill badge-info">BA Dikirim</span>
+                                                    @elseif ($baStatus === 'received')
+                                                    <span class="badge badge-pill badge-success">BA Diterima</span>
+                                                    @else
+                                                    <span class="badge badge-pill badge-secondary">Belum Ada BA</span>
+                                                    @endif
+                                                </td>
+
+
                                                 <td style="text-align: center; vertical-align: middle;">
                                                     <a href="{{ route('admin.wo_instalasi_show', $install->id) }}" class="btn btn-success btn-sm " style="display:inline-block; padding: 8px 11px;"><i class="fa fa-eye"></i></a>
                                                     <a href="{{ route('admin.wo_instalasi_edit', $install->id) }}" class="btn btn-info btn-sm " style="display:inline-block; padding: 8px 11px;"><i class="fa fa-edit"></i></a>
