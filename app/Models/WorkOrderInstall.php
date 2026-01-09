@@ -69,4 +69,9 @@ class WorkOrderInstall extends Model
     {
         return $this->hasMany(BarangKeluar::class, 'work_order_install_id');
     }
+
+    public function beritaAcara()
+    {
+        return $this->hasOne(BeritaAcara::class, 'work_order_install_id');
+    }
 }
