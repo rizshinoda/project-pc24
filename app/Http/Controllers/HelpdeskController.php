@@ -587,40 +587,47 @@ class HelpdeskController extends Controller
     }
     public function maintenanceCreate($id)
     {
-        $onlineBilling = OnlineBilling::findOrFail($id); // Ambil data pelanggan berdasarkan ID
+        $onlineBilling = OnlineBilling::findOrFail($id);
 
-        // Mendapatkan tahun 2 digit dan bulan saat ini
-        $currentYear = date('y'); // Tahun dengan dua digit terakhir
-        $currentMonth = date('m'); // Bulan saat ini
-
-        // Mengambil daftar jenis unik dari StockBarang
+        // Ambil daftar jenis barang
         $jenisList = Jenis::select('id', 'nama_jenis')->get();
 
-        // Mengambil data stok dengan total jumlah berdasarkan tipe, merek, dan jenis, serta melakukan pagination
+        // Ambil stok barang
         $stockBarangs = StockBarang::with(['merek', 'tipe', 'jenis'])
             ->selectRaw('tipe_id, merek_id, jenis_id, kualitas, SUM(jumlah) as total_jumlah')
             ->groupBy('tipe_id', 'merek_id', 'jenis_id', 'kualitas')
             ->get();
 
-        // Mendapatkan nomor SPK terakhir dari tahun ini dan bulan ini
-        $lastSpk = WorkOrderMaintenance::whereYear('created_at', date('Y')) // Tahun dengan 4 digit
-            ->whereMonth('created_at', $currentMonth) // Filter berdasarkan bulan
-            ->max('id'); // Dapatkan ID terbesar di bulan dan tahun yang sama
+        // Ambil nomor maintenance terakhir (TANPA reset)
+        $lastMaintenance = WorkOrderMaintenance::orderBy('id', 'desc')->first();
 
-        // Jika ada nomor SPK di bulan ini, ambil nomor urut berikutnya
-        // Jika tidak ada, mulai dari 001
-        $nextNumber = $lastSpk ? ($lastSpk + 1) : 1;
+        if ($lastMaintenance && preg_match('/\/(\d+)$/', $lastMaintenance->no_spk, $matches)) {
+            $lastNumber = (int) $matches[1];
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
 
-        // Format nomor SPK ke dalam format SRV-bulan-tahun-xxx (dengan xxx direset setiap bulan dan tahun)
-        $no_spk = 'MT-' . $currentMonth . $currentYear . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Pad minimal 4 digit (kalau lebih, tampil apa adanya)
+        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('stockBarangs', 'jenisList', 'notifications', 'no_spk', 'onlineBilling'));
+        // Generate nomor MAINTENANCE
+        $no_spk = 'PC24Telin/PSB-MAINTENANCE/' . now()->format('Y-m-d') . '/' . $numberFormatted;
+
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
+
+        // Gabungkan data role
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('stockBarangs', 'jenisList', 'notifications', 'no_spk', 'onlineBilling')
+        );
 
         return $this->renderView('maintenance_create', $data);
     }
+
     public function maintenanceStore(Request $request)
     {
         // Validasi request
@@ -984,31 +991,38 @@ class HelpdeskController extends Controller
 
     public function gantivendorCreate($id)
     {
-        $onlineBilling = OnlineBilling::findOrFail($id); // Ambil data pelanggan berdasarkan ID
+        $onlineBilling = OnlineBilling::findOrFail($id);
 
-        // Mendapatkan tahun 2 digit dan bulan saat ini
-        $currentYear = date('y'); // Tahun dengan dua digit terakhir
-        $currentMonth = date('m'); // Bulan saat ini
+        // Ambil nomor ganti vendor terakhir (TANPA reset)
+        $lastGantiVendor = WorkOrderGantiVendor::orderBy('id', 'desc')->first();
 
-        // Mendapatkan nomor SPK terakhir dari tahun ini dan bulan ini
-        $lastSpk = WorkOrderGantiVendor::whereYear('created_at', date('Y')) // Tahun dengan 4 digit
-            ->whereMonth('created_at', $currentMonth) // Filter berdasarkan bulan
-            ->max('id'); // Dapatkan ID terbesar di bulan dan tahun yang sama
+        if ($lastGantiVendor && preg_match('/\/(\d+)$/', $lastGantiVendor->no_spk, $matches)) {
+            $lastNumber = (int) $matches[1];
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
 
-        // Jika ada nomor SPK di bulan ini, ambil nomor urut berikutnya
-        // Jika tidak ada, mulai dari 001
-        $nextNumber = $lastSpk ? ($lastSpk + 1) : 1;
+        // Pad minimal 4 digit (kalau lebih, tampil apa adanya)
+        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Format nomor SPK ke dalam format SRV-bulan-tahun-xxx (dengan xxx direset setiap bulan dan tahun)
-        $no_spk = 'GV-' . $currentMonth . $currentYear . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Generate nomor GANTI VENDOR
+        $no_spk = 'PC24Telin/PSB-GANTI_LAYANAN/' . now()->format('Y-m-d') . '/' . $numberFormatted;
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('notifications', 'no_spk', 'onlineBilling'));
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
+
+        // Gabungkan data role
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('notifications', 'no_spk', 'onlineBilling')
+        );
 
         return $this->renderView('gantivendor_create', $data);
     }
+
     public function gantivendorStore(Request $request)
     {
 

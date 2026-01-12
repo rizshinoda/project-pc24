@@ -16,6 +16,7 @@ class WorkOrderGantiVendor extends Model
         'vendor_id',
         'sid_baru',
         'admin_id',
+        'approved_by'
 
     ];
     /**
@@ -36,5 +37,9 @@ class WorkOrderGantiVendor extends Model
     public function vendor()
     {
         return $this->belongsTo(Vendor::class, 'vendor_id');
+    }
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }
