@@ -690,15 +690,14 @@ class PsbController extends Controller
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
-        $user = Auth::user();
-        $namaUser = $user->name ?? 'Unknown';
+        $namaUser = $getSurvey->admin->name ?? 'Unknown';
         $noSpk = $getSurvey->no_spk ?? 'N/A';
         $tanggalSurvey = now()->format('d-m-Y');
 
         // Format teks QR
         $qrText = "=== Tanda Tangan Digital ===\n" .
             "Nama Penerbit : {$namaUser}\n" .
-            "Jabatan        : Admin PSB\n" .
+            "Jabatan        : Admin\n" .
             "Tanggal Survey : {$formattedDate}\n" .
             "Nomor SPK      : {$noSpk}\n" .
             "Status Surat   : Disetujui ✔\n";
@@ -718,6 +717,7 @@ class PsbController extends Controller
         $result = $writer->write($qrCode, null);
         $tempQrPath = storage_path('app/public/temp_qr.png');
         $result->saveToFile($tempQrPath);
+        $sanitizedFileName = str_replace(['/', '\\'], '-', $getSurvey->no_spk);
 
         if (file_exists($tempQrPath)) {
             $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
@@ -728,15 +728,15 @@ class PsbController extends Controller
             if (file_exists($tempQrPath)) {
                 unlink($tempQrPath);
             }
-        }, "work_order_survey_{$getSurvey->no_spk}.pdf");
+        }, "work_order_survey_{$sanitizedFileName}.pdf");
     }
 
     public function printInstalasiPDF($id)
     {
         $getInstall = WorkOrderInstall::findOrFail($id);
-        $getInstall->tanggal_instalasi = now()->toDateString();
-        $getInstall->save();
-        $formattedDate = Carbon::parse($getInstall->tanggal_instalasi)->translatedFormat('l, d F Y');
+        $tanggalInstalasi = now()->format('d-m-Y');
+
+        $formattedDate = Carbon::parse($tanggalInstalasi)->translatedFormat('l, d F Y');
         $templatePath = resource_path('pdf/template_instalasi.pdf');
 
 
@@ -798,16 +798,16 @@ class PsbController extends Controller
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
-        $user = Auth::user();
-        $namaUser = $user->name ?? 'Unknown';
+        $namaUser = $getInstall->admin->name ?? 'Unknown';
+
         $noSpk = $getInstall->no_spk ?? 'N/A';
         $tanggalInstalasi = now()->format('d-m-Y');
 
         // Format teks QR
         $qrText = "=== Tanda Tangan Digital ===\n" .
             "Nama Penerbit : {$namaUser}\n" .
-            "Jabatan        : Admin PSB\n" .
-            "Tanggal Survey : {$formattedDate}\n" .
+            "Jabatan        : Admin\n" .
+            "Tanggal Instalasi : {$formattedDate}\n" .
             "Nomor SPK      : {$noSpk}\n" .
             "Status Surat   : Disetujui ✔\n";
 
@@ -829,6 +829,7 @@ class PsbController extends Controller
         $result = $writer->write($qrCode, null);
         $tempQrPath = storage_path('app/public/temp_qr.png');
         $result->saveToFile($tempQrPath);
+        $sanitizedFileName = str_replace(['/', '\\'], '-', $getInstall->no_spk);
 
         if (file_exists($tempQrPath)) {
             $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
@@ -839,7 +840,7 @@ class PsbController extends Controller
             if (file_exists($tempQrPath)) {
                 unlink($tempQrPath);
             }
-        }, "work_order_instalasi_{$getInstall->no_spk}.pdf");
+        }, "work_order_instalasi_{$sanitizedFileName}.pdf");
     }
     public function printMaintenancePDF($id)
     {
@@ -914,8 +915,8 @@ class PsbController extends Controller
         // Format teks QR
         $qrText = "=== Tanda Tangan Digital ===\n" .
             "Nama Penerbit : {$namaUser}\n" .
-            "Jabatan        : Admin PSB\n" .
-            "Tanggal Survey : {$formattedDate}\n" .
+            "Jabatan        : PSB\n" .
+            "Tanggal Maintenance : {$formattedDate}\n" .
             "Nomor SPK      : {$noSpk}\n" .
             "Status Surat   : Disetujui ✔\n";
 
@@ -937,6 +938,7 @@ class PsbController extends Controller
         $result = $writer->write($qrCode, null);
         $tempQrPath = storage_path('app/public/temp_qr.png');
         $result->saveToFile($tempQrPath);
+        $sanitizedFileName = str_replace(['/', '\\'], '-', $getMaintenance->no_spk);
 
         if (file_exists($tempQrPath)) {
             $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
@@ -947,7 +949,7 @@ class PsbController extends Controller
             if (file_exists($tempQrPath)) {
                 unlink($tempQrPath);
             }
-        }, "work_order_maintenance_{$getMaintenance->no_spk}.pdf");
+        }, "work_order_maintenance_{$sanitizedFileName}.pdf");
     }
 
     public function printUpgradePDF($id)
@@ -1015,16 +1017,16 @@ class PsbController extends Controller
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
-        $user = Auth::user();
-        $namaUser = $user->name ?? 'Unknown';
+        $namaUser = $getUpgrade->admin->name ?? 'Unknown';
+
         $noSpk = $getUpgrade->no_spk ?? 'N/A';
         $tanggalUpgrade = now()->format('d-m-Y');
 
         // Format teks QR
         $qrText = "=== Tanda Tangan Digital ===\n" .
             "Nama Penerbit : {$namaUser}\n" .
-            "Jabatan        : Admin PSB\n" .
-            "Tanggal Survey : {$formattedDate}\n" .
+            "Jabatan        : Admin\n" .
+            "Tanggal Upgrade : {$formattedDate}\n" .
             "Nomor SPK      : {$noSpk}\n" .
             "Status Surat   : Disetujui ✔\n";
 
@@ -1046,6 +1048,7 @@ class PsbController extends Controller
         $result = $writer->write($qrCode, null);
         $tempQrPath = storage_path('app/public/temp_qr.png');
         $result->saveToFile($tempQrPath);
+        $sanitizedFileName = str_replace(['/', '\\'], '-', $getUpgrade->no_spk);
 
         if (file_exists($tempQrPath)) {
             $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
@@ -1056,7 +1059,7 @@ class PsbController extends Controller
             if (file_exists($tempQrPath)) {
                 unlink($tempQrPath);
             }
-        }, "work_order_upgrade_{$getUpgrade->no_spk}.pdf");
+        }, "work_order_upgrade_{$sanitizedFileName}.pdf");
     }
 
     public function printDowngradePDF($id)
@@ -1124,16 +1127,16 @@ class PsbController extends Controller
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
-        $user = Auth::user();
-        $namaUser = $user->name ?? 'Unknown';
-        $noSpk = $getUpgrade->no_spk ?? 'N/A';
+        $namaUser = $getDowngrade->admin->name ?? 'Unknown';
+
+        $noSpk = $getDowngrade->no_spk ?? 'N/A';
         $tanggalDowngrade = now()->format('d-m-Y');
 
         // Format teks QR
         $qrText = "=== Tanda Tangan Digital ===\n" .
             "Nama Penerbit : {$namaUser}\n" .
-            "Jabatan        : Admin PSB\n" .
-            "Tanggal Survey : {$formattedDate}\n" .
+            "Jabatan        : Admin\n" .
+            "Tanggal Downgrade : {$formattedDate}\n" .
             "Nomor SPK      : {$noSpk}\n" .
             "Status Surat   : Disetujui ✔\n";
 
@@ -1155,6 +1158,7 @@ class PsbController extends Controller
         $result = $writer->write($qrCode, null);
         $tempQrPath = storage_path('app/public/temp_qr.png');
         $result->saveToFile($tempQrPath);
+        $sanitizedFileName = str_replace(['/', '\\'], '-', $getDowngrade->no_spk);
 
         if (file_exists($tempQrPath)) {
             $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
@@ -1165,7 +1169,7 @@ class PsbController extends Controller
             if (file_exists($tempQrPath)) {
                 unlink($tempQrPath);
             }
-        }, "work_order_downgrade_{$getDowngrade->no_spk}.pdf");
+        }, "work_order_downgrade_{$sanitizedFileName}.pdf");
     }
 
     public function printGantiVendorPDF($id)
@@ -1233,16 +1237,16 @@ class PsbController extends Controller
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
-        $user = Auth::user();
-        $namaUser = $user->name ?? 'Unknown';
-        $noSpk = $getUpgrade->no_spk ?? 'N/A';
+        $namaUser = $getGantivendor->approvedBy->name ?? 'Unknown';
+
+        $noSpk = $getGantivendor->no_spk ?? 'N/A';
         $tanggalGantiVendor = now()->format('d-m-Y');
 
         // Format teks QR
         $qrText = "=== Tanda Tangan Digital ===\n" .
             "Nama Penerbit : {$namaUser}\n" .
-            "Jabatan        : Admin PSB\n" .
-            "Tanggal Survey : {$formattedDate}\n" .
+            "Jabatan        : Admin\n" .
+            "Tanggal Ganti Layanan : {$formattedDate}\n" .
             "Nomor SPK      : {$noSpk}\n" .
             "Status Surat   : Disetujui ✔\n";
 
@@ -1264,6 +1268,7 @@ class PsbController extends Controller
         $result = $writer->write($qrCode, null);
         $tempQrPath = storage_path('app/public/temp_qr.png');
         $result->saveToFile($tempQrPath);
+        $sanitizedFileName = str_replace(['/', '\\'], '-', $getGantivendor->no_spk);
 
         if (file_exists($tempQrPath)) {
             $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
@@ -1274,7 +1279,7 @@ class PsbController extends Controller
             if (file_exists($tempQrPath)) {
                 unlink($tempQrPath);
             }
-        }, "work_order_gantivendor_{$getGantivendor->no_spk}.pdf");
+        }, "work_order_gantivendor_{$sanitizedFileName}.pdf");
     }
     public function printDismantlePDF($id)
     {
@@ -1341,16 +1346,16 @@ class PsbController extends Controller
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
-        $user = Auth::user();
-        $namaUser = $user->name ?? 'Unknown';
+        $namaUser = $getDismantle->admin->name ?? 'Unknown';
+
         $noSpk = $getDismantle->no_spk ?? 'N/A';
         $tanggalDismantle = now()->format('d-m-Y');
 
         // Format teks QR
         $qrText = "=== Tanda Tangan Digital ===\n" .
             "Nama Penerbit : {$namaUser}\n" .
-            "Jabatan        : Admin PSB\n" .
-            "Tanggal Survey : {$formattedDate}\n" .
+            "Jabatan        : Admin\n" .
+            "Tanggal Dismantle : {$formattedDate}\n" .
             "Nomor SPK      : {$noSpk}\n" .
             "Status Surat   : Disetujui ✔\n";
 
@@ -1372,6 +1377,7 @@ class PsbController extends Controller
         $result = $writer->write($qrCode, null);
         $tempQrPath = storage_path('app/public/temp_qr.png');
         $result->saveToFile($tempQrPath);
+        $sanitizedFileName = str_replace(['/', '\\'], '-', $getDismantle->no_spk);
 
         if (file_exists($tempQrPath)) {
             $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
@@ -1382,7 +1388,7 @@ class PsbController extends Controller
             if (file_exists($tempQrPath)) {
                 unlink($tempQrPath);
             }
-        }, "work_order_dismantle_{$getDismantle->no_spk}.pdf");
+        }, "work_order_dismantle_{$sanitizedFileName}.pdf");
     }
 
     public function printRelokasiPDF($id)
@@ -1450,16 +1456,16 @@ class PsbController extends Controller
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
-        $user = Auth::user();
-        $namaUser = $user->name ?? 'Unknown';
+        $namaUser = $getRelokasi->admin->name ?? 'Unknown';
+
         $noSpk = $getRelokasi->no_spk ?? 'N/A';
         $tanggalRelokasi = now()->format('d-m-Y');
 
         // Format teks QR
         $qrText = "=== Tanda Tangan Digital ===\n" .
             "Nama Penerbit : {$namaUser}\n" .
-            "Jabatan        : Admin PSB\n" .
-            "Tanggal Survey : {$formattedDate}\n" .
+            "Jabatan        : Admin\n" .
+            "Tanggal Relokasi : {$formattedDate}\n" .
             "Nomor SPK      : {$noSpk}\n" .
             "Status Surat   : Disetujui ✔\n";
 
@@ -1481,6 +1487,7 @@ class PsbController extends Controller
         $result = $writer->write($qrCode, null);
         $tempQrPath = storage_path('app/public/temp_qr.png');
         $result->saveToFile($tempQrPath);
+        $sanitizedFileName = str_replace(['/', '\\'], '-', $getRelokasi->no_spk);
 
         if (file_exists($tempQrPath)) {
             $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
@@ -1491,7 +1498,7 @@ class PsbController extends Controller
             if (file_exists($tempQrPath)) {
                 unlink($tempQrPath);
             }
-        }, "work_order_relokasi_{$getRelokasi->no_spk}.pdf");
+        }, "work_order_relokasi_{$sanitizedFileName}.pdf");
     }
     public function upgrade(Request $request)
     {

@@ -231,45 +231,58 @@ class AdminController extends Controller
 
     public function createinstalasi()
     {
-        // Ambil data pelanggan dan instansi dari database
+        // Ambil data master
         $pelanggans = Pelanggan::orderBy('nama_pelanggan', 'asc')->get();
-        $instansis = Instansi::orderBy('nama_instansi', 'asc')->get(); // Ambil semua instansi
-        $vendors = Vendor::orderBy('nama_vendor', 'asc')->get(); // Ambil semua Vendor
+        $instansis  = Instansi::orderBy('nama_instansi', 'asc')->get();
+        $vendors    = Vendor::orderBy('nama_vendor', 'asc')->get();
 
-        // Mengambil daftar jenis unik dari StockBarang
+        // Jenis barang
         $jenisList = Jenis::select('id', 'nama_jenis')->get();
 
-        // Mengambil data stok dengan total jumlah berdasarkan tipe, merek, dan jenis, serta melakukan pagination
+        // Stok barang
         $stockBarangs = StockBarang::with(['merek', 'tipe', 'jenis'])
             ->selectRaw('tipe_id, merek_id, jenis_id, kualitas, SUM(jumlah) as total_jumlah')
             ->groupBy('tipe_id', 'merek_id', 'jenis_id', 'kualitas')
             ->get();
 
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
 
-        // Mendapatkan tahun 2 digit dan bulan saat ini
-        $currentYear = date('y'); // Tahun dengan dua digit terakhir
-        $currentMonth = date('m'); // Bulan saat ini
+        // Ambil nomor instalasi terakhir (TANPA reset harian)
+        $lastInstall = WorkOrderInstall::orderBy('id', 'desc')->first();
 
-        // Mendapatkan nomor SPK terakhir dari tahun ini dan bulan ini
-        $lastSpk = WorkOrderInstall::whereYear('created_at', date('Y')) // Tahun dengan 4 digit
-            ->whereMonth('created_at', $currentMonth) // Filter berdasarkan bulan
-            ->max('id'); // Dapatkan ID terbesar di bulan dan tahun yang sama
+        if ($lastInstall && preg_match('/\/(\d+)$/', $lastInstall->no_spk, $matches)) {
+            $lastNumber = (int) $matches[1];
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
 
-        // Jika ada nomor SPK di bulan ini, ambil nomor urut berikutnya
-        // Jika tidak ada, mulai dari 001
-        $nextNumber = $lastSpk ? ($lastSpk + 1) : 1;
+        // Pad minimal 4 digit (kalau lebih, tampil apa adanya)
+        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Format nomor SPK ke dalam format SRV-bulan-tahun-xxx (dengan xxx direset setiap bulan dan tahun)
-        $no_spk = 'INS-' . $currentMonth . $currentYear . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        // Generate nomor INSTALASI
+        $no_spk = 'PC24Telin/PSB-INSTALLASI/' . now()->format('Y-m-d') . '/' . $numberFormatted;
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('stockBarangs', 'jenisList', 'notifications', 'no_spk', 'pelanggans', 'instansis', 'vendors'));
+        // Gabungkan data role
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'stockBarangs',
+                'jenisList',
+                'notifications',
+                'no_spk',
+                'pelanggans',
+                'instansis',
+                'vendors'
+            )
+        );
 
-        // Menampilkan form untuk membuat work order baru dengan nomor SPK baru
         return $this->renderView('form_instalasi', $data);
     }
+
     public function storeinstalasi(Request $request)
     {
         // Validasi request
@@ -1108,36 +1121,41 @@ class AdminController extends Controller
 
     public function create()
     {
-        // Ambil data pelanggan dan instansi dari database
+        // Ambil data master
         $pelanggans = Pelanggan::orderBy('nama_pelanggan', 'asc')->get();
-        $instansis = Instansi::orderBy('nama_instansi', 'asc')->get(); // Ambil semua instansi
-        $vendors = Vendor::orderBy('nama_vendor', 'asc')->get(); // Ambil semua Vendor
+        $instansis  = Instansi::orderBy('nama_instansi', 'asc')->get();
+        $vendors    = Vendor::orderBy('nama_vendor', 'asc')->get();
 
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
 
-        // Mendapatkan tahun 2 digit dan bulan saat ini
-        $currentYear = date('y'); // Tahun dengan dua digit terakhir
-        $currentMonth = date('m'); // Bulan saat ini
+        // Ambil nomor survey terakhir (TANPA reset)
+        $lastSurvey = WorkOrderSurvey::orderBy('id', 'desc')->first();
 
-        // Mendapatkan nomor SPK terakhir dari tahun ini dan bulan ini
-        $lastSpk = WorkOrderSurvey::whereYear('created_at', date('Y')) // Tahun dengan 4 digit
-            ->whereMonth('created_at', $currentMonth) // Filter berdasarkan bulan
-            ->max('id'); // Dapatkan ID terbesar di bulan dan tahun yang sama
+        if ($lastSurvey && preg_match('/\/(\d+)$/', $lastSurvey->no_spk, $matches)) {
+            $lastNumber = (int) $matches[1];
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
 
-        // Jika ada nomor SPK di bulan ini, ambil nomor urut berikutnya
-        // Jika tidak ada, mulai dari 001
-        $nextNumber = $lastSpk ? ($lastSpk + 1) : 1;
+        // Pad ke 4 digit minimal (kalau lebih, tampil apa adanya)
+        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Format nomor SPK ke dalam format SRV-bulan-tahun-xxx (dengan xxx direset setiap bulan dan tahun)
-        $no_spk = 'SRV-' . $currentMonth . $currentYear . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        // Nomor survey
+        $no_spk = 'PC24Telin/PSB-SURVEY/' . now()->format('Y-m-d') . '/' . $numberFormatted;
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('notifications', 'no_spk', 'pelanggans', 'instansis', 'vendors'));
+        // Gabungkan data role
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('notifications', 'no_spk', 'pelanggans', 'instansis', 'vendors')
+        );
 
-        // Menampilkan form untuk membuat work order baru dengan nomor SPK baru
         return $this->renderView('form_survey', $data);
     }
+
 
 
     public function store(Request $request)
@@ -1527,31 +1545,38 @@ class AdminController extends Controller
 
     public function upgradecreate($id)
     {
-        $onlineBilling = OnlineBilling::findOrFail($id); // Ambil data pelanggan berdasarkan ID
+        $onlineBilling = OnlineBilling::findOrFail($id);
 
-        // Mendapatkan tahun 2 digit dan bulan saat ini
-        $currentYear = date('y'); // Tahun dengan dua digit terakhir
-        $currentMonth = date('m'); // Bulan saat ini
+        // Ambil nomor upgrade terakhir (TANPA reset)
+        $lastUpgrade = WorkOrderUpgrade::orderBy('id', 'desc')->first();
 
-        // Mendapatkan nomor SPK terakhir dari tahun ini dan bulan ini
-        $lastSpk = WorkOrderUpgrade::whereYear('created_at', date('Y')) // Tahun dengan 4 digit
-            ->whereMonth('created_at', $currentMonth) // Filter berdasarkan bulan
-            ->max('id'); // Dapatkan ID terbesar di bulan dan tahun yang sama
+        if ($lastUpgrade && preg_match('/\/(\d+)$/', $lastUpgrade->no_spk, $matches)) {
+            $lastNumber = (int) $matches[1];
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
 
-        // Jika ada nomor SPK di bulan ini, ambil nomor urut berikutnya
-        // Jika tidak ada, mulai dari 001
-        $nextNumber = $lastSpk ? ($lastSpk + 1) : 1;
+        // Pad minimal 4 digit (kalau lebih, tetap tampil)
+        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Format nomor SPK ke dalam format SRV-bulan-tahun-xxx (dengan xxx direset setiap bulan dan tahun)
-        $no_spk = 'UPG-' . $currentMonth . $currentYear . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Generate nomor UPGRADE
+        $no_spk = 'PC24Telin/PSB-UPGRADE/' . now()->format('Y-m-d') . '/' . $numberFormatted;
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('notifications', 'no_spk', 'onlineBilling'));
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
+
+        // Gabungkan data role
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('notifications', 'no_spk', 'onlineBilling')
+        );
 
         return $this->renderView('upgrade_create', $data);
     }
+
 
     public function upgradeStore(Request $request)
     {
@@ -1782,31 +1807,38 @@ class AdminController extends Controller
 
     public function downgradeCreate($id)
     {
-        $onlineBilling = OnlineBilling::findOrFail($id); // Ambil data pelanggan berdasarkan ID
+        $onlineBilling = OnlineBilling::findOrFail($id);
 
-        // Mendapatkan tahun 2 digit dan bulan saat ini
-        $currentYear = date('y'); // Tahun dengan dua digit terakhir
-        $currentMonth = date('m'); // Bulan saat ini
+        // Ambil nomor downgrade terakhir (TANPA reset)
+        $lastDowngrade = WorkOrderDowngrade::orderBy('id', 'desc')->first();
 
-        // Mendapatkan nomor SPK terakhir dari tahun ini dan bulan ini
-        $lastSpk = WorkOrderDowngrade::whereYear('created_at', date('Y')) // Tahun dengan 4 digit
-            ->whereMonth('created_at', $currentMonth) // Filter berdasarkan bulan
-            ->max('id'); // Dapatkan ID terbesar di bulan dan tahun yang sama
+        if ($lastDowngrade && preg_match('/\/(\d+)$/', $lastDowngrade->no_spk, $matches)) {
+            $lastNumber = (int) $matches[1];
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
 
-        // Jika ada nomor SPK di bulan ini, ambil nomor urut berikutnya
-        // Jika tidak ada, mulai dari 001
-        $nextNumber = $lastSpk ? ($lastSpk + 1) : 1;
+        // Pad minimal 4 digit (kalau lebih, tampil apa adanya)
+        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Format nomor SPK ke dalam format SRV-bulan-tahun-xxx (dengan xxx direset setiap bulan dan tahun)
-        $no_spk = 'DWG-' . $currentMonth . $currentYear . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Generate nomor DWG
+        $no_spk = 'PC24Telin/PSB-DOWNGRADE/' . now()->format('Y-m-d') . '/' . $numberFormatted;
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('notifications', 'no_spk', 'onlineBilling'));
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
+
+        // Gabungkan data role
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('notifications', 'no_spk', 'onlineBilling')
+        );
 
         return $this->renderView('downgrade_create', $data);
     }
+
 
     public function downgradeStore(Request $request)
     {
@@ -2026,31 +2058,38 @@ class AdminController extends Controller
 
     public function dismantlecreate($id)
     {
-        $onlineBilling = OnlineBilling::findOrFail($id); // Ambil data pelanggan berdasarkan ID
+        $onlineBilling = OnlineBilling::findOrFail($id);
 
-        // Mendapatkan tahun 2 digit dan bulan saat ini
-        $currentYear = date('y'); // Tahun dengan dua digit terakhir
-        $currentMonth = date('m'); // Bulan saat ini
+        // Ambil nomor dismantle terakhir (TANPA reset)
+        $lastDismantle = WorkOrderDismantle::orderBy('id', 'desc')->first();
 
-        // Mendapatkan nomor SPK terakhir dari tahun ini dan bulan ini
-        $lastSpk = WorkOrderDismantle::whereYear('created_at', date('Y')) // Tahun dengan 4 digit
-            ->whereMonth('created_at', $currentMonth) // Filter berdasarkan bulan
-            ->max('id'); // Dapatkan ID terbesar di bulan dan tahun yang sama
+        if ($lastDismantle && preg_match('/\/(\d+)$/', $lastDismantle->no_spk, $matches)) {
+            $lastNumber = (int) $matches[1];
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
 
-        // Jika ada nomor SPK di bulan ini, ambil nomor urut berikutnya
-        // Jika tidak ada, mulai dari 001
-        $nextNumber = $lastSpk ? ($lastSpk + 1) : 1;
+        // Pad minimal 4 digit (kalau lebih, tampil apa adanya)
+        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Format nomor SPK ke dalam format SRV-bulan-tahun-xxx (dengan xxx direset setiap bulan dan tahun)
-        $no_spk = 'DIS-' . $currentMonth . $currentYear . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Generate nomor DISMANTLE
+        $no_spk = 'PC24Telin/PSB-DISMANTLE/' . now()->format('Y-m-d') . '/' . $numberFormatted;
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('notifications', 'no_spk', 'onlineBilling'));
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
+
+        // Gabungkan data role
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('notifications', 'no_spk', 'onlineBilling')
+        );
 
         return $this->renderView('dismantle_create', $data);
     }
+
 
     public function dismantleStore(Request $request)
     {
@@ -2278,40 +2317,47 @@ class AdminController extends Controller
     }
     public function relokasiCreate($id)
     {
-        $onlineBilling = OnlineBilling::findOrFail($id); // Ambil data pelanggan berdasarkan ID
+        $onlineBilling = OnlineBilling::findOrFail($id);
 
-        // Mendapatkan tahun 2 digit dan bulan saat ini
-        $currentYear = date('y'); // Tahun dengan dua digit terakhir
-        $currentMonth = date('m'); // Bulan saat ini
-
-        // Mengambil daftar jenis unik dari StockBarang
+        // Ambil daftar jenis barang
         $jenisList = Jenis::select('id', 'nama_jenis')->get();
 
-        // Mengambil data stok dengan total jumlah berdasarkan tipe, merek, dan jenis, serta melakukan pagination
+        // Ambil stok barang
         $stockBarangs = StockBarang::with(['merek', 'tipe', 'jenis'])
             ->selectRaw('tipe_id, merek_id, jenis_id, kualitas, SUM(jumlah) as total_jumlah')
             ->groupBy('tipe_id', 'merek_id', 'jenis_id', 'kualitas')
             ->get();
 
-        // Mendapatkan nomor SPK terakhir dari tahun ini dan bulan ini
-        $lastSpk = WorkOrderRelokasi::whereYear('created_at', date('Y')) // Tahun dengan 4 digit
-            ->whereMonth('created_at', $currentMonth) // Filter berdasarkan bulan
-            ->max('id'); // Dapatkan ID terbesar di bulan dan tahun yang sama
+        // Ambil nomor relokasi terakhir (TANPA reset)
+        $lastRelokasi = WorkOrderRelokasi::orderBy('id', 'desc')->first();
 
-        // Jika ada nomor SPK di bulan ini, ambil nomor urut berikutnya
-        // Jika tidak ada, mulai dari 001
-        $nextNumber = $lastSpk ? ($lastSpk + 1) : 1;
+        if ($lastRelokasi && preg_match('/\/(\d+)$/', $lastRelokasi->no_spk, $matches)) {
+            $lastNumber = (int) $matches[1];
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
 
-        // Format nomor SPK ke dalam format SRV-bulan-tahun-xxx (dengan xxx direset setiap bulan dan tahun)
-        $no_spk = 'REL-' . $currentMonth . $currentYear . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Pad minimal 4 digit (kalau lebih, tampil apa adanya)
+        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('stockBarangs', 'jenisList', 'notifications', 'no_spk', 'onlineBilling'));
+        // Generate nomor RELOKASI
+        $no_spk = 'PC24Telin/PSB-RELOKASI/' . now()->format('Y-m-d') . '/' . $numberFormatted;
+
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
+
+        // Gabungkan data role
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('stockBarangs', 'jenisList', 'notifications', 'no_spk', 'onlineBilling')
+        );
 
         return $this->renderView('relokasi_create', $data);
     }
+
     public function relokasiStore(Request $request)
     {
         // Validasi request
@@ -2660,8 +2706,11 @@ class AdminController extends Controller
     {
         $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
 
-        // Ubah status menjadi 'approved'
-        $getGantivendor->status = 'On Progress';
+        // ✅ Update status & simpan user yang ACC
+        $getGantivendor->update([
+            'status' => 'On Progress',
+            'approved_by' => Auth::id(), // user yang ACC
+        ]);
         $getGantivendor->save();
         // Cari entri terkait di tabel statuses
         $status = Status::where('work_orderable_id', $getGantivendor->id)
