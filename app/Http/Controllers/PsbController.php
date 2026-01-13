@@ -668,7 +668,7 @@ class PsbController extends Controller
         $pdf->SetXY(40, 69.7);
         $pdf->Write(1, $getSurvey->media);
         $pdf->SetXY(40, 85.5);
-        $pdf->Write(1, $getSurvey->instansi->nama_instansi);
+        $pdf->Write(1, $getSurvey->nama_site);
         $pdf->SetXY(40, 87.5);
         $pdf->MultiCell(140, 3, $getSurvey->alamat_pemasangan, 0, 'L');
         $pdf->SetXY(140, 32.7);
@@ -776,7 +776,7 @@ class PsbController extends Controller
         $pdf->SetXY(40, 69.7);
         $pdf->Write(1, $getInstall->media);
         $pdf->SetXY(40, 85.5);
-        $pdf->Write(1, $getInstall->instansi->nama_instansi);
+        $pdf->Write(1, $getInstall->nama_site);
         $pdf->SetXY(40, 87.5);
         $pdf->MultiCell(140, 3, $getInstall->alamat_pemasangan, 0, 'L');
         $pdf->SetXY(140, 32.7);
@@ -885,7 +885,7 @@ class PsbController extends Controller
         $pdf->SetXY(40, 69.7);
         $pdf->Write(1, $getMaintenance->onlineBilling->media);
         $pdf->SetXY(40, 85.5);
-        $pdf->Write(1, $getMaintenance->onlineBilling->instansi->nama_instansi);
+        $pdf->Write(1, $getMaintenance->onlineBilling->nama_site);
         $pdf->SetXY(40, 87.5);
         $pdf->MultiCell(140, 3, $getMaintenance->onlineBilling->alamat_pemasangan, 0, 'L');
         $pdf->SetXY(140, 32.7);
@@ -995,7 +995,7 @@ class PsbController extends Controller
         $pdf->SetXY(40, 69.7);
         $pdf->Write(1, $getUpgrade->onlineBilling->media);
         $pdf->SetXY(40, 85.5);
-        $pdf->Write(1, $getUpgrade->onlineBilling->instansi->nama_instansi);
+        $pdf->Write(1, $getUpgrade->onlineBilling->nama_site);
         $pdf->SetXY(40, 87.5);
         $pdf->MultiCell(140, 3, $getUpgrade->onlineBilling->alamat_pemasangan, 0, 'L');
         $pdf->SetXY(140, 32.7);
@@ -1105,7 +1105,7 @@ class PsbController extends Controller
         $pdf->SetXY(40, 69.7);
         $pdf->Write(1, $getDowngrade->onlineBilling->media);
         $pdf->SetXY(40, 85.5);
-        $pdf->Write(1, $getDowngrade->onlineBilling->instansi->nama_instansi);
+        $pdf->Write(1, $getDowngrade->onlineBilling->nama_site);
         $pdf->SetXY(40, 87.5);
         $pdf->MultiCell(140, 3, $getDowngrade->onlineBilling->alamat_pemasangan, 0, 'L');
         $pdf->SetXY(140, 32.7);
@@ -1215,7 +1215,7 @@ class PsbController extends Controller
         $pdf->SetXY(40, 69.7);
         $pdf->Write(1, $getGantivendor->onlineBilling->media);
         $pdf->SetXY(40, 85.5);
-        $pdf->Write(1, $getGantivendor->onlineBilling->instansi->nama_instansi);
+        $pdf->Write(1, $getGantivendor->onlineBilling->nama_site);
         $pdf->SetXY(40, 87.5);
         $pdf->MultiCell(140, 3, $getGantivendor->onlineBilling->alamat_pemasangan, 0, 'L');
         $pdf->SetXY(140, 32.7);
@@ -1324,7 +1324,7 @@ class PsbController extends Controller
         $pdf->SetXY(40, 69.7);
         $pdf->Write(1, $getDismantle->onlineBilling->media);
         $pdf->SetXY(40, 85.5);
-        $pdf->Write(1, $getDismantle->onlineBilling->instansi->nama_instansi);
+        $pdf->Write(1, $getDismantle->onlineBilling->nama_site);
         $pdf->SetXY(40, 87.5);
         $pdf->MultiCell(140, 3, $getDismantle->onlineBilling->alamat_pemasangan, 0, 'L');
         $pdf->SetXY(140, 32.7);
@@ -1434,7 +1434,7 @@ class PsbController extends Controller
         $pdf->SetXY(40, 69.7);
         $pdf->Write(1, $getRelokasi->onlineBilling->media);
         $pdf->SetXY(40, 85.5);
-        $pdf->Write(1, $getRelokasi->onlineBilling->instansi->nama_instansi);
+        $pdf->Write(1, $getRelokasi->onlineBilling->nama_site);
         $pdf->SetXY(40, 87.5);
         $pdf->MultiCell(140, 3, $getRelokasi->onlineBilling->alamat_pemasangan, 0, 'L');
         $pdf->SetXY(140, 32.7);

@@ -208,6 +208,37 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">
+                                        <i class="mdi mdi-paperclip"></i> Lampiran Work Order
+                                    </h4>
+
+                                    @if (!empty($getRelokasi->attachments))
+                                    <div class="list-group">
+                                        @foreach ($getRelokasi->attachments as $file)
+                                        <a href="{{ asset('storage/'.$file) }}"
+                                            target="_blank"
+                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                                            <span>
+                                                <i class="mdi mdi-file"></i>
+                                                {{ basename($file) }}
+                                            </span>
+
+                                            <span class="badge badge-info">Download</span>
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                    @else
+                                    <p class="text-muted mb-0">Tidak ada file terlampir.</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="container mt-4">
                         @php
                         // Tahapan normal

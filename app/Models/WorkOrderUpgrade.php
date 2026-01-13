@@ -15,9 +15,12 @@ class WorkOrderUpgrade extends Model
         'satuan',
         'status',
         'admin_id',
+        'attachments', // tambahkan ini supaya bisa diisi massal
 
     ];
-
+    protected $casts = [
+        'attachments' => 'array', // penting supaya JSON di DB otomatis jadi array di PHP
+    ];
     /**
      * Relationship with the OnlineBilling model.
      */

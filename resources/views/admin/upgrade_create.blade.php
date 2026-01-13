@@ -150,7 +150,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="bandwidth">Volume Baru</label>
-                                                    <div class="input-group">
+                                                    <div class="input-group mb-4">
                                                         <input type="number" name="bandwidth_baru" id="bandwidth_baru" class="form-control" min="1" required>
                                                         <select class="form-control" id="satuan" name="satuan" required style="max-width: 130px;">
                                                             <option value="" disabled selected>Pilih Satuan</option>
@@ -164,6 +164,11 @@
                                                         <input type="hidden" name="online_billing_id" value="{{ $onlineBilling->id }}">
 
                                                     </div>
+
+
+                                                    <label>Upload File <span class="text-muted small">(pdf, doc, docx, jpg, png)</span>
+                                                    </label>
+                                                    <input type="file" name="attachments[]" multiple>
                                                 </div>
 
 
