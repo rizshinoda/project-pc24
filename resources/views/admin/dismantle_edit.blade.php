@@ -152,7 +152,12 @@
                                         </div>
                                         <div class="form-group ">
                                             <label for="keterangan">Keterangan</label>
-                                            <textarea name="keterangan" id="keterangan" class="form-control" rows="4">{{ $workOrder->keterangan }}</textarea>
+                                            <textarea name="keterangan" id="keterangan" class="form-control mb-4" rows="4">{{ $workOrder->keterangan }}</textarea>
+
+                                            <label>Upload File <span class="text-muted small">(pdf, doc, docx, jpg, png)</span>
+
+                                            </label>
+                                            <input type="file" name="attachments[]" multiple>
                                         </div>
 
                                         <!-- Kirimkan online_billing_id sebagai hidden input -->

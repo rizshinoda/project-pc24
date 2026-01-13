@@ -1587,6 +1587,8 @@ class AdminController extends Controller
             'online_billing_id' => 'required|exists:online_billings,id',
             'bandwidth_baru' => 'required|string',
             'satuan' => 'required|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+
         ]);
 
         // Simpan data ke tabel work_order_upgrades
@@ -1612,6 +1614,27 @@ class AdminController extends Controller
             'Upgrade',
             $workOrder->onlineBilling->nama_site
         );
+
+        $uploadedFiles = [];
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/upgrade',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
+
+        // Simpan path file ke kolom JSON attachments
+        $workOrder->attachments = $uploadedFiles;
+        $workOrder->save();
         // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
         $naUsers = User::where('is_role', 6)->get();
         // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
@@ -1686,16 +1709,35 @@ class AdminController extends Controller
             'bandwidth_baru' => 'required|numeric|min:1',
             'satuan' => 'required|in:Gbps,Mbps,Kbps,RU(RACK UNIT),CORE,PAIR',
             'online_billing_id' => 'required|exists:online_billings,id',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+
         ]);
 
         // Ambil data work order berdasarkan ID
         $workOrder = WorkOrderUpgrade::findOrFail($id);
+        $uploadedFiles = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/upgrade',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
 
         // Update data work order
         $workOrder->update([
             'bandwidth_baru' => $request->bandwidth_baru,
             'satuan' => $request->satuan,
             'online_billing_id' => $request->online_billing_id,
+            'attachments' => $uploadedFiles,
+
         ]);
         LogActivity::add('Upgrade', $workOrder->onlineBilling->nama_site, 'edit');
 
@@ -1849,6 +1891,8 @@ class AdminController extends Controller
             'online_billing_id' => 'required|exists:online_billings,id',
             'bandwidth_baru' => 'required|string',
             'satuan' => 'required|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+
         ]);
 
         // Simpan data ke tabel work_order_upgrades
@@ -1873,7 +1917,26 @@ class AdminController extends Controller
             'Downgrade',
             $workOrder->onlineBilling->nama_site
         );
+        $uploadedFiles = [];
 
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/downgrade',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
+
+        // Simpan path file ke kolom JSON attachments
+        $workOrder->attachments = $uploadedFiles;
+        $workOrder->save();
         // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
         $naUsers = User::where('is_role', 6)->get();
         // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
@@ -1948,16 +2011,34 @@ class AdminController extends Controller
             'bandwidth_baru' => 'required|numeric|min:1',
             'satuan' => 'required|in:Gbps,Mbps,Kbps,RU(RACK UNIT),CORE,PAIR',
             'online_billing_id' => 'required|exists:online_billings,id',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+
         ]);
 
         // Ambil data work order berdasarkan ID
         $workOrder = WorkOrderDowngrade::findOrFail($id);
+        $uploadedFiles = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/upgrade',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
 
         // Update data work order
         $workOrder->update([
             'bandwidth_baru' => $request->bandwidth_baru,
             'satuan' => $request->satuan,
             'online_billing_id' => $request->online_billing_id,
+            'attachments' => $uploadedFiles,
+
         ]);
         LogActivity::add('Downgrade', $workOrder->onlineBilling->nama_site, 'edit');
 
@@ -2099,6 +2180,8 @@ class AdminController extends Controller
             'no_spk' => 'required|string|unique:work_order_dismantles',
             'online_billing_id' => 'required|exists:online_billings,id',
             'keterangan' => 'nullable|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+
         ]);
 
         // Simpan data ke tabel work_order_upgrades
@@ -2122,6 +2205,26 @@ class AdminController extends Controller
             'Dismantle',
             $workOrder->onlineBilling->nama_site
         );
+        $uploadedFiles = [];
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/dismantle',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
+
+        // Simpan path file ke kolom JSON attachments
+        $workOrder->attachments = $uploadedFiles;
+        $workOrder->save();
 
 
         // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
@@ -2209,21 +2312,44 @@ class AdminController extends Controller
         $request->validate([
             'keterangan' => 'nullable|string',
             'online_billing_id' => 'required|exists:online_billings,id',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // validasi file
         ]);
 
         // Ambil data work order berdasarkan ID
         $workOrder = WorkOrderDismantle::findOrFail($id);
 
-        // Update data work order
+        // Siapkan array untuk menyimpan path file
+        // Upload file baru dan reset file lama
+        $uploadedFiles = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/dismantle',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
+
+        // Update data work order + attachments baru (reset lama)
         $workOrder->update([
             'keterangan' => $request->keterangan,
             'online_billing_id' => $request->online_billing_id,
+            'attachments' => $uploadedFiles,
         ]);
+
+
         LogActivity::add('Dismantle', $workOrder->onlineBilling->nama_site, 'edit');
 
         // Redirect dengan pesan sukses
         return redirect()->route('admin.dismantle')->with('success', 'Work order berhasil diperbarui.');
     }
+
 
     public function dismantleDestroy($id)
     {
@@ -2369,6 +2495,7 @@ class AdminController extends Controller
             'non_stock' => 'nullable|string',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
 
             // tambahkan validasi lain sesuai kebutuhan
         ]);
@@ -2434,7 +2561,26 @@ class AdminController extends Controller
             'Relokasi',
             $getRelokasi->onlineBilling->nama_site
         );
+        $uploadedFiles = [];
 
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/relokasi',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
+
+        // Simpan path file ke kolom JSON attachments
+        $getRelokasi->attachments = $uploadedFiles;
+        $getRelokasi->save();
         // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
         $gaUsers = User::where('is_role', 2)->get();
         // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
@@ -2533,18 +2679,34 @@ class AdminController extends Controller
             'keterangan' => 'nullable|string',
             'cart' => 'nullable|array',
             'non_stock' => 'nullable|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // validasi file
 
             // tambahkan validasi lain sesuai kebutuhan
         ]);
 
         // Ambil data work order berdasarkan ID
         $workOrder = WorkOrderRelokasi::findOrFail($id);
+        // Upload file baru dan reset file lama
+        $uploadedFiles = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
 
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/relokasi',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
         $workOrder->update([
             'online_billing_id' => $validatedData['online_billing_id'],
             'alamat_pemasangan_baru' => $validatedData['alamat_pemasangan_baru'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'attachments' => $uploadedFiles,
 
         ]);
         LogActivity::add('Relokasi', $workOrder->onlineBilling->nama_site, 'edit');
