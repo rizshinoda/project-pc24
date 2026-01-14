@@ -2,34 +2,31 @@
 <html>
 @php
 $basePath = match ((int) $targetRole) {
-2 => '/ga/maintenance/show/',
-5 => '/psb/maintenance/show/',
+2 => '/ga/relokasi/',
+5 => '/psb/relokasi/',
 };
 @endphp
 
 <head>
     <meta charset="UTF-8">
     <title>
-        Request SPK Alokasi Team & Perangkat @if($getMaintenance->onlineBilling)
-        / Client {{ $getMaintenance->onlineBilling->pelanggan->nama_pelanggan ?? '-' }} {{ $getMaintenance->onlineBilling->nama_site ?? '' }}
+        Work Order Relokasi @if($getRelokasi->onlineBilling)
+        / Client {{ $getRelokasi->onlineBilling->pelanggan->nama_pelanggan ?? '-' }} {{ $getRelokasi->onlineBilling->nama_site ?? '' }}
         @endif
     </title>
 </head>
 
 <body style="font-family: Arial, sans-serif; font-size: 14px; color: #333; line-height: 1.4;">
 
-    <p style="margin-bottom: 10px;">Dear Team PC24,</p>
+    <p style="margin-bottom: 10px;">Dear Team PSB & GA,</p>
 
-    <p style="margin-bottom: 12px;">
-        Mohon dibantu dibuatkan SPK, Alokasikan Team & Perangkat untuk hari
-        {{ \Carbon\Carbon::parse($getMaintenance->tanggal_maintenance)->translatedFormat('l, d F Y') }} dengan detail sebagai berikut:
-    </p>
+    <p style="margin-bottom: 12px;">Terlampir Work Order Relokasi dengan detail site sebagai berikut:</p>
 
     <table cellpadding="4" cellspacing="0" border="0"
         style="width: 100%; max-width: 700px; border-collapse: collapse; margin-left: 40px;">
         <tbody>
 
-            @if ($billing = $getMaintenance->onlineBilling)
+            @if ($billing = $getRelokasi->onlineBilling)
             <tr>
                 <td style="width: 180px;"><strong>No. JAR</strong></td>
                 <td style="width: 10px;">:</td>
@@ -66,8 +63,8 @@ $basePath = match ((int) $targetRole) {
                 <td>:</td>
                 <td>{{ $billing->bandwidth ?? '-' }} {{ $billing->satuan ?? '' }}</td>
             </tr>
-            @endif
 
+            @endif
             {{-- Perangkat Stock --}}
             @if ($detailBarang->isNotEmpty())
             <tr>
@@ -82,9 +79,9 @@ $basePath = match ((int) $targetRole) {
             @endif
 
             {{-- Perangkat Non-Stock --}}
-            @if (!empty($getMaintenance->non_stock))
+            @if (!empty($getRelokasi->non_stock))
             @php
-            $nonStockItems = preg_split('/\r\n|\r|\n/', $getMaintenance->non_stock);
+            $nonStockItems = preg_split('/\r\n|\r|\n/', $getRelokasi->non_stock);
             @endphp
             <tr>
                 <td style="vertical-align: top;"><strong>Perangkat Non-Stock</strong></td>
@@ -98,24 +95,22 @@ $basePath = match ((int) $targetRole) {
             @endif
 
 
-
         </tbody>
     </table>
+    <p style="margin-bottom: 12px;">Mohon dapat diterima dengan baik dan mohon dibantu proses lebih lanjutnya. Terima Kasih</p>
 
     <br>
 
-    @if ($getMaintenance->keterangan)
-    <p style="margin: 6px 0;"><strong>Note:</strong> {{ $getMaintenance->keterangan }}</p>
-    @endif
+
 
     <p style="margin: 6px 0;">
-        📎 <a href="{{ url($basePath . $getMaintenance->id) }}">
+        📎 <a href="{{ url($basePath . $getRelokasi->id) }}">
             Lihat Detail Permintaan
         </a>
     </p>
     <br>
     <p style="margin-top: 10px;">Warm regards,<br>
-        {{ $getMaintenance->admin->name ?? 'User Pengaju' }}
+        {{ $getRelokasi->admin->name ?? 'User Pengaju' }}
     </p>
 
 </body>

@@ -57,7 +57,7 @@
                 <td>{{ $billing->layanan ?? '-' }}</td>
             </tr>
             <tr>
-                <td><strong>Bandwidth</strong></td>
+                <td><strong>Volume</strong></td>
                 <td>:</td>
                 <td>{{ $billing->bandwidth ?? '-' }} {{ $billing->satuan ?? '' }}</td>
             </tr>

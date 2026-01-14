@@ -39,6 +39,7 @@ use App\Models\RequestBarangDetails;
 use App\Models\WorkOrderGantiVendor;
 use App\Models\WorkOrderMaintenance;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Intervention\Image\Facades\Image;
 use App\Exports\WorkOrderSurveyExport;
@@ -1662,6 +1663,25 @@ class AdminController extends Controller
                 'url' => $url, // URL dengan hash #instalasi
             ]);
         }
+
+        // Load relasi onlineBilling untuk email
+        $workOrder->load('onlineBilling', 'admin');
+
+
+        $psbUsers = User::where('is_role', 5)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($psbUsers as $psb) {
+            Mail::to($psb->email)->send(
+                new \App\Mail\UpgradeMail(
+                    $workOrder,
+
+                    5 // PSB
+                )
+            );
+        }
+
         return redirect()->route('admin.upgrade')->with('success', 'Work order berhasil diterbitkan.');
     }
     public function upgradeShow($id)
@@ -1964,6 +1984,25 @@ class AdminController extends Controller
                 'url' => $url, // URL dengan hash #instalasi
             ]);
         }
+
+
+        // Load relasi onlineBilling untuk email
+        $workOrder->load('onlineBilling', 'admin');
+
+
+        $psbUsers = User::where('is_role', 5)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($psbUsers as $psb) {
+            Mail::to($psb->email)->send(
+                new \App\Mail\DowngradeMail(
+                    $workOrder,
+
+                    5 // PSB
+                )
+            );
+        }
         return redirect()->route('admin.downgrade')->with('success', 'Work order berhasil diterbitkan.');
     }
     public function downgradeShow($id)
@@ -2264,6 +2303,38 @@ class AdminController extends Controller
                 'message' => 'WO Dismantle baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
                 'url' => $url, // URL dengan hash #instalasi
             ]);
+        }
+
+
+        // Load relasi onlineBilling untuk email
+        $workOrder->load('onlineBilling', 'admin');
+
+        $gaUsers = User::where('is_role', 2)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($gaUsers as $ga) {
+            Mail::to($ga->email)->send(
+                new \App\Mail\DismantleMail(
+                    $workOrder,
+
+                    2 // PSB
+                )
+            );
+        }
+
+        $psbUsers = User::where('is_role', 5)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($psbUsers as $psb) {
+            Mail::to($psb->email)->send(
+                new \App\Mail\DismantleMail(
+                    $workOrder,
+
+                    5 // PSB
+                )
+            );
         }
         return redirect()->route('admin.dismantle')->with('success', 'Work order berhasil diterbitkan.');
     }
@@ -2616,6 +2687,39 @@ class AdminController extends Controller
                 'message' => 'WO Relokasi baru telah diterbitkan dengan No Order: ' . $getRelokasi->no_spk,
                 'url' => $url, // URL dengan hash #instalasi
             ]);
+        }
+        // Ambil semua detail barang dari request_barang_id ini
+        $detailBarang = WorkOrderRelokasiDetail::where('work_order_relokasi_id', $getRelokasi->id)->get();
+        // Load relasi onlineBilling untuk email
+        $getRelokasi->load('onlineBilling', 'admin');
+
+        $gaUsers = User::where('is_role', 2)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($gaUsers as $ga) {
+            Mail::to($ga->email)->send(
+                new \App\Mail\RelokasiMail(
+                    $getRelokasi,
+                    $detailBarang,
+                    2 // PSB
+                )
+            );
+        }
+
+        $psbUsers = User::where('is_role', 5)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($psbUsers as $psb) {
+            Mail::to($psb->email)->send(
+                new \App\Mail\RelokasiMail(
+                    $getRelokasi,
+                    $detailBarang,
+
+                    5 // PSB
+                )
+            );
         }
         return redirect()->route('admin.relokasi')->with('success', 'Work order berhasil diterbitkan.');
     }
