@@ -145,6 +145,10 @@
                                         <span class="badge badge-pill badge-danger">Pending</span>
                                         @elseif($getUpgrade->status=='On Progress')
                                         <span class="badge badge-pill badge-info">On Progress</span>
+                                        @elseif($getUpgrade->status=='Shipped')
+                                        <span class="badge badge-pill badge-primary">Shipped</span>
+                                        @elseif($getUpgrade->status=='Rejected')
+                                        <span class="badge badge-pill badge-dark">Rejected</span>
                                         @elseif($getUpgrade->status=='Canceled')
                                         <span class="badge badge-pill badge-warning">Cancelled</span>
                                         @elseif($getUpgrade->status=='Completed')
@@ -235,7 +239,7 @@
                     <div class="container mt-4">
                         @php
                         // Tahapan normal
-                        $steps = ['Pending', 'On Progress', 'Completed'];
+                        $steps = ['Pending', 'On Progress', 'Shipped', 'Completed'];
 
                         // Ambil status dari progress
                         $currentStatus = ucfirst($getUpgrade->status ?? 'Pending');

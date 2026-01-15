@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use setasign\Fpdi\Fpdi;
-
 use Carbon\Carbon;
+
 use App\Models\Tipe;
 use App\Models\User;
 use App\Models\Jenis;
 use App\Models\Merek;
 use App\Models\Status;
+use setasign\Fpdi\Fpdi;
 use App\Models\StockBarang;
 use App\Models\BarangKeluar;
 use App\Models\Notification;
@@ -17,8 +17,10 @@ use Illuminate\Http\Request;
 use App\Models\OnlineBilling;
 use App\Models\RequestBarang;
 use App\Models\InstallProgress;
+use App\Models\UpgradeProgress;
 use App\Models\RelokasiProgress;
 use App\Models\WorkOrderInstall;
+use App\Models\WorkOrderUpgrade;
 use App\Models\DismantleProgress;
 use App\Models\ReqBarangProgress;
 use App\Models\WorkOrderRelokasi;
@@ -28,6 +30,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\InstallProgressPhoto;
 use App\Models\RequestBarangDetails;
+use App\Models\UpgradeProgressPhoto;
 use App\Models\WorkOrderMaintenance;
 use Illuminate\Support\Facades\Auth;
 use App\Models\RelokasiProgressPhoto;
@@ -2023,6 +2026,289 @@ class GaController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="surat_request.pdf"',
         ]);
+    }
+
+    public function upgrade(Request $request)
+    {
+
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey dengan eager loading
+        $query = WorkOrderUpgrade::with([
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        ])->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%')
+                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination
+        $getUpgrade = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getUpgrade', 'status', 'search', 'month', 'year', 'notifications'));
+
+        return $this->renderView('upgrade', $data);
+    }
+
+    public function showupgrade($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = UpgradeProgress::where('work_order_upgrade_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getUpgrade = WorkOrderUpgrade::with('WorkOrderUpgradeDetail.stockBarang')->findOrFail($id);
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getUpgrade', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('upgrade_show', $data);
+    }
+
+    public function approveupgrade($id)
+    {
+        $getUpgrade = WorkOrderUpgrade::findOrFail($id);
+
+        // Ubah status menjadi 'approved'
+        $getUpgrade->status = 'On Progress';
+        $getUpgrade->save();
+
+        // Cari entri terkait di tabel statuses
+        $status = Status::where('work_orderable_id', $getUpgrade->id)
+            ->where('process', 'Upgrade') // Pastikan prosesnya adalah 'Upgrade'
+            ->first();
+
+        // Perbarui status di tabel statuses jika entri ditemukan
+        if ($status) {
+            $status->status = 'On Progress'; // Sesuaikan dengan status baru
+            $status->save();
+        }
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('ga.upgrade.show', $id)->with('success', 'Upgrade telah disetujui.');
+    }
+    public function rejectupgrade($id)
+    {
+        $getUpgrade = WorkOrderUpgrade::findOrFail($id);
+
+        // Ubah status menjadi 'rejected'
+        $getUpgrade->status = 'Rejected';
+        $getUpgrade->save();
+
+        // Cari entri terkait di tabel statuses
+        $status = Status::where('work_orderable_id', $getUpgrade->id)
+            ->where('process', 'Upgrade') // Pastikan prosesnya adalah 'Upgrade'
+            ->first();
+
+        // Perbarui status di tabel statuses jika entri ditemukan
+        if ($status) {
+            $status->status = 'Rejected'; // Sesuaikan dengan status baru
+            $status->save();
+        }
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('ga.upgrade', $id)->with('error', 'Upgrade telah ditolak.');
+    }
+
+    public function inputBarangupgradecreate(Request $request, $upgradeId)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        $getUpgrade = WorkOrderUpgrade::findOrFail($upgradeId);
+        // Ambil data keranjang yang ada di session
+        $cartItems = session()->get('cart', []);  // Jika tidak ada data di session, defaultkan ke array kosong
+        // Ambil data stok barang dengan relasi yang diperlukan
+        $search = $request->input('search', ''); // Ambil nilai pencarian dari input
+
+        $stockBarangs = StockBarang::with(['jenis', 'merek', 'tipe'])
+            ->when($search, function ($query, $search) {
+                return $query->whereHas('jenis', function ($query) use ($search) {
+                    $query->where('nama_jenis', 'like', '%' . $search . '%');
+                })
+                    ->orWhereHas('merek', function ($query) use ($search) {
+                        $query->where('nama_merek', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('tipe', function ($query) use ($search) {
+                        $query->where('nama_tipe', 'like', '%' . $search . '%');
+                    });
+            })
+            ->orderBy('id', 'desc')
+            ->get(); // Mengambil semua data tanpa paginasi
+
+        return $this->renderView('input_barang_upgrade', compact('getUpgrade', 'stockBarangs', 'search', 'cartItems', 'notifications'));
+    }
+    public function inputBarangupgradestore(Request $request, $upgradeId)
+    {
+        // Jika `cartItems` dikirim sebagai JSON string, decode menjadi array terlebih dahulu
+        if (is_string($request->input('cartItems'))) {
+            $request->merge(['cartItems' => json_decode($request->input('cartItems'), true)]);
+        }
+
+        // Validasi data `cartItems`
+        $validated = $request->validate([
+            'cartItems' => 'required|array',
+            'cartItems.*.id' => 'required|exists:stock_barangs,id', // validasi ID barang dalam stok
+            'cartItems.*.jumlah' => 'required|integer|min:1',
+            'cartItems.*.serialNumber' => 'nullable|string',
+            'cartItems.*.kualitas' => 'required|string|in:baru,bekas',
+        ]);
+
+        $cartItems = $validated['cartItems'];
+
+        foreach ($cartItems as $item) {
+            $stockBarang = StockBarang::find($item['id']);
+
+            if ($stockBarang && $stockBarang->jumlah >= $item['jumlah']) {
+                // Menyimpan entri baru di tabel barang_keluars
+                BarangKeluar::create([
+                    'work_order_upgrade_id' => $upgradeId, // ID Work Order untuk instalasi
+                    'stock_barang_id' => $item['id'],
+                    'jumlah' => $item['jumlah'],
+                    'serial_number' => $item['serialNumber'],
+                    'kualitas' => $item['kualitas'],
+                    'user_id' => Auth::user()->id,
+                ]);
+
+                // Update stok setelah barang dikirim
+                $stockBarang->jumlah -= $item['jumlah'];
+                $stockBarang->save();
+            } else {
+                // Redirect jika stok tidak mencukupi
+                return redirect()->back()->with('error', 'Stok tidak mencukupi untuk barang: ' . $item['id']);
+            }
+        }
+
+        // Kirim notifikasi ke pengguna NA setelah barang berhasil diinput
+        $naUsers = User::where('is_role', 6)->get(); // Role NA adalah 4
+        foreach ($naUsers as $naUser) {
+            $url = route('na.upgrade_show', ['id' => $upgradeId]); // URL menuju halaman konfigurasi NA
+            Notification::create([
+                'user_id' => $naUser->id,
+                'message' => 'Barang untuk Upgrade telah diinput, Silahkan Konfigurasi Perangkat ',
+                'url' => $url,
+            ]);
+        }
+        return redirect()->route('ga.upgrade.show', $upgradeId)->with('success', 'Barang berhasil dikirim!');
+    }
+    public function cancelBarangupgrade($barangKeluarId)
+    {
+        // Cari barang yang akan dibatalkan
+        $barangKeluar = BarangKeluar::findOrFail($barangKeluarId);
+        $getUpgrade = $barangKeluar->workOrderUpgrade;
+
+        // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
+        if ($getUpgrade->status === 'Completed') {
+            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        }
+
+        // Kembalikan jumlah barang ke stok awal
+        $stockBarang = $barangKeluar->stockBarang;
+        $stockBarang->jumlah += $barangKeluar->jumlah;
+        $stockBarang->save();
+
+        // Hapus data barang keluar
+        $barangKeluar->delete();
+
+        // Arahkan ke halaman show requestBarang dengan id
+        return redirect()->route('ga.upgrade.show', ['id' => $getUpgrade->id])
+            ->with('success', 'Barang berhasil dibatalkan dan stok dikembalikan.');
+    }
+    public function upgradecreateShipped($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getUpgrade = WorkOrderUpgrade::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getUpgrade', 'notifications'));
+
+        return $this->renderView('wo_upgrade_createshipped', $data);
+    }
+
+    public function upgradestoreShipped(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new UpgradeProgress();
+        $progress->work_order_upgrade_id = $id;
+        $progress->keterangan = $request->keterangan;
+        $progress->status = 'Shipped'; // Set status langsung menjadi Shipped
+        $progress->psb_id = Auth::id();
+        $progress->save();
+
+        // Ambil data WO Instalasi
+        $getUpgrade = WorkOrderUpgrade::findOrFail($id);
+        $getUpgrade->status = 'Shipped'; // Update status WO menjadi Shipped
+        $getUpgrade->save();
+
+        // Cari entri terkait di tabel statuses
+        $status = Status::where('work_orderable_id', $getUpgrade->id)
+            ->where('process', 'Upgrade') // Pastikan prosesnya adalah 'Upgrade'
+            ->first();
+
+        // Perbarui status di tabel statuses jika entri ditemukan
+        if ($status) {
+            $status->status = 'Shipped'; // Sesuaikan dengan status baru
+            $status->save();
+        }
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel install_progress_photos
+                UpgradeProgressPhoto::create([
+                    'upgrade_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        return redirect()->route('ga.upgrade.show', $id)->with('success', 'Status berhasil diubah menjadi Shipped.');
     }
 }
 

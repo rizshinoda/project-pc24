@@ -17,12 +17,14 @@ class UpgradeMail extends Mailable
 
     public $workOrder;
     public $targetRole;
+    public $detailBarang;
 
 
-    public function __construct($workOrder, int $targetRole)
+    public function __construct($workOrder,  $detailBarang, int $targetRole)
     {
         $this->workOrder = $workOrder;
         $this->targetRole = $targetRole;
+        $this->detailBarang = $detailBarang;
     }
 
     /**

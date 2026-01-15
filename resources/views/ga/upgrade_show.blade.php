@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-    @include('na.partials.style')
+    @include('ga.partials.style')
 </head>
 
 <body>
     <div class="container-scroller">
 
-        @include('na.partials.navbar')
+        @include('ga.partials.navbar')
         <div class="container-fluid page-body-wrapper">
             <!-- partial:partials/_sidebar.html -->
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -28,60 +28,80 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('na/dashboard') }}">
+                        <a class="nav-link" href="{{ url('ga/dashboard') }}">
                             <span class="menu-title">Dashboard</span>
                             <i class="mdi mdi-home menu-icon"></i>
                         </a>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-                            <span class="menu-title">Work Order</span>
+                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic1" aria-expanded="false" aria-controls="ui-basic1">
+                            <span class="menu-title">Tambah Data</span>
                             <i class="menu-arrow"></i>
                             <i class="mdi mdi-format-list-bulleted menu-icon"></i>
                         </a>
-                        <div class="collapse" id="ui-basic">
+                        <div class="collapse" id="ui-basic1">
                             <ul class="nav flex-column sub-menu">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('na/instalasi')}}">Instalasi</a>
+                                    <a class="nav-link" href="{{url('ga/jenis')}}">Data Jenis</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('na/upgrade')}}">Upgrade</a>
+                                    <a class="nav-link" href="{{url('ga/merek')}}">Data Merek</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('na/downgrade')}}">Downgrade</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{url('na/gantivendor')}}">Ganti Vendor</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{url('na/dismantle')}}">Dismantle</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{url('na/relokasi')}}">Relokasi</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{url('na/maintenance')}}">Maintenance</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{url('na/requestbarang')}}">Request Barang</a>
+                                    <a class="nav-link" href="{{url('ga/tipe')}}">Data Tipe</a>
                                 </li>
                             </ul>
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('na/OB')}}">
+                        <a class="nav-link" href="{{ url('ga/stockbarang') }}">
+                            <span class="menu-title">Stock Barang</span>
+                            <i class="mdi mdi-database-edit-outline menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic2" aria-expanded="false" aria-controls="ui-basic2">
+                            <span class="menu-title">Work Order</span>
+                            <i class="menu-arrow"></i>
+                            <i class="mdi mdi-format-list-bulleted menu-icon"></i>
+                        </a>
+                        <div class="collapse" id="ui-basic2">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('ga/instalasi')}}">Instalasi</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('ga/maintenance')}}">Maintenance</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('ga/requestbarang')}}">Request Barang</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('ga/dismantle')}}">Dismantle</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('ga/relokasi')}}">Relokasi</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('ga/upgrade')}}">Upgrade</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url('ga/OB')}}">
                             <span class="menu-title">Online Billing</span>
                             <i class="mdi mdi-database-outline menu-icon"></i>
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('na.sitedismantle') }}">
+                        <a class="nav-link" href="{{ route('ga.sitedismantle') }}">
                             <span class="menu-title">Site Dismantle</span>
                             <i class="mdi mdi-delete-circle menu-icon"></i>
                         </a>
                     </li>
-
             </nav>
             <!-- partial -->
 
@@ -139,7 +159,26 @@
                                     @else
                                     <p>Tidak ada foto pelanggan</p>
                                     @endif
+                                    @if($getUpgrade->status == 'Pending')
+                                    <!-- Tombol Approve dan Reject -->
+                                    <div class="mt-5">
+                                        <!-- Tombol Approve -->
+                                        <form action="{{ route('ga.upgrade.approve', $getUpgrade->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            <button type="button" class="btn btn-success" onclick="confirmApproval('{{ route('ga.upgrade.approve', $getUpgrade->id) }}')">
+                                                <i class="fa fa-check"></i> Approve
+                                            </button>
+                                        </form>
 
+                                        <!-- Tombol Reject -->
+                                        <form action="{{ route('ga.upgrade.reject', $getUpgrade->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            <button type="button" class="btn btn-danger" onclick="confirmRejection('{{ route('ga.upgrade.reject', $getUpgrade->id) }}')">
+                                                <i class="fa fa-times"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -157,10 +196,10 @@
                                     <p>
                                         <strong>Volume:</strong>
                                         {{ $getUpgrade->onlineBilling->bandwidth }} {{ $getUpgrade->onlineBilling->satuan }}
-                                        <span style="font-size: larger;">➔</span>
-                                        {{ $getUpgrade->bandwidth_baru }} {{ $getUpgrade->satuan }}
+
                                     </p>
                                     <p><strong>Vlan:</strong> {{ $getUpgrade->onlineBilling->vlan }}</p>
+                                    <p><strong>Vendor:</strong> {{ $getUpgrade->onlineBilling->vendor?->nama_vendor }}</p>
 
                                 </div>
                             </div>
@@ -176,9 +215,10 @@
                                     <p><strong>Alamat:</strong> {{ $getUpgrade->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getUpgrade->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getUpgrade->onlineBilling->no_pic }}</p>
-                                    <p><strong>Vendor:</strong> {{ $getUpgrade->onlineBilling->vendor?->nama_vendor }}</p>
+                                    <p><strong>Alamat Baru:</strong> {{ $getUpgrade->alamat_pemasangan_baru }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getUpgrade->keterangan }}</p>
                                     <p><strong>Barang non stock:</strong> {{ $getUpgrade->non_stock }}</p>
+
                                 </div>
                             </div>
                         </div>
@@ -223,7 +263,6 @@
                         </div>
                         @endif
                     </div>
-
                     <!-- Card untuk tabel progress survey -->
                     <div class="row mt-4">
                         <div class="col-md-12">
@@ -268,7 +307,24 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Status Barang yang Sudah Dikirim GA</h4>
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <!-- Tombol Input Barang di kiri -->
+                                        <div>
+                                            @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Shipped')
+                                            <a href="{{ route('ga.input_barang_upgrade.create', $getUpgrade->id) }}" class="btn btn-info">Input Barang</a>
+                                            @endif
+                                        </div>
 
+                                        <!-- Tombol Kirim di kanan -->
+                                        <div>
+                                            @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Shipped' )
+                                            <a href="javascript:void(0);" id="btn-kirim-perangkat" data-url="{{ route('ga.upgrade.create.shipped', $getUpgrade->id) }}" class="btn btn-primary">
+                                                <i class="fa fa-truck"></i> Kirim Perangkat
+                                            </a>
+
+                                            @endif
+                                        </div>
+                                    </div>
 
                                     <div class=" table-responsive">
 
@@ -284,7 +340,7 @@
                                                     <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Status Konfigurasi</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Aksi</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Aksi</th> <!-- Kolom tambahan untuk aksi pembatalan -->
 
                                                 </tr>
                                             </thead>
@@ -307,14 +363,15 @@
                                                         @endif
                                                     </td>
                                                     <td style=" text-align: center; vertical-align: middle;">
-                                                        @if(!$barangKeluar->is_configured)
-                                                        <form action="{{ route('na.configure-barang', $barangKeluar->id) }}" method="POST">
+                                                        <!-- Tampilkan tombol Batalkan hanya jika status bukan 'Completed' -->
+                                                        @if ($getUpgrade->status !== 'Completed')
+                                                        <form id="cancelForm{{ $barangKeluar->id }}" action="{{ route('ga.cancel_barang.upgrade', $barangKeluar->id) }}" method="POST" style="display: none;">
                                                             @csrf
-                                                            @method('PATCH')
-                                                            <button type="submit" class="btn btn-info btn-sm">Konfigurasikan</button>
+                                                            @method('DELETE')
                                                         </form>
+                                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmCancellation({{ $barangKeluar->id }})">Batalkan</button>
                                                         @else
-                                                        <button class="btn btn-secondary btn-sm" disabled>Sudah Dikonfigurasi</button>
+                                                        <span class="text-muted">Tidak bisa dibatalkan</span>
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -333,29 +390,12 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Card untuk tabel progress survey -->
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    @if($getUpgrade->status == 'Pending')
-                                    <!-- Tombol Approve dan Reject -->
-                                    <!-- Tombol Approve -->
-                                    <form action="{{ route('na.upgrade.approve', $getUpgrade->id) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        <button type="button" class="btn btn-success" onclick="confirmApproval('{{ route('na.upgrade.approve', $getUpgrade->id) }}')">
-                                            <i class="fa fa-check"></i> Approve
-                                        </button>
-                                    </form>
+                                    <h4 class="card-title">Progres Upgrade</h4>
 
-
-                                    @endif
-                                    <h4 class="card-title mt-2">Progres Upgrade</h4>
-                                    @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Completed' || $getUpgrade->status === 'Shipped')
-                                    <a href="{{ route('na_upgrade_add_progress', $getUpgrade->id) }}" class="btn btn-info mb-3">
-                                        Add Progress</a>
-
-                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">
@@ -444,7 +484,7 @@
                                         </table>
                                     </div>
                                     <!-- Tombol Kembali -->
-                                    <a href="{{ route('na.upgrade') }}" class="btn btn-info mt-3">
+                                    <a href="{{ route('ga.upgrade') }}" class="btn btn-info mt-3">
                                         <i class="fa fa-arrow-left"></i> Kembali
                                     </a>
 
@@ -452,6 +492,8 @@
                             </div>
                         </div>
                     </div>
+
+
 
                 </div>
 
@@ -469,7 +511,7 @@
         </div>
 
     </div>
-    @include('na.partials.script')
+    @include('ga.partials.script')
 </body>
 
 </html>

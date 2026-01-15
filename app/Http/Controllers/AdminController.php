@@ -1679,6 +1679,8 @@ class AdminController extends Controller
         $naUsers = User::where('is_role', 6)->get();
         // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
         $psbUsers = User::where('is_role', 5)->get();
+        $gaUsers = User::where('is_role', 2)->get();
+
         // Buat notifikasi untuk setiap pengguna General Affair
         foreach ($naUsers as $naUser) {
             $url = route(
@@ -1702,6 +1704,16 @@ class AdminController extends Controller
                 'url' => $url, // URL dengan hash #instalasi
             ]);
         }
+        foreach ($gaUsers as $gaUser) {
+            $url = route('ga.upgrade.show', ['id' => $workOrder->id]) . '#upgrade';
+
+            Notification::create([
+                'user_id' => $gaUser->id,
+                'message' => 'WO Upgrade baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
+                'url' => $url, // URL dengan hash #instalasi
+            ]);
+        }
+        $detailBarang = WorkOrderUpgradeDetail::where('work_order_upgrade_id', $workOrder->id)->get();
 
         // Load relasi onlineBilling untuk email
         $workOrder->load('onlineBilling', 'admin');
@@ -1715,12 +1727,25 @@ class AdminController extends Controller
             Mail::to($psb->email)->send(
                 new \App\Mail\UpgradeMail(
                     $workOrder,
-
+                    $detailBarang,
                     5 // PSB
                 )
             );
         }
 
+        $gaUsers = User::where('is_role', 2)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($gaUsers as $ga) {
+            Mail::to($ga->email)->send(
+                new \App\Mail\UpgradeMail(
+                    $workOrder,
+                    $detailBarang,
+                    2 // PSB
+                )
+            );
+        }
         return redirect()->route('admin.upgrade')->with('success', 'Work order berhasil diterbitkan.');
     }
     public function upgradeShow($id)

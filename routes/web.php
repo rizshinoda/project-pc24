@@ -315,6 +315,15 @@ Route::group(['middleware' => ['ga', SessionTimeout::class]], function () {
     Route::get('ga/relokasi/{id}/createshipped', [GaController::class, 'relokasicreateShipped'])->name('ga.relokasi.create.shipped');
     Route::post('ga/relokasi/{id}/storeshipped', [GaController::class, 'relokasistoreShipped'])->name('ga.relokasi.store.shipped');
 
+    Route::get('ga/upgrade', [GaController::class, 'upgrade'])->name('ga.upgrade');
+    Route::get('ga/upgrade/{id}', [GaController::class, 'showupgrade'])->name('ga.upgrade.show');
+    Route::post('ga/upgrade/{id}/approve', [GaController::class, 'approveupgrade'])->name('ga.upgrade.approve');
+    Route::post('ga/upgrade/{id}/reject', [GaController::class, 'rejectupgrade'])->name('ga.upgrade.reject');
+    Route::get('ga/upgrade/{id}/input_barang/create', [GaController::class, 'inputBarangupgradecreate'])->name('ga.input_barang_upgrade.create');
+    Route::post('ga/upgrade/{id}/input_barang', [GaController::class, 'inputBarangupgradestore'])->name('ga.input_barang_upgrade.store');
+    Route::delete('ga/cancel_barang_upgrade/{barangKeluar}', [GAController::class, 'cancelBarangupgrade'])->name('ga.cancel_barang.upgrade');
+    Route::get('ga/upgrade/{id}/createshipped', [GaController::class, 'upgradecreateShipped'])->name('ga.upgrade.create.shipped');
+    Route::post('ga/upgrade/{id}/storeshipped', [GaController::class, 'upgradestoreShipped'])->name('ga.upgrade.store.shipped');
 
     Route::get('ga/OB', [GaController::class, 'OB'])->name('ga.OB');
     Route::get('ga/OB/{id}', [GaController::class, 'showOB'])->name('ga.OB_show');

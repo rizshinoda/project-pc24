@@ -122,6 +122,10 @@
                                         <span class="badge badge-pill badge-danger">Pending</span>
                                         @elseif($getUpgrade->status=='On Progress')
                                         <span class="badge badge-pill badge-info">On Progress</span>
+                                        @elseif($getUpgrade->status=='Shipped')
+                                        <span class="badge badge-pill badge-primary">Shipped</span>
+                                        @elseif($getUpgrade->status=='Rejected')
+                                        <span class="badge badge-pill badge-dark">Rejected</span>
                                         @elseif($getUpgrade->status=='Canceled')
                                         <span class="badge badge-pill badge-warning">Cancelled</span>
                                         @elseif($getUpgrade->status=='Completed')
@@ -173,6 +177,8 @@
                                     <p><strong>PIC:</strong> {{ $getUpgrade->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getUpgrade->onlineBilling->no_pic }}</p>
                                     <p><strong>Vendor:</strong> {{ $getUpgrade->onlineBilling->vendor?->nama_vendor }}</p>
+                                    <p><strong>Keterangan:</strong> {{ $getUpgrade->keterangan }}</p>
+                                    <p><strong>Barang non stock:</strong> {{ $getUpgrade->non_stock }}</p>
                                 </div>
                             </div>
                         </div>
@@ -180,7 +186,7 @@
                     <div class="container mt-4">
                         @php
                         // Tahapan normal
-                        $steps = ['Pending', 'On Progress', 'Completed'];
+                        $steps = ['Pending', 'On Progress', 'Shipped', 'Completed'];
 
                         // Ambil status dari progress
                         $currentStatus = ucfirst($getUpgrade->status ?? 'Pending');
@@ -217,6 +223,103 @@
                         </div>
                         @endif
                     </div>
+
+                    <!-- Card untuk tabel progress survey -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Detail Barang</h4>
+                                    <div class=" table-responsive">
+
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style=" text-align: center; vertical-align: middle;">No</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Jenis</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Merek</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Tipe</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($getUpgrade->WorkOrderUpgradeDetail as $detail)
+                                                <tr>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
+
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->jenis->nama_jenis }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->merek->nama_merek }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->tipe->nama_tipe }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $detail->jumlah }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ ucfirst($detail->stockBarang->kualitas) }}</td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Status Barang yang Sudah Dikirim GA</h4>
+
+
+                                    <div class=" table-responsive">
+
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style=" text-align: center; vertical-align: middle;">No</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">GA</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Jenis</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Merek</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Tipe</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Serial Number</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Status Konfigurasi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($getUpgrade->barangKeluar as $barangKeluar)
+                                                <tr>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->user->name }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->stockBarang->jenis->nama_jenis }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->stockBarang->merek->nama_merek }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->stockBarang->tipe->nama_tipe }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->serial_number }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->jumlah }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ ucfirst($barangKeluar->stockBarang->kualitas) }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                        @if($barangKeluar->is_configured)
+                                                        <span class="badge badge-pill bg-success">Sudah Dikonfigurasi</span>
+                                                        @else
+                                                        <span class="badge badge-pill bg-warning">Belum Dikonfigurasi</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                                @empty
+                                                <tr>
+                                                    <td colspan="9" class="text-center">Belum ada barang yang diinput</td>
+                                                </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Card untuk tabel progress survey -->
                     <div class="row mt-4">
                         <div class="col-md-12">
@@ -235,7 +338,7 @@
 
                                     @endif
                                     <h4 class="card-title mt-2">Progres Upgrade</h4>
-                                    @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Completed')
+                                    @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Completed' || $getUpgrade->status === 'Shipped')
                                     <a href="{{ route('noc_upgrade_add_progress', $getUpgrade->id) }}" class="btn btn-info mb-3">
                                         Add Progress</a>
 

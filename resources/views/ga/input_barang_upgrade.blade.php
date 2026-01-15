@@ -82,6 +82,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{url('ga/relokasi')}}">Relokasi</a>
                                 </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{url('ga/upgrade')}}">Upgrade</a>
                                 </li>
@@ -111,49 +112,108 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-danger text-white me-2">
                                 <i class="mdi mdi-home"></i>
-                            </span> Relokasi
+                            </span> Input Barang
                         </h3>
-
+                        {{-- Alert untuk menampilkan pesan sukses --}}
+                        @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        @endif
                     </div>
-                    @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                    @endif
-                    <div class="row justify-content-center">
-                        <div class="col-md-6"> <!-- Lebar form setengah halaman -->
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="mb-5 text-center">Progress Shipping Relokasi</h4>
-                                    {{-- Form untuk mengupload multiple foto --}}
-                                    <form action="{{ route('ga.relokasi.store.shipped', $getRelokasi->id) }}" method="POST" enctype="multipart/form-data">
-                                        @csrf
+                    <div class="col-lg-12 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
 
-                                        <div class="form-group">
-                                            <label for="keterangan">Keterangan Pengiriman</label>
-                                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3" required>{{ old('keterangan', 'Perangkat dikirim ke Team Regional Terkait') }}</textarea>
-                                        </div>
+                                <!-- resources/views/ga/input_barang.blade.php -->
 
-                                        <div class="form-group">
-                                            <label for="foto">Upload Foto Resi (Opsional)</label>
-                                            <input type="file" name="foto[]" id="foto" class="form-control" multiple>
-                                        </div>
+                                <h4 class="card-title">Keranjang Barang</h4>
 
-                                        <div class="text-center">
-                                            <button type="submit" class="btn btn-primary">
-                                                Kirim Perangkat
-                                            </button>
-                                            <a href="{{ route('ga.relokasi.show', $getRelokasi->id) }}" class="btn btn-light ">Kembali</a>
+                                <form id="submitBarangForm" method="POST" action="{{ route('ga.input_barang_upgrade.store', $getUpgrade->id) }}">
+                                    @csrf
+                                    <input type="hidden" name="cartItems" id="cartItemsInput">
+                                    <table class="table table-bordered" id="cartTable">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Jenis</th>
+                                                <th>Merek</th>
+                                                <th>Tipe</th>
+                                                <th>Kualitas</th>
+                                                <th>Jumlah</th>
+                                                <th>Serial Number</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($cartItems as $index => $item)
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>{{ $item['jenis'] }}</td>
+                                                <td>{{ $item['merek'] }}</td>
+                                                <td>{{ $item['tipe'] }}</td>
+                                                <td>{{ ucfirst($item['kualitas']) }}</td>
+                                                <td>{{ $item['jumlah'] }}</td>
+                                                <td>{{ $item['serial_number'] }}</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger" onclick="removeFromCart({{ $index }})">Hapus</button>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                    <a href="{{ route('ga.upgrade.show', $getUpgrade->id) }}" class="btn btn-info mt-3"> <i class="fa fa-arrow-left"></i> Kembali</a>
 
-                                        </div>
-                                    </form>
+                                    <!-- Tombol Submit -->
+                                    <button type="submit" class="btn btn-info mt-3 pull-right">Submit Barang</button>
+
+                                </form>
+
+                                <h4 class="mt-3">Daftar Barang</h4>
+                                <input type="text" id="searchInput" class="form-control mb-4" placeholder="Cari Barang">
+
+                                <!-- Tabel Stok Barang -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered wrap">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Jenis</th>
+                                                <th>Merek</th>
+                                                <th>Tipe</th>
+                                                <th>Serial Number</th>
+                                                <th>Jumlah</th>
+                                                <th>Kualitas</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="stockTableBody">
+                                            @foreach($stockBarangs as $key => $stock)
+                                            <tr data-jenis-id="{{ $stock->jenis_id }}" data-merek-id="{{ $stock->merek_id }}" data-tipe-id="{{ $stock->tipe_id }}">
+                                                <td>{{ $key + 1 }}</td>
+                                                <td>{{ $stock->jenis->nama_jenis }}</td>
+                                                <td>{{ $stock->merek->nama_merek }}</td>
+                                                <td>{{ $stock->tipe->nama_tipe }}</td>
+                                                <td>{{ $stock->serial_number }}</td>
+                                                <td>{{ $stock->jumlah }}</td>
+                                                <td>{{ ucfirst($stock->kualitas) }}</td>
+                                                <td>
+                                                    <button class="btn btn-info" onclick="addToCart('{{ $stock->id }}', '{{ $stock->jenis->nama_jenis }}', '{{ $stock->merek->nama_merek }}', '{{ $stock->tipe->nama_tipe }}', '{{ $stock->serial_number }}', '{{ $stock->kualitas }}', {{ $stock->jumlah }})">Tambah ke Keranjang</button>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
+
                             </div>
                         </div>
                     </div>
+
                 </div>
-
-
                 <!-- content-wrapper ends -->
                 <!-- partial:partials/_footer.html -->
                 <footer class="footer">
