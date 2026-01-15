@@ -3,6 +3,8 @@
 @php
 $basePath = match ((int) $targetRole) {
 5 => '/psb/upgrade/show/',
+2 => '/ga/relokasi/show/',
+
 };
 @endphp
 
@@ -17,7 +19,7 @@ $basePath = match ((int) $targetRole) {
 
 <body style="font-family: Arial, sans-serif; font-size: 14px; color: #333; line-height: 1.4;">
 
-    <p style="margin-bottom: 10px;">Dear Team PSB,</p>
+    <p style="margin-bottom: 10px;">Dear Team PSB & GA,</p>
 
     <p style="margin-bottom: 12px;">Terlampir Work Order Upgrade dengan detail site sebagai berikut:</p>
 
@@ -67,6 +69,34 @@ $basePath = match ((int) $targetRole) {
                 <td><strong>Volume Baru</strong></td>
                 <td>:</td>
                 <td>{{ $getUpgrade->bandwidth_baru ?? '-' }} {{ $getUpgrade->satuan ?? '' }}</td>
+            </tr>
+            @endif
+            {{-- Perangkat Stock --}}
+            @if ($detailBarang->isNotEmpty())
+            <tr>
+                <td style="vertical-align: top;"><strong>Perangkat Stock</strong></td>
+                <td style="vertical-align: top;">:</td>
+                <td style="padding: 4px; margin: 0px;">
+                    @foreach ($detailBarang as $barang)
+                    - {{ $barang->merek }} - {{ $barang->tipe }} ({{ $barang->kualitas }}), Jumlah: {{ $barang->jumlah }} Unit<br>
+                    @endforeach
+                </td>
+            </tr>
+            @endif
+
+            {{-- Perangkat Non-Stock --}}
+            @if (!empty($getUpgrade->non_stock))
+            @php
+            $nonStockItems = preg_split('/\r\n|\r|\n/', $getUpgrade->non_stock);
+            @endphp
+            <tr>
+                <td style="vertical-align: top;"><strong>Perangkat Non-Stock</strong></td>
+                <td style="vertical-align: top;">:</td>
+                <td style="padding: 4px; margin: 0px;">
+                    @foreach ($nonStockItems as $item)
+                    - {{ trim($item) }}<br>
+                    @endforeach
+                </td>
             </tr>
             @endif
 

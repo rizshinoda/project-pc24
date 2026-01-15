@@ -44,6 +44,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Intervention\Image\Facades\Image;
 use App\Exports\WorkOrderSurveyExport;
 use App\Models\WorkOrderInstallDetail;
+use App\Models\WorkOrderUpgradeDetail;
 use App\Exports\WorkOrderInstallExport;
 use App\Exports\WorkOrderUpgradeExport;
 use App\Models\WorkOrderRelokasiDetail;
@@ -1547,6 +1548,14 @@ class AdminController extends Controller
     public function upgradecreate($id)
     {
         $onlineBilling = OnlineBilling::findOrFail($id);
+        // Ambil daftar jenis barang
+        $jenisList = Jenis::select('id', 'nama_jenis')->get();
+
+        // Ambil stok barang
+        $stockBarangs = StockBarang::with(['merek', 'tipe', 'jenis'])
+            ->selectRaw('tipe_id, merek_id, jenis_id, kualitas, SUM(jumlah) as total_jumlah')
+            ->groupBy('tipe_id', 'merek_id', 'jenis_id', 'kualitas')
+            ->get();
 
         // Ambil nomor upgrade terakhir (TANPA reset)
         $lastUpgrade = WorkOrderUpgrade::orderBy('id', 'desc')->first();
@@ -1572,7 +1581,7 @@ class AdminController extends Controller
         // Gabungkan data role
         $data = array_merge(
             $this->ambilDataRole(),
-            compact('notifications', 'no_spk', 'onlineBilling')
+            compact('stockBarangs', 'jenisList', 'notifications', 'no_spk', 'onlineBilling')
         );
 
         return $this->renderView('upgrade_create', $data);
@@ -1588,10 +1597,13 @@ class AdminController extends Controller
             'online_billing_id' => 'required|exists:online_billings,id',
             'bandwidth_baru' => 'required|string',
             'satuan' => 'required|string',
+            'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+
+            'cart' => 'nullable|array', // Keranjang tidak wajib
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
 
         ]);
-
         // Simpan data ke tabel work_order_upgrades
         $workOrder = WorkOrderUpgrade::create([
             'online_billing_id' => $validated['online_billing_id'],
@@ -1599,8 +1611,35 @@ class AdminController extends Controller
             'bandwidth_baru' => $validated['bandwidth_baru'],
             'satuan' => $validated['satuan'],
             'admin_id' => Auth::user()->id,
+            'keterangan' => $validated['keterangan'],
+            'non_stock' => $validated['non_stock'],
             'status' => 'Pending', // Default status
         ]);
+
+        // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
+        if (!empty($validated['cart'])) {
+            foreach ($validated['cart'] as $jenis => $merekArray) {
+                foreach ($merekArray as $merek => $tipeArray) {
+                    foreach ($tipeArray as $tipe => $kualitasArray) {
+                        foreach ($kualitasArray as $kualitas => $item) {
+                            $stockBarang = StockBarang::whereHas('merek', fn($query) => $query->where('nama_merek', $merek))
+                                ->whereHas('tipe', fn($query) => $query->where('nama_tipe', $tipe))
+                                ->where('kualitas', $kualitas)
+                                ->first();
+
+                            WorkOrderUpgradeDetail::create([
+                                'work_order_upgrade_id' => $workOrder->id,
+                                'stock_barang_id' => $stockBarang?->id, // Gunakan null-safe operator untuk menghindari error jika tidak ditemukan
+                                'merek' => $merek,
+                                'tipe' => $tipe,
+                                'kualitas' => $kualitas,
+                                'jumlah' => $item['total_jumlah'],
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
 
         Status::create([
             'work_orderable_id' => $workOrder->id,
@@ -1640,6 +1679,8 @@ class AdminController extends Controller
         $naUsers = User::where('is_role', 6)->get();
         // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
         $psbUsers = User::where('is_role', 5)->get();
+        $gaUsers = User::where('is_role', 2)->get();
+
         // Buat notifikasi untuk setiap pengguna General Affair
         foreach ($naUsers as $naUser) {
             $url = route(
@@ -1663,6 +1704,16 @@ class AdminController extends Controller
                 'url' => $url, // URL dengan hash #instalasi
             ]);
         }
+        foreach ($gaUsers as $gaUser) {
+            $url = route('ga.upgrade.show', ['id' => $workOrder->id]) . '#upgrade';
+
+            Notification::create([
+                'user_id' => $gaUser->id,
+                'message' => 'WO Upgrade baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
+                'url' => $url, // URL dengan hash #instalasi
+            ]);
+        }
+        $detailBarang = WorkOrderUpgradeDetail::where('work_order_upgrade_id', $workOrder->id)->get();
 
         // Load relasi onlineBilling untuk email
         $workOrder->load('onlineBilling', 'admin');
@@ -1676,12 +1727,25 @@ class AdminController extends Controller
             Mail::to($psb->email)->send(
                 new \App\Mail\UpgradeMail(
                     $workOrder,
-
+                    $detailBarang,
                     5 // PSB
                 )
             );
         }
 
+        $gaUsers = User::where('is_role', 2)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($gaUsers as $ga) {
+            Mail::to($ga->email)->send(
+                new \App\Mail\UpgradeMail(
+                    $workOrder,
+                    $detailBarang,
+                    2 // PSB
+                )
+            );
+        }
         return redirect()->route('admin.upgrade')->with('success', 'Work order berhasil diterbitkan.');
     }
     public function upgradeShow($id)

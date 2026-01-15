@@ -13,6 +13,8 @@ class BarangKeluar extends Model
         'work_order_install_id',
         'work_order_relokasi_id',
         'work_order_maintenance_id',
+        'work_order_upgrade_id',
+
         'stock_barang_id',
         'jumlah',
         'serial_number',
@@ -43,6 +45,11 @@ class BarangKeluar extends Model
     {
         return $this->belongsTo(WorkOrderMaintenance::class);
     }
+    public function workOrderUpgrade()
+    {
+        return $this->belongsTo(WorkOrderUpgrade::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

@@ -82,6 +82,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{url('ga/relokasi')}}">Relokasi</a>
                                 </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{url('ga/upgrade')}}">Upgrade</a>
                                 </li>
@@ -111,7 +112,7 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-danger text-white me-2">
                                 <i class="mdi mdi-home"></i>
-                            </span> Dismantle
+                            </span> Upgrade
                         </h3>
                         {{-- Alert untuk menampilkan pesan sukses --}}
                         @if (session('success'))
@@ -135,9 +136,9 @@
                     <div class="col-lg-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <h4>Daftar WO Dismantle</h4>
+                                <h4>Daftar WO Upgrade</h4>
                                 <!-- Form Pencarian dan Filter -->
-                                <form method="GET" action="{{ route('ga.dismantle') }}" class="mb-4">
+                                <form method="GET" action="{{ route('ga.upgrade') }}" class="mb-4">
                                     <div class="row">
                                         <!-- Kolom Pencarian -->
                                         <div class="col-md-6 mb-3">
@@ -178,20 +179,25 @@
                                 <!-- Tab Status -->
                                 <ul class="nav nav-tabs justify-content-center mb-4" id="surveyTab" role="tablist">
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" id="all-tab" href="{{ route('psb.dismantle', ['status' => 'all', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Semua</a>
+                                        <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" id="all-tab" href="{{ route('ga.upgrade', ['status' => 'all', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Semua</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'Pending' ? 'active' : '' }}" id="pending-tab" href="{{ route('psb.dismantle', ['status' => 'Pending', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Pending</a>
+                                        <a class="nav-link {{ $status == 'Pending' ? 'active' : '' }}" id="pending-tab" href="{{ route('ga.upgrade', ['status' => 'Pending', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Pending</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'On Progress' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('psb.dismantle', ['status' => 'On Progress', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">On Progress</a>
-                                    </li>
-
-                                    <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'Completed' ? 'active' : '' }}" id="completed-tab" href="{{ route('psb.dismantle', ['status' => 'Completed', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Completed</a>
+                                        <a class="nav-link {{ $status == 'On Progress' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('ga.upgrade', ['status' => 'On Progress', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">On Progress</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'Canceled' ? 'active' : '' }}" id="canceled-tab" href="{{ route('psb.dismantle', ['status' => 'Canceled', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Cancelled</a>
+                                        <a class="nav-link {{ $status == 'Shipped' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('ga.upgrade', ['status' => 'Shipped', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Shipped</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Rejected' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('ga.upgrade', ['status' => 'Rejected', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Rejected</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Completed' ? 'active' : '' }}" id="completed-tab" href="{{ route('ga.upgrade', ['status' => 'Completed', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Completed</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Canceled' ? 'active' : '' }}" id="canceled-tab" href="{{ route('ga.upgrade', ['status' => 'Canceled', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Cancelled</a>
                                     </li>
                                 </ul>
                                 <div class="table-responsive">
@@ -211,33 +217,38 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($getDismantle as $key => $dismantle)
+                                            @foreach ($getUpgrade as $key => $upgrade)
                                             <tr>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $getDismantle->firstItem() + $key }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $dismantle->no_spk }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $dismantle->created_at->format('d M Y') }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $dismantle->onlineBilling->pelanggan->nama_pelanggan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $dismantle->onlineBilling->instansi?->nama_instansi}}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $dismantle->onlineBilling->nama_site ?? 'Tidak Ada Nama Site' }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $getUpgrade->firstItem() + $key }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $upgrade->no_spk }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $upgrade->created_at->format('d M Y') }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $upgrade->onlineBilling->pelanggan->nama_pelanggan }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $upgrade->onlineBilling->instansi?->nama_instansi}}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $upgrade->onlineBilling->nama_site ?? 'Tidak Ada Nama Site' }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    {{ \Illuminate\Support\Str::limit($dismantle->onlineBilling->alamat_pemasangan, 60, '...') }}
+                                                    {{ \Illuminate\Support\Str::limit($upgrade->onlineBilling->alamat_pemasangan, 60, '...') }}
                                                 </td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $dismantle->onlineBilling->bandwidth }} {{ $dismantle->onlineBilling->satuan }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $upgrade->onlineBilling->bandwidth }} {{ $upgrade->onlineBilling->satuan }}</td>
 
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    @if($dismantle->status == 'Pending')
+                                                    @if($upgrade->status == 'Pending')
                                                     <span class="badge badge-pill badge-danger">Pending</span>
-                                                    @elseif($dismantle->status == 'On Progress')
+                                                    @elseif($upgrade->status == 'On Progress')
                                                     <span class="badge badge-pill badge-info">On Progress</span>
-                                                    @elseif($dismantle->status == 'Shipped')
-                                                    <span class="badge badge-pill badge-warning">Shipped</span>
-                                                    @elseif($dismantle->status == 'Completed')
+                                                    @elseif($upgrade->status=='Shipped')
+                                                    <span class="badge badge-pill badge-primary">Shipped</span>
+                                                    @elseif($upgrade->status=='Rejected')
+                                                    <span class="badge badge-pill badge-dark">Rejected</span>
+                                                    @elseif($upgrade->status == 'Canceled')
+                                                    <span class="badge badge-pill badge-warning">Cancelled</span>
+                                                    @elseif($upgrade->status == 'Completed')
                                                     <span class="badge badge-pill badge-success">Completed</span>
                                                     @endif
                                                 </td>
 
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    <a href="{{ route('ga.dismantle_show', $dismantle->id) }}" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a>
+                                                    <a href="{{ route('ga.upgrade.show', $upgrade->id) }}" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a>
+
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -247,16 +258,16 @@
 
                                 <div class="mt-3">
                                     Showing
-                                    {{$getDismantle->firstItem()}}
+                                    {{$getUpgrade->firstItem()}}
                                     to
-                                    {{$getDismantle->lastItem()}}
+                                    {{$getUpgrade->lastItem()}}
                                     of
-                                    {{$getDismantle->total()}}
+                                    {{$getUpgrade->total()}}
                                     entries
 
                                 </div>
                                 <div class="pull-right">
-                                    {{ $getDismantle->links() }}
+                                    {{ $getUpgrade->links() }}
                                 </div>
 
                             </div>

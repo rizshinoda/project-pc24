@@ -82,6 +82,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{url('ga/relokasi')}}">Relokasi</a>
                                 </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{url('ga/upgrade')}}">Upgrade</a>
                                 </li>
@@ -111,7 +112,7 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-danger text-white me-2">
                                 <i class="mdi mdi-home"></i>
-                            </span> Relokasi
+                            </span> Upgrade
                         </h3>
 
                     </div>
@@ -124,9 +125,9 @@
                         <div class="col-md-6"> <!-- Lebar form setengah halaman -->
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="mb-5 text-center">Progress Shipping Relokasi</h4>
+                                    <h4 class="mb-5 text-center">Progress Shipping Upgrade</h4>
                                     {{-- Form untuk mengupload multiple foto --}}
-                                    <form action="{{ route('ga.relokasi.store.shipped', $getRelokasi->id) }}" method="POST" enctype="multipart/form-data">
+                                    <form action="{{ route('ga.upgrade.store.shipped', $getUpgrade->id) }}" method="POST" enctype="multipart/form-data">
                                         @csrf
 
                                         <div class="form-group">
@@ -143,7 +144,7 @@
                                             <button type="submit" class="btn btn-primary">
                                                 Kirim Perangkat
                                             </button>
-                                            <a href="{{ route('ga.relokasi.show', $getRelokasi->id) }}" class="btn btn-light ">Kembali</a>
+                                            <a href="{{ route('ga.upgrade.show', $getUpgrade->id) }}" class="btn btn-light ">Kembali</a>
 
                                         </div>
                                     </form>

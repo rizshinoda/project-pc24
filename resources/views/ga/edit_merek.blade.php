@@ -82,6 +82,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{url('ga/relokasi')}}">Relokasi</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('ga/upgrade')}}">Upgrade</a>
+                                </li>
                             </ul>
                         </div>
                     </li>

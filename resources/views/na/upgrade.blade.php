@@ -167,7 +167,12 @@
                                     <li class="nav-item">
                                         <a class="nav-link {{ $status == 'On Progress' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('na.upgrade', ['status' => 'On Progress', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">On Progress</a>
                                     </li>
-
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Shipped' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('na.upgrade', ['status' => 'Shipped', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Shipped</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Rejected' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('na.upgrade', ['status' => 'Rejected', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Rejected</a>
+                                    </li>
                                     <li class="nav-item">
                                         <a class="nav-link {{ $status == 'Completed' ? 'active' : '' }}" id="completed-tab" href="{{ route('na.upgrade', ['status' => 'Completed', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Completed</a>
                                     </li>
@@ -210,8 +215,12 @@
                                                     <span class="badge badge-pill badge-danger">Pending</span>
                                                     @elseif($upgrade->status == 'On Progress')
                                                     <span class="badge badge-pill badge-info">On Progress</span>
-                                                    @elseif($upgrade->status == 'Shipped')
-                                                    <span class="badge badge-pill badge-warning">Shipped</span>
+                                                    @elseif($upgrade->status=='Shipped')
+                                                    <span class="badge badge-pill badge-primary">Shipped</span>
+                                                    @elseif($upgrade->status=='Rejected')
+                                                    <span class="badge badge-pill badge-dark">Rejected</span>
+                                                    @elseif($upgrade->status == 'Canceled')
+                                                    <span class="badge badge-pill badge-warning">Cancelled</span>
                                                     @elseif($upgrade->status == 'Completed')
                                                     <span class="badge badge-pill badge-success">Completed</span>
                                                     @endif
