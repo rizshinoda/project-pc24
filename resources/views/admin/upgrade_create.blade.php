@@ -108,6 +108,7 @@
             </nav>
             <!-- partial -->
 
+
             <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
@@ -120,72 +121,173 @@
 
 
                     </div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="mb-5 text-center">Form Upgrade</h4>
-                                    {{-- Menampilkan pesan error jika ada --}}
-                                    @if ($errors->any())
-                                    <div class="alert alert-danger">
-                                        <ul>
-                                            @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                    @endif
 
-                                    {{-- Form untuk membuat work order --}}
-                                    <form action="{{ route('admin.upgrade_store') }}" method="POST" enctype="multipart/form-data">
-                                        @csrf
+                    <div class="col-lg-12 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="mb-5 text-center">Form Upgrade</h4>
+                                {{-- Menampilkan pesan error jika ada --}}
+                                @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                @endif
 
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-group ">
-                                                    <label for="nama_site">No SPK</label>
+                                {{-- Form untuk membuat work order --}}
+                                <form action="{{ route('admin.upgrade_store') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group row">
+                                                <label for="nama_site" class="col-sm-4 col-form-label">No SPK</label>
+                                                <div class="col-sm-8">
                                                     <!-- Nomor SPK akan di-generate otomatis di server -->
                                                     <input type="text" class="form-control" id="no_spk" name="no_spk" value="{{ $no_spk }}" readonly>
 
                                                 </div>
-                                                <div class="form-group">
-                                                    <label for="bandwidth">Volume Baru</label>
-                                                    <div class="input-group mb-4">
-                                                        <input type="number" name="bandwidth_baru" id="bandwidth_baru" class="form-control" min="1" required>
-                                                        <select class="form-control" id="satuan" name="satuan" required style="max-width: 130px;">
-                                                            <option value="" disabled selected>Pilih Satuan</option>
-                                                            <option value="Gbps">Gbps</option>
-                                                            <option value="Mbps">Mbps</option>
-                                                            <option value="Kbps">Kbps</option>
-                                                            <option value="RU(RACK UNIT)">RU(RACK UNIT)</option>
-                                                            <option value="CORE">CORE</option>
-                                                            <option value="PAIR">PAIR</option>
-                                                        </select>
-                                                        <input type="hidden" name="online_billing_id" value="{{ $onlineBilling->id }}">
-
-                                                    </div>
-
-
-                                                    <label>Upload File <span class="text-muted small">(pdf, doc, docx, jpg, png)</span>
-                                                    </label>
-                                                    <input type="file" name="attachments[]" multiple>
-                                                </div>
-
-
-
                                             </div>
 
+                                            <div class="form-group row">
+                                                <label for="bandwidth" class="col-sm-4 col-form-label">Volume Baru</label>
+                                                <div class="col-sm-4">
+                                                    <input type="number" name="bandwidth_baru" id="bandwidth_baru" class="form-control" min="1" required>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <select class="form-control" id="satuan" name="satuan" required>
+                                                        <option value="" disabled selected>Pilih Satuan</option>
+                                                        <option value="Gbps">Gbps</option>
+                                                        <option value="Mbps">Mbps</option>
+                                                        <option value="Kbps">Kbps</option>
+                                                        <option value="RU(RACK UNIT)">RU(RACK UNIT)</option>
+                                                        <option value="CORE">CORE</option>
+                                                        <option value="PAIR">PAIR</option>
+
+
+                                                    </select>
+
+                                                    <input type="hidden" name="online_billing_id" value="{{ $onlineBilling->id }}">
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="bandwidth" class="col-sm-4 col-form-label">Keterangan</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="keterangan" name="keterangan" class="form-control" rows="4"></textarea>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="bandwidth" class="col-sm-4 col-form-label">
+                                                    Upload File
+                                                    <span class="d-block text-muted small">
+                                                        (pdf, doc, docx, jpg, png)
+                                                    </span>
+                                                </label>
+                                                <div class="col-sm-8">
+                                                    <input type="file" name="attachments[]" multiple>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label for="no_penerima" class="col-sm-4 col-form-label">Input Barang Non Stock</label>
+                                                <div class="col-sm-8">
+                                                    <textarea id="non_stock" name="non_stock" class="form-control" rows="4"></textarea>
+                                                </div>
+                                            </div>
+                                            <!-- Dropdown Jenis Barang -->
+                                            <div class="form-group row">
+                                                <label for="jenis_id" class="col-sm-4 col-form-label">Jenis Barang</label>
+                                                <div class="col-sm-8">
+                                                    <select id="jenis_id" name="jenis_id" class="form-control">
+                                                        <option value="">Pilih Jenis Barang</option>
+                                                        @foreach ($jenisList as $jenis)
+                                                        <option value="{{ $jenis->id }}">{{ $jenis->nama_jenis }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
+                                            <!-- Tabel Stok Barang -->
+                                            <div class="form-group row">
+                                                <label>Data Barang</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" id="search" class="form-control w-50 h-46" />
+                                                    <table class="table table-bordered mt-2" id="stock-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align: center;">Merek</th>
+                                                                <th style="text-align: center;">Tipe</th>
+                                                                <th style="text-align: center;">Jumlah Tersedia</th>
+                                                                <th style="text-align: center;">Kualitas</th>
+                                                                <th style="text-align: center;">Jumlah Request</th>
+                                                                <th style="text-align: center;">Aksi</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="stock-table-body">
+                                                            @foreach ($stockBarangs as $stock)
+                                                            <tr data-jenis-id="{{ $stock->jenis_id }}">
+                                                                <td style="text-align: center;">{{ $stock->merek->nama_merek }}</td>
+                                                                <td style="text-align: center;">{{ $stock->tipe->nama_tipe }}</td>
+                                                                <td style="text-align: center;">{{ $stock->total_jumlah }}</td>
+                                                                <td style="text-align: center;">{{ $stock->kualitas }}</td>
+                                                                <td style="text-align: center;">
+                                                                    <input type="number" min="0" max="{{ $stock->total_jumlah }}" value="0" class="form-control quantity" />
+                                                                </td>
+                                                                <td style="text-align: center;">
+                                                                    <button type="button" class="btn btn-success add-to-cart" data-id="{{ $stock->id }}" data-merek="{{ $stock->merek->nama_merek }}" data-tipe="{{ $stock->tipe->nama_tipe }}" data-jumlah="{{ $stock->total_jumlah }}" data-kualitas="{{ $stock->kualitas }}">
+                                                                        <i class="fa fa-plus"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tabel Keranjang -->
+                                            <div class="form-group row">
+                                                <label>Keranjang</label>
+                                                <div class="col-sm-8">
+                                                    <table class="table table-bordered mt-2" id="cart-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align: center;">Merek</th>
+                                                                <th style="text-align: center;">Tipe</th>
+                                                                <th style="text-align: center;">Jumlah</th>
+                                                                <th style="text-align: center;">Kualitas</th>
+                                                                <th style="text-align: center;">Aksi</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="cart-table-body">
+                                                            <!-- Items added to the cart will be displayed here -->
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                            </div>
+
+
                                         </div>
-                                        <br>
+
+                                    </div>
+                                    <br>
+                                    <div class="text-center">
                                         <!-- Tombol submit -->
                                         <button type="submit" class="btn btn-info">Submit</button>
                                         <a href="{{ route('admin.OB_show', $onlineBilling->id) }}" class="btn btn-light">Kembali</a>
-
-                                    </form>
-                                </div>
+                                    </div>
+                                </form>
                             </div>
-                            <!-- main-panel ends -->
                         </div>
+                        <!-- main-panel ends -->
                     </div>
                 </div>
                 <footer class="footer">
@@ -196,6 +298,8 @@
                 </footer>
                 <!-- partial -->
             </div>
+            <!-- Main Panel -->
+
             <!-- main-panel ends -->
         </div>
 

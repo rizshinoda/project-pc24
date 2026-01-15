@@ -15,6 +15,8 @@ class WorkOrderUpgrade extends Model
         'satuan',
         'status',
         'admin_id',
+        'non_stock',
+        'keterangan',
         'attachments', // tambahkan ini supaya bisa diisi massal
 
     ];
@@ -35,5 +37,14 @@ class WorkOrderUpgrade extends Model
     public function statuses()
     {
         return $this->morphMany(Status::class, 'workOrderable');
+    }
+    // Relasi ke RequestBarangStockBarang (Barang yang direquest)
+    public function WorkOrderUpgradeDetail()
+    {
+        return $this->hasMany(WorkOrderUpgradeDetail::class, 'work_order_upgrade_id');
+    }
+    public function barangKeluar()
+    {
+        return $this->hasMany(BarangKeluar::class, 'work_order_upgrade_id');
     }
 }
