@@ -2310,6 +2310,86 @@ class GaController extends Controller
 
         return redirect()->route('ga.upgrade.show', $id)->with('success', 'Status berhasil diubah menjadi Shipped.');
     }
+
+
+    public function printDetailBarang($id)
+    {
+        $requestBarang = RequestBarang::with([
+            'user',
+            'onlineBilling',
+            'requestBarangDetails.stockBarang.jenis',
+            'requestBarangDetails.stockBarang.merek',
+            'requestBarangDetails.stockBarang.tipe',
+            'barangKeluar.stockBarang.jenis',
+            'barangKeluar.stockBarang.merek',
+            'barangKeluar.stockBarang.tipe',
+        ])->findOrFail($id);
+
+        return view('ga.print_request_barang', compact('requestBarang'));
+    }
+
+    public function printDetailBarangInstalasi($id)
+    {
+        $getInstall = WorkOrderInstall::with([
+            'admin',
+            'WorkOrderInstallDetail.stockBarang.jenis',
+            'WorkOrderInstallDetail.stockBarang.merek',
+            'WorkOrderInstallDetail.stockBarang.tipe',
+            'barangKeluar.stockBarang.jenis',
+            'barangKeluar.stockBarang.merek',
+            'barangKeluar.stockBarang.tipe',
+        ])->findOrFail($id);
+
+        return view('ga.print_barang_instalasi', compact('getInstall'));
+    }
+
+    public function printDetailBarangMaintenance($id)
+    {
+        $getMaintenance = WorkOrderMaintenance::with([
+            'admin',
+            'onlineBilling',
+            'WorkOrderMaintenanceDetail.stockBarang.jenis',
+            'WorkOrderMaintenanceDetail.stockBarang.merek',
+            'WorkOrderMaintenanceDetail.stockBarang.tipe',
+            'barangKeluar.stockBarang.jenis',
+            'barangKeluar.stockBarang.merek',
+            'barangKeluar.stockBarang.tipe',
+        ])->findOrFail($id);
+
+        return view('ga.print_barang_maintenance', compact('getMaintenance'));
+    }
+
+    public function printDetailBarangRelokasi($id)
+    {
+        $getRelokasi = WorkOrderRelokasi::with([
+            'admin',
+            'onlineBilling',
+            'WorkOrderRelokasiDetail.stockBarang.jenis',
+            'WorkOrderRelokasiDetail.stockBarang.merek',
+            'WorkOrderRelokasiDetail.stockBarang.tipe',
+            'barangKeluar.stockBarang.jenis',
+            'barangKeluar.stockBarang.merek',
+            'barangKeluar.stockBarang.tipe',
+        ])->findOrFail($id);
+
+        return view('ga.print_barang_relokasi', compact('getRelokasi'));
+    }
+
+    public function printDetailBarangUpgrade($id)
+    {
+        $getUpgrade = WorkOrderUpgrade::with([
+            'admin',
+            'onlineBilling',
+            'WorkOrderUpgradeDetail.stockBarang.jenis',
+            'WorkOrderUpgradeDetail.stockBarang.merek',
+            'WorkOrderUpgradeDetail.stockBarang.tipe',
+            'barangKeluar.stockBarang.jenis',
+            'barangKeluar.stockBarang.merek',
+            'barangKeluar.stockBarang.tipe',
+        ])->findOrFail($id);
+
+        return view('ga.print_barang_upgrade', compact('getUpgrade'));
+    }
 }
 
 // ambilDataRole(): Fungsi ini mengembalikan informasi tentang role pengguna, termasuk teks role (roleText) dan folder view (viewFolder) yang diturunkan dari role.

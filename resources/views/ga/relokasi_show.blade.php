@@ -381,6 +381,10 @@
                                                 @endforelse
                                             </tbody>
                                         </table>
+                                        <a href="{{ route('ga.relokasi_barang.printdetailbarang', $getRelokasi->id) }}"
+                                            class="btn btn-info mt-3">
+                                            <i class="fa fa-print"></i> Print Detail Barang
+                                        </a>
                                     </div>
 
 

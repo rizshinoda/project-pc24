@@ -397,6 +397,11 @@
                                                 @endforelse
                                             </tbody>
                                         </table>
+
+                                        <a href="{{ route('ga.instalasi_barang.printdetailbarang', $getInstall->id) }}"
+                                            class="btn btn-info mt-3">
+                                            <i class="fa fa-print"></i> Print Detail Barang
+                                        </a>
                                     </div>
 
 

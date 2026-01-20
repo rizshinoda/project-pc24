@@ -382,6 +382,10 @@
                                                 @endforelse
                                             </tbody>
                                         </table>
+                                        <a href="{{ route('ga.upgrade_barang.printdetailbarang', $getUpgrade->id) }}"
+                                            class="btn btn-info mt-3">
+                                            <i class="fa fa-print"></i> Print Detail Barang
+                                        </a>
                                     </div>
 
 
