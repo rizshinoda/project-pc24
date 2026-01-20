@@ -350,7 +350,10 @@
                                         </table>
                                     </div>
 
-
+                                    <a href="{{ route('ga.request_barang.printdetailbarang', $requestBarang->id) }}"
+                                        class="btn btn-info mt-3">
+                                        <i class="fa fa-print"></i> Print Detail Barang
+                                    </a>
                                 </div>
 
                             </div>

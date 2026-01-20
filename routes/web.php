@@ -331,6 +331,12 @@ Route::group(['middleware' => ['ga', SessionTimeout::class]], function () {
     Route::get('ga/sitedismantle', [GaController::class, 'sitedismantle'])->name('ga.sitedismantle');
     Route::get('ga/sitedismantle{id}', [GaController::class, 'showsitedismantle'])->name('ga.showsitedismantle');
 
+    Route::get('ga/requestbarang/{id}/print/detailrequestbarang', [GaController::class, 'printDetailBarang'])->name('ga.request_barang.printdetailbarang');
+    Route::get('ga/instalasi/{id}/print/detailbaranginstalasi', [GaController::class, 'printDetailBarangInstalasi'])->name('ga.instalasi_barang.printdetailbarang');
+    Route::get('ga/maintenance/{id}/print/detailbarangmaintenance', [GaController::class, 'printDetailBarangMaintenance'])->name('ga.maintenance_barang.printdetailbarang');
+    Route::get('ga/relokasi/{id}/print/detailbarangrelokasi', [GaController::class, 'printDetailBarangRelokasi'])->name('ga.relokasi_barang.printdetailbarang');
+    Route::get('ga/upgrade/{id}/print/detailbarangupgrade', [GaController::class, 'printDetailBarangUpgrade'])->name('ga.upgrade_barang.printdetailbarang');
+
     Route::get('ga/chat', Index::class)->name('ga.chat.index');
     Route::get('ga/chat/{query}', Chat::class)->name('ga.chat');
     Route::get('ga/users', Users::class)->name('ga.users');
