@@ -128,17 +128,12 @@
         <tr>
             <th>Dibuat Oleh</th>
             <th>Penerima Barang</th>
-            <th>Gudang</th>
-            <th>K. Gudang</th>
-            <th>Approval</th>
+
         </tr>
         <tr>
             <td>Erizal</td>
             <td>.....................</td>
-            <td>KUSMADI / MANDONG</td>
-            <td>SAIFUL ANWAR</td>
-            <td>NOVAL ISMAIL</td>
-        </tr>
+
     </table>
 
 </body>
