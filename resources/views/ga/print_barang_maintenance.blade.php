@@ -133,7 +133,7 @@
             <th>Approval</th>
         </tr>
         <tr>
-            <td>{{ $getMaintenance->admin->name }}</td>
+            <td>Erizal</td>
             <td>.....................</td>
             <td>KUSMADI / MANDONG</td>
             <td>SAIFUL ANWAR</td>
