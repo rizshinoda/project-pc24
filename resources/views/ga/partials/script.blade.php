@@ -54,25 +54,36 @@
     }
 </script>
 <script>
-    // Pencarian di tabel
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        const searchQuery = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#stockTableBody tr');
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
 
-        rows.forEach(row => {
-            const jenis = row.cells[1].textContent.toLowerCase();
-            const merek = row.cells[2].textContent.toLowerCase();
-            const tipe = row.cells[3].textContent.toLowerCase();
+        if (!searchInput) return; // safety
 
-            // Filter berdasarkan input pencarian
-            if (jenis.includes(searchQuery) || merek.includes(searchQuery) || tipe.includes(searchQuery)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+        searchInput.addEventListener('keyup', function() {
+            const searchQuery = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#stockTableBody tr');
+
+            rows.forEach(row => {
+                const jenis = row.cells[1]?.textContent.toLowerCase() || '';
+                const merek = row.cells[2]?.textContent.toLowerCase() || '';
+                const tipe = row.cells[3]?.textContent.toLowerCase() || '';
+                const serial = row.cells[4]?.textContent.toLowerCase() || '';
+
+                if (
+                    jenis.includes(searchQuery) ||
+                    merek.includes(searchQuery) ||
+                    tipe.includes(searchQuery) ||
+                    serial.includes(searchQuery)
+                ) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         });
     });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>

@@ -36,22 +36,24 @@
             <a class="nav-link" href="{{url('psb/instalasi')}}">Instalasi</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{url('psb/maintenance')}}">Maintenance</a>
+            <a class="nav-link" href="{{url('psb/gantivendor')}}">Ganti Vendor</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{url('psb/relokasi')}}">Relokasi</a>
+          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="{{url('psb/upgrade')}}">Upgrade</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{url('psb/downgrade')}}">Downgrade</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{url('psb/gantivendor')}}">Ganti Vendor</a>
-          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="{{url('psb/dismantle')}}">Dismantle</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{url('psb/relokasi')}}">Relokasi</a>
+            <a class="nav-link" href="{{url('psb/maintenance')}}">Maintenance</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{url('psb/requestbarang')}}">Request Barang</a>
