@@ -88,6 +88,8 @@ Route::group(['middleware' => ['superadmin', SessionTimeout::class]], function (
     Route::get('superadmin/chat', Index::class)->name('superadmin.chat.index');
     Route::get('superadmin/chat/{query}', Chat::class)->name('superadmin.chat');
     Route::get('superadmin/users', Users::class)->name('superadmin.users');
+
+    Route::post('superadmin/OB/import-online-billing', [DashboardController::class, 'importOB'])->name('import.prosesOB');
 });
 
 Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {

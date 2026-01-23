@@ -208,6 +208,8 @@
                                                         <option value="CROSSCONNECT">CROSSCONNECT</option>
                                                         <option value="COLOCATION">COLOCATION</option>
                                                         <option value="INTERNET BROADBAND">INTERNET BROADBAND</option>
+                                                        <option value="INTERNET BROADBAND 1:4">INTERNET BROADBAND 1:4</option>
+                                                        <option value="INTERNET BROADBAND 1:10">INTERNET BROADBAND 1:10</option>
                                                         <option value="INTERNET BROADBAND+IP">INTERNET BROADBAND+IP</option>
                                                         <option value="INTERNET DEDICATED">INTERNET DEDICATED</option>
                                                         <option value="METRO - DARK FIBER">METRO - DARK FIBER</option>

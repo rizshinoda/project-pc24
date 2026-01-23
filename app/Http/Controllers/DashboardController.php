@@ -27,9 +27,11 @@ use App\Models\WorkOrderDismantle;
 use App\Models\WorkOrderDowngrade;
 use App\Models\GantiVendorProgress;
 use App\Models\MaintenanceProgress;
+use App\Imports\OnlineBillingImport;
 use App\Models\WorkOrderGantiVendor;
 use App\Models\WorkOrderMaintenance;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DashboardController extends Controller
 {
@@ -1024,5 +1026,19 @@ class DashboardController extends Controller
         $users->save();
 
         return back()->with('success', 'User dinonaktifkan!');
+    }
+
+    public function importOB(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls|max:2048',
+        ]);
+
+        try {
+            Excel::import(new OnlineBillingImport, $request->file('file'));
+            return redirect()->back()->with('success', 'Berhasil mengimpor data!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimpor: ' . $e->getMessage());
+        }
     }
 }
