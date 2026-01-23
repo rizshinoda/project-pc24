@@ -847,7 +847,7 @@ class PsbController extends Controller
         $getMaintenance = WorkOrderMaintenance::findOrFail($id);
         $tanggalMaintenance = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalMaintenance)->translatedFormat('l, d F Y');
-        $templatePath = resource_path('pdf/template_maintenance.pdf');
+        $templatePath = resource_path('pdf/mt.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();

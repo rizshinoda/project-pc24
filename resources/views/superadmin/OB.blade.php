@@ -50,6 +50,17 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4>Daftar Online Billing</h4>
+                                <form action="{{ route('import.prosesOB') }}" method="POST" enctype="multipart/form-data" class="mb-3">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input type="file" name="file" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="submit" class="btn btn-sm btn-success">Import Excel</button>
+                                        </div>
+                                    </div>
+                                </form>
                                 <!-- Form Pencarian dan Filter -->
                                 <form method="GET" action="{{ route('superadmin.OB') }}" class="mb-4">
                                     <div class="row">

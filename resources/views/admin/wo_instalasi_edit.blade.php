@@ -207,7 +207,10 @@
                                                         <option value="CROSSCONNECT" {{ old('layanan', $getInstall->layanan) == 'CROSSCONNECT' ? 'selected' : '' }}>CROSSCONNECT</option>
                                                         <option value="COLOCATION" {{ old('layanan', $getInstall->layanan) == 'COLOCATION' ? 'selected' : '' }}>COLOCATION</option>
                                                         <option value="INTERNET BROADBAND" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND' ? 'selected' : '' }}>INTERNET BROADBAND</option>
+                                                        <option value="INTERNET BROADBAND 1:4" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND 1:4' ? 'selected' : '' }}>INTERNET BROADBAND 1:4</option>
+                                                        <option value="INTERNET BROADBAND 1:10" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND 1:10' ? 'selected' : '' }}>INTERNET BROADBAND 1:10</option>
                                                         <option value="INTERNET DEDICATED" {{ old('layanan', $getInstall->layanan) == 'INTERNET DEDICATED' ? 'selected' : '' }}>INTERNET DEDICATED</option>
+
                                                         <option value="INTERNET BROADBAND+IP" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND+IP' ? 'selected' : '' }}>INTERNET BROADBAND+IP</option>
 
                                                         <option value="METRO - DARK FIBER" {{ old('layanan', $getInstall->layanan) == 'METRO - DARK FIBER' ? 'selected' : '' }}>METRO - DARK FIBER</option>
