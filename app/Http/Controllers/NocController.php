@@ -254,7 +254,7 @@ class NocController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -433,7 +433,7 @@ class NocController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -627,7 +627,7 @@ class NocController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -843,7 +843,7 @@ class NocController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -1133,7 +1133,7 @@ class NocController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -1306,7 +1306,7 @@ class NocController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru

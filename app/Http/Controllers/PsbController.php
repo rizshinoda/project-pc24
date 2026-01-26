@@ -260,7 +260,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -441,7 +441,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -529,7 +529,7 @@ class PsbController extends Controller
     {
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi multiple file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Update keterangan progress
@@ -1619,7 +1619,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -1836,7 +1836,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -2054,7 +2054,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -2189,7 +2189,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -2419,7 +2419,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -2745,7 +2745,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+            'foto.*' => 'nullable|image|max:10240',
         ]);
 
         // Menyimpan progress baru
