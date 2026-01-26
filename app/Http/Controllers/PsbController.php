@@ -669,13 +669,13 @@ class PsbController extends Controller
         $pdf->Write(1, $getSurvey->media);
         $pdf->SetXY(29.3, 71.5);
         $pdf->Write(1, $getSurvey->nama_site);
-        $pdf->SetXY(29.3, 74.5);
-        $pdf->MultiCell(140, 3, $getSurvey->alamat_pemasangan, 0, 'L');
+        $pdf->SetXY(29.3, 74.8);
+        $pdf->MultiCell(150, 3, $getSurvey->alamat_pemasangan, 0, 'L');
         $pdf->SetXY(137, 36.2);
         $pdf->Write(0, $formattedDate);
         $pdf->SetXY(137, 42.2);
         $pdf->Write(0, $getSurvey->nama_pic);
-        $pdf->SetXY(145, 42.2);
+        $pdf->SetXY(137, 45.4);
         $pdf->Write(0, $getSurvey->no_pic);
         $pdf->SetXY(137, 49.5);
         // Ubah format tanggal dulu
@@ -683,13 +683,29 @@ class PsbController extends Controller
         $pdf->Write(1, $tanggal);
         $pdf->SetXY(137.2, 56.4);
         $pdf->Write(1, $getSurvey->no_jaringan);
-        $pdf->SetXY(137, 63.1);
-        $pdf->Write(1, $getSurvey->bandwidth);
-        $pdf->SetXY(140, 63.1);
-        $pdf->Write(1, $getSurvey->satuan);
-        $pdf->SetXY(137, 78.5);
-        $pdf->Write(1, $getSurvey->vlan);
+        $x = 137;
+        $y = 63.1;
 
+        $bandwidth = $getSurvey->bandwidth;
+        $satuan    = $getSurvey->satuan;
+
+        $pdf->SetXY($x, $y);
+        $pdf->Write(1, $bandwidth);
+
+        // hitung lebar teks bandwidth
+        $textWidth = $pdf->GetStringWidth($bandwidth);
+
+        // jarak kecil antar teks (atur sesuai kebutuhan)
+        $gap = 1;
+
+        // set posisi satuan tepat setelah bandwidth
+        $pdf->SetXY($x + $textWidth + $gap, $y);
+        $pdf->Write(1, $satuan);
+
+        $pdf->SetXY(56, 132);
+        $pdf->Write(1, $getSurvey->vlan);
+        $pdf->SetXY(56, 129);
+        $pdf->Write(1, $getSurvey->nni);
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
@@ -723,7 +739,7 @@ class PsbController extends Controller
         $sanitizedFileName = str_replace(['/', '\\'], '-', $getSurvey->no_spk);
 
         if (file_exists($tempQrPath)) {
-            $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
+            $pdf->Image($tempQrPath, 29.5, 260, 16, 16); // kanan bawah
         }
 
         return response()->streamDownload(function () use ($pdf, $tempQrPath) {
@@ -754,7 +770,7 @@ class PsbController extends Controller
             $imagePath = storage_path('app/public/pelanggan/' . $getInstall->pelanggan->foto);
             if (file_exists($imagePath)) {
                 list($imgWidth, $imgHeight) = getimagesize($imagePath);
-                $boxWidth = 22;
+                $boxWidth = 19;
                 $boxHeight = 30;
                 $widthScale = $boxWidth / $imgWidth;
                 $heightScale = $boxHeight / $imgHeight;
@@ -762,42 +778,61 @@ class PsbController extends Controller
                 $finalWidth = $imgWidth * $scale;
                 $finalHeight = $imgHeight * $scale;
                 $x = 164 + ($boxWidth - $finalWidth) / 2;
-                $y = 5 + ($boxHeight - $finalHeight) / 2;
+                $y = 0 + ($boxHeight - $finalHeight) / 2;
                 $pdf->Image($imagePath, $x, $y, $finalWidth, $finalHeight);
             }
         }
 
         // Teks isi template
-        $pdf->SetXY(40, 32.7);
+        $pdf->SetXY(30, 36);
         $pdf->Write(0,  $getInstall->no_spk);
-        $pdf->SetXY(40, 43.5);
+        $pdf->SetXY(29.3, 42.5);
         $pdf->Write(0, $getInstall->pelanggan->nama_pelanggan);
-        $pdf->SetXY(40, 51);
-        $pdf->MultiCell(65, 3, $getInstall->pelanggan->alamat, 0, 'L');
-        $pdf->SetXY(40, 60.9);
+        $pdf->SetXY(29.3, 48.2);
+        $pdf->MultiCell(90, 3, $getInstall->pelanggan->alamat, 0, 'L');
+        $pdf->SetXY(29.3, 56.2);
         $pdf->Write(1, $getInstall->layanan);
-        $pdf->SetXY(40, 69.7);
+        $pdf->SetXY(29.5, 63);
         $pdf->Write(1, $getInstall->media);
-        $pdf->SetXY(40, 85.5);
+        $pdf->SetXY(29.3, 71.5);
         $pdf->Write(1, $getInstall->nama_site);
-        $pdf->SetXY(40, 87.5);
-        $pdf->MultiCell(140, 3, $getInstall->alamat_pemasangan, 0, 'L');
-        $pdf->SetXY(140, 32.7);
+        $pdf->SetXY(29.3, 74.8);
+        $pdf->MultiCell(150, 3, $getInstall->alamat_pemasangan, 0, 'L');
+        $pdf->SetXY(137, 36.2);
         $pdf->Write(0, $formattedDate);
-        $pdf->SetXY(140, 43.5);
+        $pdf->SetXY(137, 42.2);
         $pdf->Write(0, $getInstall->nama_pic);
-        $pdf->SetXY(140, 52.5);
+        $pdf->SetXY(137, 45.4);
         $pdf->Write(0, $getInstall->no_pic);
-        $pdf->SetXY(140, 60.9);
+        $pdf->SetXY(137, 49.5);
+        // Ubah format tanggal dulu
+        $tanggal = date('d F Y', strtotime($getInstall->tanggal_rfs));
+        $pdf->Write(1, $tanggal);
+        $pdf->SetXY(137.2, 56.4);
         $pdf->Write(1, $getInstall->no_jaringan);
-        $pdf->SetXY(140, 69.9);
-        $pdf->Write(1, $getInstall->bandwidth);
-        $pdf->SetXY(143, 70);
-        $pdf->Write(1, $getInstall->satuan);
-        $pdf->SetXY(140, 78.5);
+        $x = 137;
+        $y = 63.1;
+
+        $bandwidth = $getInstall->bandwidth;
+        $satuan    = $getInstall->satuan;
+
+        $pdf->SetXY($x, $y);
+        $pdf->Write(1, $bandwidth);
+
+        // hitung lebar teks bandwidth
+        $textWidth = $pdf->GetStringWidth($bandwidth);
+
+        // jarak kecil antar teks (atur sesuai kebutuhan)
+        $gap = 1;
+
+        // set posisi satuan tepat setelah bandwidth
+        $pdf->SetXY($x + $textWidth + $gap, $y);
+        $pdf->Write(1, $satuan);
+
+        $pdf->SetXY(56, 132);
         $pdf->Write(1, $getInstall->vlan);
-        $pdf->SetXY(64, 110.8);
-        $pdf->Write(0, $formattedDate);
+        $pdf->SetXY(56, 129);
+        $pdf->Write(1, $getInstall->nni);
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
@@ -835,7 +870,7 @@ class PsbController extends Controller
         $sanitizedFileName = str_replace(['/', '\\'], '-', $getInstall->no_spk);
 
         if (file_exists($tempQrPath)) {
-            $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
+            $pdf->Image($tempQrPath, 29.5, 260, 16, 16); // kanan bawah
         }
 
         return response()->streamDownload(function () use ($pdf, $tempQrPath) {
@@ -905,8 +940,7 @@ class PsbController extends Controller
         $pdf->Write(1, $getMaintenance->onlineBilling->satuan);
         $pdf->SetXY(140, 78.5);
         $pdf->Write(1, $getMaintenance->onlineBilling->vlan);
-        $pdf->SetXY(64, 110.8);
-        $pdf->Write(0, $formattedDate);
+
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
@@ -973,7 +1007,7 @@ class PsbController extends Controller
             $imagePath = storage_path('app/public/pelanggan/' . $getUpgrade->onlineBilling->pelanggan->foto);
             if (file_exists($imagePath)) {
                 list($imgWidth, $imgHeight) = getimagesize($imagePath);
-                $boxWidth = 22;
+                $boxWidth = 19;
                 $boxHeight = 30;
                 $widthScale = $boxWidth / $imgWidth;
                 $heightScale = $boxHeight / $imgHeight;
@@ -981,42 +1015,58 @@ class PsbController extends Controller
                 $finalWidth = $imgWidth * $scale;
                 $finalHeight = $imgHeight * $scale;
                 $x = 164 + ($boxWidth - $finalWidth) / 2;
-                $y = 5 + ($boxHeight - $finalHeight) / 2;
+                $y = 0 + ($boxHeight - $finalHeight) / 2;
                 $pdf->Image($imagePath, $x, $y, $finalWidth, $finalHeight);
             }
         }
 
         // Teks isi template
-        $pdf->SetXY(40, 32.7);
+        $pdf->SetXY(30, 36);
         $pdf->Write(0,  $getUpgrade->no_spk);
-        $pdf->SetXY(40, 43.5);
+        $pdf->SetXY(29.3, 42.5);
         $pdf->Write(0, $getUpgrade->onlineBilling->pelanggan->nama_pelanggan);
-        $pdf->SetXY(40, 51);
-        $pdf->MultiCell(65, 3, $getUpgrade->onlineBilling->pelanggan->alamat, 0, 'L');
-        $pdf->SetXY(40, 60.9);
+        $pdf->SetXY(29.3, 48.2);
+        $pdf->MultiCell(90, 3, $getUpgrade->onlineBilling->pelanggan->alamat, 0, 'L');
+        $pdf->SetXY(29.3, 56.2);
         $pdf->Write(1, $getUpgrade->onlineBilling->layanan);
-        $pdf->SetXY(40, 69.7);
+        $pdf->SetXY(29.5, 63);
         $pdf->Write(1, $getUpgrade->onlineBilling->media);
-        $pdf->SetXY(40, 85.5);
+        $pdf->SetXY(29.3, 71.5);
         $pdf->Write(1, $getUpgrade->onlineBilling->nama_site);
-        $pdf->SetXY(40, 87.5);
-        $pdf->MultiCell(140, 3, $getUpgrade->onlineBilling->alamat_pemasangan, 0, 'L');
-        $pdf->SetXY(140, 32.7);
+        $pdf->SetXY(29.3, 74.8);
+        $pdf->MultiCell(150, 3, $getUpgrade->onlineBilling->alamat_pemasangan, 0, 'L');
+        $pdf->SetXY(137, 36.2);
         $pdf->Write(0, $formattedDate);
-        $pdf->SetXY(140, 43.5);
+        $pdf->SetXY(137, 42.2);
         $pdf->Write(0, $getUpgrade->onlineBilling->nama_pic);
-        $pdf->SetXY(140, 52.5);
+        $pdf->SetXY(137, 45.4);
         $pdf->Write(0, $getUpgrade->onlineBilling->no_pic);
-        $pdf->SetXY(140, 60.9);
+
+        $pdf->SetXY(137.2, 56.4);
         $pdf->Write(1, $getUpgrade->onlineBilling->no_jaringan);
-        $pdf->SetXY(140, 69.9);
-        $pdf->Write(1, $getUpgrade->onlineBilling->bandwidth);
-        $pdf->SetXY(143, 70);
-        $pdf->Write(1, $getUpgrade->onlineBilling->satuan);
-        $pdf->SetXY(140, 78.5);
+        $x = 137;
+        $y = 63.1;
+
+        $bandwidth = $getUpgrade->bandwidth_baru;
+        $satuan    = $getUpgrade->satuan;
+
+        $pdf->SetXY($x, $y);
+        $pdf->Write(1, $bandwidth);
+
+        // hitung lebar teks bandwidth
+        $textWidth = $pdf->GetStringWidth($bandwidth);
+
+        // jarak kecil antar teks (atur sesuai kebutuhan)
+        $gap = 1;
+
+        // set posisi satuan tepat setelah bandwidth
+        $pdf->SetXY($x + $textWidth + $gap, $y);
+        $pdf->Write(1, $satuan);
+
+        $pdf->SetXY(56, 132);
         $pdf->Write(1, $getUpgrade->onlineBilling->vlan);
-        $pdf->SetXY(64, 110.8);
-        $pdf->Write(0, $formattedDate);
+        $pdf->SetXY(56, 129);
+        $pdf->Write(1, $getUpgrade->onlineBilling->nni);
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
@@ -1054,7 +1104,7 @@ class PsbController extends Controller
         $sanitizedFileName = str_replace(['/', '\\'], '-', $getUpgrade->no_spk);
 
         if (file_exists($tempQrPath)) {
-            $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
+            $pdf->Image($tempQrPath, 29.5, 260, 16, 16); // kanan bawah
         }
 
         return response()->streamDownload(function () use ($pdf, $tempQrPath) {
@@ -1083,7 +1133,7 @@ class PsbController extends Controller
             $imagePath = storage_path('app/public/pelanggan/' . $getDowngrade->onlineBilling->pelanggan->foto);
             if (file_exists($imagePath)) {
                 list($imgWidth, $imgHeight) = getimagesize($imagePath);
-                $boxWidth = 22;
+                $boxWidth = 19;
                 $boxHeight = 30;
                 $widthScale = $boxWidth / $imgWidth;
                 $heightScale = $boxHeight / $imgHeight;
@@ -1091,42 +1141,58 @@ class PsbController extends Controller
                 $finalWidth = $imgWidth * $scale;
                 $finalHeight = $imgHeight * $scale;
                 $x = 164 + ($boxWidth - $finalWidth) / 2;
-                $y = 5 + ($boxHeight - $finalHeight) / 2;
+                $y = 0 + ($boxHeight - $finalHeight) / 2;
                 $pdf->Image($imagePath, $x, $y, $finalWidth, $finalHeight);
             }
         }
 
         // Teks isi template
-        $pdf->SetXY(40, 32.7);
+        $pdf->SetXY(30, 36);
         $pdf->Write(0,  $getDowngrade->no_spk);
-        $pdf->SetXY(40, 43.5);
+        $pdf->SetXY(29.3, 42.5);
         $pdf->Write(0, $getDowngrade->onlineBilling->pelanggan->nama_pelanggan);
-        $pdf->SetXY(40, 51);
-        $pdf->MultiCell(65, 3, $getDowngrade->onlineBilling->pelanggan->alamat, 0, 'L');
-        $pdf->SetXY(40, 60.9);
+        $pdf->SetXY(29.3, 48.2);
+        $pdf->MultiCell(90, 3, $getDowngrade->onlineBilling->pelanggan->alamat, 0, 'L');
+        $pdf->SetXY(29.3, 56.2);
         $pdf->Write(1, $getDowngrade->onlineBilling->layanan);
-        $pdf->SetXY(40, 69.7);
+        $pdf->SetXY(29.5, 63);
         $pdf->Write(1, $getDowngrade->onlineBilling->media);
-        $pdf->SetXY(40, 85.5);
+        $pdf->SetXY(29.3, 71.5);
         $pdf->Write(1, $getDowngrade->onlineBilling->nama_site);
-        $pdf->SetXY(40, 87.5);
-        $pdf->MultiCell(140, 3, $getDowngrade->onlineBilling->alamat_pemasangan, 0, 'L');
-        $pdf->SetXY(140, 32.7);
+        $pdf->SetXY(29.3, 74.8);
+        $pdf->MultiCell(150, 3, $getDowngrade->onlineBilling->alamat_pemasangan, 0, 'L');
+        $pdf->SetXY(137, 36.2);
         $pdf->Write(0, $formattedDate);
-        $pdf->SetXY(140, 43.5);
+        $pdf->SetXY(137, 42.2);
         $pdf->Write(0, $getDowngrade->onlineBilling->nama_pic);
-        $pdf->SetXY(140, 52.5);
+        $pdf->SetXY(137, 45.4);
         $pdf->Write(0, $getDowngrade->onlineBilling->no_pic);
-        $pdf->SetXY(140, 60.9);
+
+        $pdf->SetXY(137.2, 56.4);
         $pdf->Write(1, $getDowngrade->onlineBilling->no_jaringan);
-        $pdf->SetXY(140, 69.9);
-        $pdf->Write(1, $getDowngrade->onlineBilling->bandwidth);
-        $pdf->SetXY(143, 70);
-        $pdf->Write(1, $getDowngrade->onlineBilling->satuan);
-        $pdf->SetXY(140, 78.5);
+        $x = 137;
+        $y = 63.1;
+
+        $bandwidth = $getDowngrade->bandwidth_baru;
+        $satuan    = $getDowngrade->satuan;
+
+        $pdf->SetXY($x, $y);
+        $pdf->Write(1, $bandwidth);
+
+        // hitung lebar teks bandwidth
+        $textWidth = $pdf->GetStringWidth($bandwidth);
+
+        // jarak kecil antar teks (atur sesuai kebutuhan)
+        $gap = 1;
+
+        // set posisi satuan tepat setelah bandwidth
+        $pdf->SetXY($x + $textWidth + $gap, $y);
+        $pdf->Write(1, $satuan);
+
+        $pdf->SetXY(56, 132);
         $pdf->Write(1, $getDowngrade->onlineBilling->vlan);
-        $pdf->SetXY(64, 110.8);
-        $pdf->Write(0, $formattedDate);
+        $pdf->SetXY(56, 129);
+        $pdf->Write(1, $getDowngrade->onlineBilling->nni);
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
@@ -1164,7 +1230,7 @@ class PsbController extends Controller
         $sanitizedFileName = str_replace(['/', '\\'], '-', $getDowngrade->no_spk);
 
         if (file_exists($tempQrPath)) {
-            $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
+            $pdf->Image($tempQrPath, 29.5, 260, 16, 16); // kanan bawah
         }
 
         return response()->streamDownload(function () use ($pdf, $tempQrPath) {
@@ -1193,7 +1259,7 @@ class PsbController extends Controller
             $imagePath = storage_path('app/public/pelanggan/' . $getGantivendor->onlineBilling->pelanggan->foto);
             if (file_exists($imagePath)) {
                 list($imgWidth, $imgHeight) = getimagesize($imagePath);
-                $boxWidth = 22;
+                $boxWidth = 19;
                 $boxHeight = 30;
                 $widthScale = $boxWidth / $imgWidth;
                 $heightScale = $boxHeight / $imgHeight;
@@ -1201,42 +1267,58 @@ class PsbController extends Controller
                 $finalWidth = $imgWidth * $scale;
                 $finalHeight = $imgHeight * $scale;
                 $x = 164 + ($boxWidth - $finalWidth) / 2;
-                $y = 5 + ($boxHeight - $finalHeight) / 2;
+                $y = 0 + ($boxHeight - $finalHeight) / 2;
                 $pdf->Image($imagePath, $x, $y, $finalWidth, $finalHeight);
             }
         }
 
         // Teks isi template
-        $pdf->SetXY(40, 32.7);
+        $pdf->SetXY(30, 36);
         $pdf->Write(0,  $getGantivendor->no_spk);
-        $pdf->SetXY(40, 43.5);
+        $pdf->SetXY(29.3, 42.5);
         $pdf->Write(0, $getGantivendor->onlineBilling->pelanggan->nama_pelanggan);
-        $pdf->SetXY(40, 51);
-        $pdf->MultiCell(65, 3, $getGantivendor->onlineBilling->pelanggan->alamat, 0, 'L');
-        $pdf->SetXY(40, 60.9);
+        $pdf->SetXY(29.3, 48.2);
+        $pdf->MultiCell(90, 3, $getGantivendor->onlineBilling->pelanggan->alamat, 0, 'L');
+        $pdf->SetXY(29.3, 56.2);
         $pdf->Write(1, $getGantivendor->onlineBilling->layanan);
-        $pdf->SetXY(40, 69.7);
+        $pdf->SetXY(29.5, 63);
         $pdf->Write(1, $getGantivendor->onlineBilling->media);
-        $pdf->SetXY(40, 85.5);
+        $pdf->SetXY(29.3, 71.5);
         $pdf->Write(1, $getGantivendor->onlineBilling->nama_site);
-        $pdf->SetXY(40, 87.5);
-        $pdf->MultiCell(140, 3, $getGantivendor->onlineBilling->alamat_pemasangan, 0, 'L');
-        $pdf->SetXY(140, 32.7);
+        $pdf->SetXY(29.3, 74.8);
+        $pdf->MultiCell(150, 3, $getGantivendor->onlineBilling->alamat_pemasangan, 0, 'L');
+        $pdf->SetXY(137, 36.2);
         $pdf->Write(0, $formattedDate);
-        $pdf->SetXY(140, 43.5);
+        $pdf->SetXY(137, 42.2);
         $pdf->Write(0, $getGantivendor->onlineBilling->nama_pic);
-        $pdf->SetXY(140, 52.5);
+        $pdf->SetXY(137, 45.4);
         $pdf->Write(0, $getGantivendor->onlineBilling->no_pic);
-        $pdf->SetXY(140, 60.9);
+
+        $pdf->SetXY(137.2, 56.4);
         $pdf->Write(1, $getGantivendor->onlineBilling->no_jaringan);
-        $pdf->SetXY(140, 69.9);
-        $pdf->Write(1, $getGantivendor->onlineBilling->bandwidth);
-        $pdf->SetXY(143, 70);
-        $pdf->Write(1, $getGantivendor->onlineBilling->satuan);
-        $pdf->SetXY(140, 78.5);
+        $x = 137;
+        $y = 63.1;
+
+        $bandwidth = $getGantivendor->onlineBilling->bandwidth;
+        $satuan    = $getGantivendor->onlineBilling->satuan;
+
+        $pdf->SetXY($x, $y);
+        $pdf->Write(1, $bandwidth);
+
+        // hitung lebar teks bandwidth
+        $textWidth = $pdf->GetStringWidth($bandwidth);
+
+        // jarak kecil antar teks (atur sesuai kebutuhan)
+        $gap = 1;
+
+        // set posisi satuan tepat setelah bandwidth
+        $pdf->SetXY($x + $textWidth + $gap, $y);
+        $pdf->Write(1, $satuan);
+
+        $pdf->SetXY(56, 132);
         $pdf->Write(1, $getGantivendor->onlineBilling->vlan);
-        $pdf->SetXY(64, 110.8);
-        $pdf->Write(0, $formattedDate);
+        $pdf->SetXY(56, 129);
+        $pdf->Write(1, $getGantivendor->onlineBilling->nni);
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
@@ -1274,7 +1356,7 @@ class PsbController extends Controller
         $sanitizedFileName = str_replace(['/', '\\'], '-', $getGantivendor->no_spk);
 
         if (file_exists($tempQrPath)) {
-            $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
+            $pdf->Image($tempQrPath, 29.5, 260, 16, 16); // kanan bawah
         }
 
         return response()->streamDownload(function () use ($pdf, $tempQrPath) {
@@ -1302,7 +1384,7 @@ class PsbController extends Controller
             $imagePath = storage_path('app/public/pelanggan/' . $getDismantle->onlineBilling->pelanggan->foto);
             if (file_exists($imagePath)) {
                 list($imgWidth, $imgHeight) = getimagesize($imagePath);
-                $boxWidth = 22;
+                $boxWidth = 19;
                 $boxHeight = 30;
                 $widthScale = $boxWidth / $imgWidth;
                 $heightScale = $boxHeight / $imgHeight;
@@ -1310,42 +1392,59 @@ class PsbController extends Controller
                 $finalWidth = $imgWidth * $scale;
                 $finalHeight = $imgHeight * $scale;
                 $x = 164 + ($boxWidth - $finalWidth) / 2;
-                $y = 5 + ($boxHeight - $finalHeight) / 2;
+                $y = 0 + ($boxHeight - $finalHeight) / 2;
                 $pdf->Image($imagePath, $x, $y, $finalWidth, $finalHeight);
             }
         }
 
+
         // Teks isi template
-        $pdf->SetXY(40, 32.7);
+        $pdf->SetXY(30, 36);
         $pdf->Write(0,  $getDismantle->no_spk);
-        $pdf->SetXY(40, 43.5);
+        $pdf->SetXY(29.3, 42.5);
         $pdf->Write(0, $getDismantle->onlineBilling->pelanggan->nama_pelanggan);
-        $pdf->SetXY(40, 51);
-        $pdf->MultiCell(65, 3, $getDismantle->onlineBilling->pelanggan->alamat, 0, 'L');
-        $pdf->SetXY(40, 60.9);
+        $pdf->SetXY(29.3, 48.2);
+        $pdf->MultiCell(90, 3, $getDismantle->onlineBilling->pelanggan->alamat, 0, 'L');
+        $pdf->SetXY(29.3, 56.2);
         $pdf->Write(1, $getDismantle->onlineBilling->layanan);
-        $pdf->SetXY(40, 69.7);
+        $pdf->SetXY(29.5, 63);
         $pdf->Write(1, $getDismantle->onlineBilling->media);
-        $pdf->SetXY(40, 85.5);
+        $pdf->SetXY(29.3, 71.5);
         $pdf->Write(1, $getDismantle->onlineBilling->nama_site);
-        $pdf->SetXY(40, 87.5);
-        $pdf->MultiCell(140, 3, $getDismantle->onlineBilling->alamat_pemasangan, 0, 'L');
-        $pdf->SetXY(140, 32.7);
+        $pdf->SetXY(29.3, 74.8);
+        $pdf->MultiCell(150, 3, $getDismantle->onlineBilling->alamat_pemasangan, 0, 'L');
+        $pdf->SetXY(137, 36.2);
         $pdf->Write(0, $formattedDate);
-        $pdf->SetXY(140, 43.5);
+        $pdf->SetXY(137, 42.2);
         $pdf->Write(0, $getDismantle->onlineBilling->nama_pic);
-        $pdf->SetXY(140, 52.5);
+        $pdf->SetXY(137, 45.4);
         $pdf->Write(0, $getDismantle->onlineBilling->no_pic);
-        $pdf->SetXY(140, 60.9);
+
+        $pdf->SetXY(137.2, 56.4);
         $pdf->Write(1, $getDismantle->onlineBilling->no_jaringan);
-        $pdf->SetXY(140, 69.9);
-        $pdf->Write(1, $getDismantle->onlineBilling->bandwidth);
-        $pdf->SetXY(143, 70);
-        $pdf->Write(1, $getDismantle->onlineBilling->satuan);
-        $pdf->SetXY(140, 78.5);
+        $x = 137;
+        $y = 63.1;
+
+        $bandwidth = $getDismantle->onlineBilling->bandwidth;
+        $satuan    = $getDismantle->onlineBilling->satuan;
+
+        $pdf->SetXY($x, $y);
+        $pdf->Write(1, $bandwidth);
+
+        // hitung lebar teks bandwidth
+        $textWidth = $pdf->GetStringWidth($bandwidth);
+
+        // jarak kecil antar teks (atur sesuai kebutuhan)
+        $gap = 1;
+
+        // set posisi satuan tepat setelah bandwidth
+        $pdf->SetXY($x + $textWidth + $gap, $y);
+        $pdf->Write(1, $satuan);
+
+        $pdf->SetXY(56, 132);
         $pdf->Write(1, $getDismantle->onlineBilling->vlan);
-        $pdf->SetXY(64, 110.8);
-        $pdf->Write(0, $formattedDate);
+        $pdf->SetXY(56, 129);
+        $pdf->Write(1, $getDismantle->onlineBilling->nni);
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
@@ -1383,7 +1482,7 @@ class PsbController extends Controller
         $sanitizedFileName = str_replace(['/', '\\'], '-', $getDismantle->no_spk);
 
         if (file_exists($tempQrPath)) {
-            $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
+            $pdf->Image($tempQrPath, 29.5, 260, 16, 16); // kanan bawah
         }
 
         return response()->streamDownload(function () use ($pdf, $tempQrPath) {
@@ -1412,7 +1511,7 @@ class PsbController extends Controller
             $imagePath = storage_path('app/public/pelanggan/' . $getRelokasi->onlineBilling->pelanggan->foto);
             if (file_exists($imagePath)) {
                 list($imgWidth, $imgHeight) = getimagesize($imagePath);
-                $boxWidth = 22;
+                $boxWidth = 19;
                 $boxHeight = 30;
                 $widthScale = $boxWidth / $imgWidth;
                 $heightScale = $boxHeight / $imgHeight;
@@ -1420,42 +1519,59 @@ class PsbController extends Controller
                 $finalWidth = $imgWidth * $scale;
                 $finalHeight = $imgHeight * $scale;
                 $x = 164 + ($boxWidth - $finalWidth) / 2;
-                $y = 5 + ($boxHeight - $finalHeight) / 2;
+                $y = 0 + ($boxHeight - $finalHeight) / 2;
                 $pdf->Image($imagePath, $x, $y, $finalWidth, $finalHeight);
             }
         }
 
+
         // Teks isi template
-        $pdf->SetXY(40, 32.7);
+        $pdf->SetXY(30, 36);
         $pdf->Write(0,  $getRelokasi->no_spk);
-        $pdf->SetXY(40, 43.5);
+        $pdf->SetXY(29.3, 42.5);
         $pdf->Write(0, $getRelokasi->onlineBilling->pelanggan->nama_pelanggan);
-        $pdf->SetXY(40, 51);
-        $pdf->MultiCell(65, 3, $getRelokasi->onlineBilling->pelanggan->alamat, 0, 'L');
-        $pdf->SetXY(40, 60.9);
+        $pdf->SetXY(29.3, 48.2);
+        $pdf->MultiCell(90, 3, $getRelokasi->onlineBilling->pelanggan->alamat, 0, 'L');
+        $pdf->SetXY(29.3, 56.2);
         $pdf->Write(1, $getRelokasi->onlineBilling->layanan);
-        $pdf->SetXY(40, 69.7);
+        $pdf->SetXY(29.5, 63);
         $pdf->Write(1, $getRelokasi->onlineBilling->media);
-        $pdf->SetXY(40, 85.5);
+        $pdf->SetXY(29.3, 71.5);
         $pdf->Write(1, $getRelokasi->onlineBilling->nama_site);
-        $pdf->SetXY(40, 87.5);
-        $pdf->MultiCell(140, 3, $getRelokasi->onlineBilling->alamat_pemasangan, 0, 'L');
-        $pdf->SetXY(140, 32.7);
+        $pdf->SetXY(29.3, 74.8);
+        $pdf->MultiCell(150, 3, $getRelokasi->onlineBilling->alamat_pemasangan, 0, 'L');
+        $pdf->SetXY(137, 36.2);
         $pdf->Write(0, $formattedDate);
-        $pdf->SetXY(140, 43.5);
+        $pdf->SetXY(137, 42.2);
         $pdf->Write(0, $getRelokasi->onlineBilling->nama_pic);
-        $pdf->SetXY(140, 52.5);
+        $pdf->SetXY(137, 45.4);
         $pdf->Write(0, $getRelokasi->onlineBilling->no_pic);
-        $pdf->SetXY(140, 60.9);
+
+        $pdf->SetXY(137.2, 56.4);
         $pdf->Write(1, $getRelokasi->onlineBilling->no_jaringan);
-        $pdf->SetXY(140, 69.9);
-        $pdf->Write(1, $getRelokasi->onlineBilling->bandwidth);
-        $pdf->SetXY(143, 70);
-        $pdf->Write(1, $getRelokasi->onlineBilling->satuan);
-        $pdf->SetXY(140, 78.5);
+        $x = 137;
+        $y = 63.1;
+
+        $bandwidth = $getRelokasi->onlineBilling->bandwidth;
+        $satuan    = $getRelokasi->onlineBilling->satuan;
+
+        $pdf->SetXY($x, $y);
+        $pdf->Write(1, $bandwidth);
+
+        // hitung lebar teks bandwidth
+        $textWidth = $pdf->GetStringWidth($bandwidth);
+
+        // jarak kecil antar teks (atur sesuai kebutuhan)
+        $gap = 1;
+
+        // set posisi satuan tepat setelah bandwidth
+        $pdf->SetXY($x + $textWidth + $gap, $y);
+        $pdf->Write(1, $satuan);
+
+        $pdf->SetXY(56, 132);
         $pdf->Write(1, $getRelokasi->onlineBilling->vlan);
-        $pdf->SetXY(64, 110.8);
-        $pdf->Write(0, $formattedDate);
+        $pdf->SetXY(56, 129);
+        $pdf->Write(1, $getRelokasi->onlineBilling->nni);
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
@@ -1493,7 +1609,7 @@ class PsbController extends Controller
         $sanitizedFileName = str_replace(['/', '\\'], '-', $getRelokasi->no_spk);
 
         if (file_exists($tempQrPath)) {
-            $pdf->Image($tempQrPath, 29.5, 266, 16, 16); // kanan bawah
+            $pdf->Image($tempQrPath, 29.5, 260, 16, 16); // kanan bawah
         }
 
         return response()->streamDownload(function () use ($pdf, $tempQrPath) {
