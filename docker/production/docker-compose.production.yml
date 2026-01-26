@@ -9,6 +9,7 @@ services:
     volumes:
       - app-code-production:/var/www
       - storage-production:/var/www/storage/app/public
+      - ../../docker/production/php/conf/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     env_file:
       - ../../.env.prod
     depends_on:
