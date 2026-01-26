@@ -630,7 +630,7 @@ class PsbController extends Controller
         $getSurvey = WorkOrderSurvey::findOrFail($id);
         $tanggalSurvey = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalSurvey)->translatedFormat('l, d F Y');
-        $templatePath = resource_path('pdf/template_survey1.pdf');
+        $templatePath = resource_path('pdf/survey.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -643,7 +643,7 @@ class PsbController extends Controller
             $imagePath = storage_path('app/public/pelanggan/' . $getSurvey->pelanggan->foto);
             if (file_exists($imagePath)) {
                 list($imgWidth, $imgHeight) = getimagesize($imagePath);
-                $boxWidth = 22;
+                $boxWidth = 19;
                 $boxHeight = 30;
                 $widthScale = $boxWidth / $imgWidth;
                 $heightScale = $boxHeight / $imgHeight;
@@ -651,42 +651,45 @@ class PsbController extends Controller
                 $finalWidth = $imgWidth * $scale;
                 $finalHeight = $imgHeight * $scale;
                 $x = 164 + ($boxWidth - $finalWidth) / 2;
-                $y = 5 + ($boxHeight - $finalHeight) / 2;
+                $y = 0 + ($boxHeight - $finalHeight) / 2;
                 $pdf->Image($imagePath, $x, $y, $finalWidth, $finalHeight);
             }
         }
 
         // Teks isi template
-        $pdf->SetXY(40, 32.7);
+        $pdf->SetXY(30, 36);
         $pdf->Write(0,  $getSurvey->no_spk);
-        $pdf->SetXY(40, 43.5);
+        $pdf->SetXY(29.3, 42.5);
         $pdf->Write(0, $getSurvey->pelanggan->nama_pelanggan);
-        $pdf->SetXY(40, 51);
-        $pdf->MultiCell(65, 3, $getSurvey->pelanggan->alamat, 0, 'L');
-        $pdf->SetXY(40, 60.9);
+        $pdf->SetXY(29.3, 48.2);
+        $pdf->MultiCell(90, 3, $getSurvey->pelanggan->alamat, 0, 'L');
+        $pdf->SetXY(29.3, 56.2);
         $pdf->Write(1, $getSurvey->layanan);
-        $pdf->SetXY(40, 69.7);
+        $pdf->SetXY(29.5, 63);
         $pdf->Write(1, $getSurvey->media);
-        $pdf->SetXY(40, 85.5);
+        $pdf->SetXY(29.3, 71.5);
         $pdf->Write(1, $getSurvey->nama_site);
-        $pdf->SetXY(40, 87.5);
+        $pdf->SetXY(29.3, 74.5);
         $pdf->MultiCell(140, 3, $getSurvey->alamat_pemasangan, 0, 'L');
-        $pdf->SetXY(140, 32.7);
+        $pdf->SetXY(137, 36.2);
         $pdf->Write(0, $formattedDate);
-        $pdf->SetXY(140, 43.5);
+        $pdf->SetXY(137, 42.2);
         $pdf->Write(0, $getSurvey->nama_pic);
-        $pdf->SetXY(140, 52.5);
+        $pdf->SetXY(145, 42.2);
         $pdf->Write(0, $getSurvey->no_pic);
-        $pdf->SetXY(140, 60.9);
+        $pdf->SetXY(137, 49.5);
+        // Ubah format tanggal dulu
+        $tanggal = date('d F Y', strtotime($getSurvey->tanggal_rfs));
+        $pdf->Write(1, $tanggal);
+        $pdf->SetXY(137.2, 56.4);
         $pdf->Write(1, $getSurvey->no_jaringan);
-        $pdf->SetXY(140, 69.9);
+        $pdf->SetXY(137, 63.1);
         $pdf->Write(1, $getSurvey->bandwidth);
-        $pdf->SetXY(143, 70);
+        $pdf->SetXY(140, 63.1);
         $pdf->Write(1, $getSurvey->satuan);
-        $pdf->SetXY(140, 78.5);
+        $pdf->SetXY(137, 78.5);
         $pdf->Write(1, $getSurvey->vlan);
-        $pdf->SetXY(62, 110.8);
-        $pdf->Write(0, $formattedDate);
+
         $writer = new PngWriter();
 
         // Ambil data user login dan survey
@@ -737,7 +740,7 @@ class PsbController extends Controller
         $tanggalInstalasi = now()->format('d-m-Y');
 
         $formattedDate = Carbon::parse($tanggalInstalasi)->translatedFormat('l, d F Y');
-        $templatePath = resource_path('pdf/template_instalasi.pdf');
+        $templatePath = resource_path('pdf/instalasi.pdf');
 
 
         $pdf = new FPDI();
@@ -957,7 +960,7 @@ class PsbController extends Controller
         $getUpgrade = WorkOrderUpgrade::findOrFail($id);
         $tanggalUpgrade = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalUpgrade)->translatedFormat('l, d F Y');
-        $templatePath = resource_path('pdf/template_upgrade.pdf');
+        $templatePath = resource_path('pdf/upgrade.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -1067,7 +1070,7 @@ class PsbController extends Controller
         $getDowngrade = WorkOrderDowngrade::findOrFail($id);
         $tanggalDowngrade = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalDowngrade)->translatedFormat('l, d F Y');
-        $templatePath = resource_path('pdf/template_downgrade.pdf');
+        $templatePath = resource_path('pdf/downgrade.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -1177,7 +1180,7 @@ class PsbController extends Controller
         $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
         $tanggalGantiVendor = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalGantiVendor)->translatedFormat('l, d F Y');
-        $templatePath = resource_path('pdf/template_gantivendor.pdf');
+        $templatePath = resource_path('pdf/gantivendor.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -1286,7 +1289,7 @@ class PsbController extends Controller
         $getDismantle = WorkOrderDismantle::findOrFail($id);
         $tanggalDismantle = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalDismantle)->translatedFormat('l, d F Y');
-        $templatePath = resource_path('pdf/template_dismantle.pdf');
+        $templatePath = resource_path('pdf/dismantle.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
@@ -1396,7 +1399,7 @@ class PsbController extends Controller
         $getRelokasi = WorkOrderRelokasi::findOrFail($id);
         $tanggalRelokasi = now()->format('d-m-Y');
         $formattedDate = Carbon::parse($tanggalRelokasi)->translatedFormat('l, d F Y');
-        $templatePath = resource_path('pdf/template_relokasi.pdf');
+        $templatePath = resource_path('pdf/relokasi.pdf');
 
         $pdf = new FPDI();
         $pdf->AddPage();
