@@ -922,10 +922,16 @@ class PsbController extends Controller
         $pdf->Write(1, $getMaintenance->onlineBilling->layanan);
         $pdf->SetXY(40, 69.7);
         $pdf->Write(1, $getMaintenance->onlineBilling->media);
-        $pdf->SetXY(40, 85.5);
+        $pdf->SetXY(40, 85.3);
         $pdf->Write(1, $getMaintenance->onlineBilling->nama_site);
-        $pdf->SetXY(40, 87.5);
-        $pdf->MultiCell(140, 3, $getMaintenance->onlineBilling->alamat_pemasangan, 0, 'L');
+        $pdf->SetXY(40, 87);
+
+        $text = $getMaintenance->onlineBilling->alamat_pemasangan;
+        $text = preg_replace("/\r|\n/", " ", $text);
+        $text = preg_replace('/\s+/', ' ', trim($text));
+
+        $pdf->MultiCell(140, 3.7, $text, 0, 'L');
+
         $pdf->SetXY(140, 32.7);
         $pdf->Write(0, $formattedDate);
         $pdf->SetXY(140, 43.5);

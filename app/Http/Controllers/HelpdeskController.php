@@ -15,6 +15,7 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\OnlineBilling;
 use App\Models\RequestBarang;
+use App\Models\InstallProgress;
 use App\Models\WorkOrderInstall;
 use App\Models\ReqBarangProgress;
 use App\Mail\PermintaanBarangMail;
@@ -1282,6 +1283,83 @@ class HelpdeskController extends Controller
         $data = array_merge($this->ambilDataRole(), compact('statuses', 'onlinebilling', 'notifications'));
 
         return $this->renderView('sitedismantle_show', $data);
+    }
+
+    public function instalasi(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey
+        $query = WorkOrderInstall::orderBy('created_at', 'desc');
+
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
+                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
+        $getInstall = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('instalasi', $data);
+    }
+    public function showinstalasi($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // // Gabungkan data survey ke dalam data role
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = InstallProgress::where('work_order_install_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getInstall = WorkOrderInstall::with('admin')->findOrFail($id);
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getInstall', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('instalasi_show', $data);
     }
 }
 

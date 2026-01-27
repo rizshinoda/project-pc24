@@ -102,31 +102,28 @@
                             <div class="card h-100">
                                 <div class="card-body ">
                                     <h5 class="card-title">Details:</h5>
-                                    <p><strong>No Order: </strong> {{ $getMaintenance->no_spk }}</p>
-                                    <p><strong>Diterbitkan oleh:</strong> {{ $getMaintenance->admin->name }}</p>
-                                    <p><strong>Tanggal Diterbitkan:</strong> {{ $getMaintenance->created_at->translatedFormat('d M Y, H:i:s') }}</p>
-                                    <p><strong>Tanggal Maintenance:</strong>{{ \Carbon\Carbon::parse($getMaintenance->tanggal_maintenance)->translatedFormat('d M Y') }}
-                                    </p>
-
-                                    <p><strong>Status:</strong>
-                                        @if($getMaintenance->status=='Pending')
+                                    <p><strong>No Order: </strong> {{ $getInstall->no_spk }}</p>
+                                    <p><strong>No Survey:</strong> {{ $getInstall->survey_id ? $getInstall->survey->no_spk : '-' }}</p>
+                                    <p><strong>Diterbitkan oleh:</strong> {{ $getInstall->admin->name }}</p>
+                                    <p><strong>Tanggal Diterbitkan:</strong> {{ $getInstall->created_at->translatedFormat('d M Y, H:i:s') }}</p>
+                                    <p><strong>Status:</strong> @if($getInstall->status=='Pending')
                                         <span class="badge badge-pill badge-danger">Pending</span>
-                                        @elseif($getMaintenance->status=='On Progress')
+                                        @elseif($getInstall->status=='On Progress')
                                         <span class="badge badge-pill badge-info">On Progress</span>
-                                        @elseif($getMaintenance->status=='Shipped')
+                                        @elseif($getInstall->status=='Shipped')
                                         <span class="badge badge-pill badge-primary">Shipped</span>
-                                        @elseif($getMaintenance->status=='Rejected')
+                                        @elseif($getInstall->status=='Rejected')
                                         <span class="badge badge-pill badge-dark">Rejected</span>
-                                        @elseif($getMaintenance->status=='Canceled')
+                                        @elseif($getInstall->status=='Canceled')
                                         <span class="badge badge-pill badge-warning">Cancelled</span>
-                                        @elseif($getMaintenance->status=='Completed')
+                                        @elseif($getInstall->status=='Completed')
                                         <span class="badge badge-pill badge-success">Completed</span>
                                         @endif
                                     </p>
                                     <br>
                                     <!-- Foto Pelanggan -->
-                                    @if($getMaintenance->onlineBilling->pelanggan && $getMaintenance->onlineBilling->pelanggan->foto)
-                                    <img src="{{ asset('storage/pelanggan/' . $getMaintenance->onlineBilling->pelanggan->foto) }}" alt="Foto Pelanggan" style="width: 150px; height: auto;">
+                                    @if($getInstall->pelanggan && $getInstall->pelanggan->foto)
+                                    <img src="{{ asset('storage/pelanggan/' . $getInstall->pelanggan->foto) }}" alt="Foto Pelanggan" style="width: 150px; height: auto;">
                                     @else
                                     <p>Tidak ada foto pelanggan</p>
                                     @endif
@@ -139,18 +136,16 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">Pelanggan: </h5>
-                                    <p><strong>Nama Pelanggan:</strong> {{ $getMaintenance->onlineBilling->pelanggan->nama_pelanggan }}</p>
-                                    <p><strong>No Jaringan:</strong> {{ $getMaintenance->onlineBilling->no_jaringan}}</p>
-                                    <p><strong>Nama Gedung:</strong> {{ $getMaintenance->onlineBilling->pelanggan->nama_gedung}}</p>
-                                    <p><strong>Alamat:</strong> {{ $getMaintenance->onlineBilling->pelanggan->alamat}}</p>
-                                    <p><strong>Layanan:</strong> {{ $getMaintenance->onlineBilling->layanan }}</p>
-                                    <p>
-                                        <strong>Volume:</strong>
-                                        {{ $getMaintenance->onlineBilling->bandwidth }} {{ $getMaintenance->onlineBilling->satuan }}
+                                    <p><strong>Nama Pelanggan:</strong> {{ $getInstall->pelanggan->nama_pelanggan }}</p>
+                                    <p><strong>No Jaringan:</strong> {{ $getInstall->no_jaringan}}</p>
+                                    <p><strong>Nama Gedung:</strong> {{ $getInstall->pelanggan->nama_gedung}}</p>
+                                    <p><strong>Alamat:</strong> {{ $getInstall->pelanggan->alamat}}</p>
+                                    <p><strong>Layanan:</strong> {{ $getInstall->layanan }}</p>
+                                    <p><strong>Volume:</strong> {{ $getInstall->bandwidth }} {{ $getInstall->satuan }}</p>
+                                    <p><strong>NNI:</strong> {{ $getInstall->nni }}</p>
 
-                                    </p>
-                                    <p><strong>Vlan:</strong> {{ $getMaintenance->onlineBilling->vlan }}</p>
-                                    <p><strong>Vendor:</strong> {{ $getMaintenance->onlineBilling->vendor?->nama_vendor }}</p>
+                                    <p><strong>Vlan:</strong> {{ $getInstall->vlan }}</p>
+                                    <p><strong>Vendor:</strong> {{ $getInstall->vendor?->nama_vendor }}</p>
 
                                 </div>
                             </div>
@@ -161,14 +156,15 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">Site: </h5>
-                                    <p><strong>Nama Perusahaan:</strong> {{ $getMaintenance->onlineBilling->instansi?->nama_instansi }}</p>
-                                    <p><strong>Nama Site:</strong> {{ $getMaintenance->onlineBilling->nama_site }}</p>
-                                    <p><strong>Alamat:</strong> {{ $getMaintenance->onlineBilling->alamat_pemasangan }}</p>
-                                    <p><strong>PIC:</strong> {{ $getMaintenance->onlineBilling->nama_pic }}</p>
-                                    <p><strong>Nomer PIC:</strong> {{ $getMaintenance->onlineBilling->no_pic }}</p>
-                                    <p><strong>Alamat Baru:</strong> {{ $getMaintenance->alamat_pemasangan_baru }}</p>
-                                    <p><strong>Keterangan:</strong> {{ $getMaintenance->keterangan }}</p>
-                                    <p><strong>Barang non stock:</strong> {{ $getMaintenance->non_stock }}</p>
+                                    <p><strong>Nama Perusahaan:</strong> {{ $getInstall->instansi?->nama_instansi }}</p>
+                                    <p><strong>Nama Site:</strong> {{ $getInstall->nama_site }}</p>
+                                    <p><strong>Alamat:</strong> {{ $getInstall->alamat_pemasangan }}</p>
+                                    <p><strong>PIC:</strong> {{ $getInstall->nama_pic }}</p>
+                                    <p><strong>Nomer PIC:</strong> {{ $getInstall->no_pic }}</p>
+                                    <p><strong>Tanggal RFS:</strong> {{ \Carbon\Carbon::parse($getInstall->tanggal_rfs)->translatedFormat('d M Y') }}</p>
+                                    <p><strong>Durasi:</strong> {{ $getInstall->durasi }} {{ $getInstall->nama_durasi }}</p>
+                                    <p><strong>Keterangan:</strong> {{ $getInstall->keterangan }}</p>
+                                    <p><strong>Barang non stock:</strong> {{ $getInstall->non_stock }}</p>
 
                                 </div>
                             </div>
@@ -180,7 +176,7 @@
                         $steps = ['Pending', 'On Progress', 'Shipped', 'Completed'];
 
                         // Ambil status dari progress
-                        $currentStatus = ucfirst($getMaintenance->status ?? 'Pending');
+                        $currentStatus = ucfirst($getInstall->status ?? 'Pending');
 
                         // Cek apakah status termasuk flow gagal
                         $isCanceledOrRejected = in_array(strtolower($currentStatus), ['canceled', 'cancelled', 'rejected']);
@@ -221,6 +217,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Detail Barang</h4>
                                     <div class=" table-responsive">
+
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
@@ -233,7 +230,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($getMaintenance->WorkOrderMaintenanceDetail as $detail)
+                                                @foreach ($getInstall->WorkOrderInstallDetail as $detail)
                                                 <tr>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->jenis->nama_jenis }}</td>
@@ -275,7 +272,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($getMaintenance->barangKeluar as $barangKeluar)
+                                                @forelse ($getInstall->barangKeluar as $barangKeluar)
                                                 <tr>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->user->name }}</td>
@@ -301,8 +298,19 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <div class="form-group">
+                                        @if ($getInstall->status === 'approved' || $getInstall->status === 'shipped')
+                                        <!-- Tombol Selesai -->
+                                        <button type="button" class="btn btn-success" onclick="confirmCompletion('{{ route('ga.update_status', ['getInstallId' => $getInstall->id, 'status' => 'completed']) }}')">
+                                            <i class="fa fa-check"></i> Selesai
+                                        </button>
 
-
+                                        <!-- Tombol Kirim -->
+                                        <button type="button" class="btn btn-primary" onclick="confirmShipment('{{ route('ga.update_status', ['getInstallId' => $getInstall->id, 'status' => 'shipped']) }}')">
+                                            <i class="fa fa-truck"></i> Kirim
+                                        </button>
+                                        @endif
+                                    </div>
 
                                 </div>
                             </div>
@@ -312,7 +320,8 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title">Progres Maintenance</h4>
+                                    <h4 class="card-title">Progres Instalasi</h4>
+
 
                                     <div class=" table-responsive">
 
@@ -333,16 +342,17 @@
                                                 <tr>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $progress->created_at->translatedFormat('d F Y, H:i') }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $progress->userPSB->name }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $progress->user->name }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">@if($progress->status=='Pending')
                                                         <span class="badge badge-pill badge-danger">Pending</span>
                                                         @elseif($progress->status=='On Progress')
                                                         <span class="badge badge-pill badge-info">On Progress</span>
-                                                        @elseif($progress->status=='Rejected')
-                                                        <span class="badge badge-pill badge-dark">Rejected</span>
+                                                        @elseif($progress->status=='Canceled')
+                                                        <span class="badge badge-pill badge-warning">Cancelled</span>
                                                         @elseif($progress->status=='Completed')
                                                         <span class="badge badge-pill badge-success">Completed</span>
-
+                                                        @elseif($progress->status=='Shipped')
+                                                        <span class="badge badge-pill badge-primary">Shipped</span>
                                                         @endif
                                                     </td>
                                                     <td style=" text-align: center; vertical-align: middle;">
@@ -400,18 +410,13 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <!-- Tombol Kembali -->
-                                    <a href="{{ route('hd.maintenance') }}" class="btn btn-info mt-3">
-                                        <i class="fa fa-arrow-left"></i> Kembali
-                                    </a>
+                                    <a href="{{ route('hd.instalasi') }}" class="btn btn-info mt-3"><i class="fa fa-arrow-left"></i> Kembali</a>
+
 
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
-
                 </div>
 
                 <!-- content-wrapper ends -->

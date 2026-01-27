@@ -50,6 +50,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{url('helpdesk/gantivendor')}}">Ganti Vendor</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('helpdesk/instalasi')}}">Instalasi</a>
+                                </li>
                             </ul>
                         </div>
                     </li>

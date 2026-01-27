@@ -356,6 +356,8 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
     Route::patch('notifications/{id}/mark-as-read/hd', [HelpdeskController::class, 'markAsReadhd'])->name('notifications.markAsReadhd');
     Route::get('helpdesk/requestbarang/{id}/print/requestbarang', [HelpdeskController::class, 'printSuratRequest'])->name('hd.request_barang.print');
 
+    Route::get('helpdesk/instalasi', [HelpdeskController::class, 'instalasi'])->name('hd.instalasi');
+    Route::get('helpdesk/instalasi/{id}', [HelpdeskController::class, 'showinstalasi'])->name('hd.instalasi.show');
 
     Route::get('helpdesk/maintenance', [HelpdeskController::class, 'maintenance'])->name('hd.maintenance');
     Route::get('helpdesk/maintenance/create/{id}', [HelpdeskController::class, 'maintenanceCreate'])->name('hd.maintenance_create');
