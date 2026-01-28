@@ -23,12 +23,15 @@ use App\Models\WorkOrderDismantle;
 use App\Models\GantiVendorProgress;
 use App\Models\MaintenanceProgress;
 use Illuminate\Support\Facades\Log;
+use App\Exports\OnlineBillingExport;
+use App\Imports\OnlineBillingImport;
 use App\Mail\MaintenanceRequestMail;
 use App\Models\RequestBarangDetails;
 use App\Models\WorkOrderGantiVendor;
 use App\Models\WorkOrderMaintenance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\RequestBarangStockBarang;
 use App\Models\WorkOrderMaintenanceDetail;
 
@@ -1360,6 +1363,11 @@ class HelpdeskController extends Controller
 
         // Render view berdasarkan role
         return $this->renderView('instalasi_show', $data);
+    }
+
+    public function exportOB()
+    {
+        return Excel::download(new OnlineBillingExport, ' Laporan OnlineBilling.xlsx');
     }
 }
 
