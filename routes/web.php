@@ -379,6 +379,7 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
     Route::get('helpdesk/OB/{id}', [HelpdeskController::class, 'showOB'])->name('hd.OB_show');
     Route::get('helpdesk/sitedismantle', [HelpdeskController::class, 'sitedismantle'])->name('hd.sitedismantle');
     Route::get('helpdesk/sitedismantle{id}', [HelpdeskController::class, 'showsitedismantle'])->name('hd.showsitedismantle');
+    Route::get('helpdesk/Online-Billing/export', [HelpdeskController::class, 'exportOB'])->name('work-OB.export');
 
 
     Route::get('helpdesk/chat', Index::class)->name('helpdesk.chat.index');

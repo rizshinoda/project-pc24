@@ -94,14 +94,15 @@
                                             <div class="form-group row">
                                                 <label for="online_billing_id" class="col-sm-4 col-form-label">Pilih Client</label>
                                                 <div class="col-sm-8">
-                                                    <select name="online_billing_id" id="online_billing_id" class="form-control">
+                                                    <select name="online_billing_id" id="online_billing_id" class="form-control select2">
                                                         <option value="">-- Pilih Client --</option>
                                                         @foreach ($clients as $client)
                                                         <option value="{{ $client->id }}">
-                                                            {{ $client->pelanggan->nama_pelanggan}} / {{ $client->nama_site }}
+                                                            {{ $client->pelanggan->nama_pelanggan }} / {{ $client->nama_site }}
                                                         </option>
                                                         @endforeach
                                                     </select>
+
                                                 </div>
                                             </div>
                                             <div class="form-group row">

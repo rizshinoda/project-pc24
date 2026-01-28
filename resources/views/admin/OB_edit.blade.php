@@ -168,7 +168,7 @@
                                             <div class="form-group row">
                                                 <label for="alamat" class="col-sm-4 col-form-label">Alamat</label>
                                                 <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="alamat" name="alamat" value="{{ $getOB->alamat }}" readonly>
+                                                    <textarea type="text" class="form-control" id="alamat" name="alamat" value="{{ $getOB->alamat }}" rows="4" readonly></textarea>
                                                 </div>
                                             </div>
 
@@ -379,7 +379,7 @@
                                             <div class="form-group row">
                                                 <label for="no_pelanggan" class="col-sm-4 col-form-label">Alamat Pemasangan</label>
                                                 <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="alamat_pemasangan" name="alamat_pemasangan" value="{{ old('alamat_pemasangan', $getOB->alamat_pemasangan) }}" required>
+                                                    <textarea type="text" class="form-control" id="alamat_pemasangan" name="alamat_pemasangan" rows="4" required>{{$getOB->alamat_pemasangan}}</textarea>
                                                 </div>
                                             </div>
                                             <div class="form-group row">

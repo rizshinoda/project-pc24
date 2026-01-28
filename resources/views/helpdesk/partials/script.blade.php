@@ -349,52 +349,96 @@
         chart.render();
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+
         const clientSelect = document.getElementById('online_billing_id');
         const subjectManual = document.getElementById('subject_manual');
 
+        /* ===============================
+           INIT SELECT2
+        =============================== */
+        const select2Instance = $('#online_billing_id').select2({
+            placeholder: '-- Pilih Client --',
+            allowClear: true,
+            width: '100%'
+        });
+
+        // Styling select2 via JS (aman & lokal)
+        setTimeout(() => {
+            const container = $('#online_billing_id').next('.select2-container');
+
+            container.find('.select2-selection--single').css({
+                height: '38px',
+                padding: '6px 12px'
+            });
+
+            container.find('.select2-selection__rendered').css({
+                lineHeight: '24px'
+            });
+
+            container.find('.select2-selection__arrow').css({
+                height: '38px'
+            });
+        }, 0);
+
+        /* ===============================
+           HELPER STYLE
+        =============================== */
+        function disableInput(el) {
+            el.disabled = true;
+            el.style.backgroundColor = '#e9ecef';
+            el.style.cursor = 'not-allowed';
+        }
+
+        function enableInput(el) {
+            el.disabled = false;
+            el.style.backgroundColor = '#fff';
+            el.style.cursor = 'pointer';
+        }
+
+        /* ===============================
+           TOGGLE LOGIC
+        =============================== */
         function toggleInputs() {
             if (clientSelect.value) {
-                // Jika pilih client, disable subject manual
-                subjectManual.disabled = true;
+                disableInput(subjectManual);
                 subjectManual.value = '';
+
+                $('#online_billing_id').prop('disabled', false).trigger('change.select2');
             } else if (subjectManual.value.trim() !== '') {
-                // Jika isi subject manual, disable dropdown client
-                clientSelect.disabled = true;
+                disableInput(clientSelect);
+                $('#online_billing_id').prop('disabled', true).trigger('change.select2');
+
+                enableInput(subjectManual);
             } else {
-                // Jika tidak pilih apa-apa, dua-duanya aktif
-                subjectManual.disabled = false;
-                clientSelect.disabled = false;
+                enableInput(subjectManual);
+                enableInput(clientSelect);
+                $('#online_billing_id').prop('disabled', false).trigger('change.select2');
             }
         }
 
-        // Event listener
+        // Event
         clientSelect.addEventListener('change', toggleInputs);
         subjectManual.addEventListener('input', toggleInputs);
 
-        // Panggil saat awal halaman
         toggleInputs();
-    });
 
-
-    document.addEventListener('DOMContentLoaded', function() {
+        /* ===============================
+           AUTO HIDE ALERT
+        =============================== */
         const alertSuccess = document.querySelector('.alert-success');
-        if (alertSuccess) {
-            // Menghilangkan alert setelah 5 detik
-            setTimeout(function() {
-                alertSuccess.style.display = 'none';
-            }, 5000);
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
         const alertDanger = document.querySelector('.alert-danger');
 
-        if (alertDanger) {
-            setTimeout(function() {
-                alertDanger.style.display = 'none';
-            }, 5000);
+        if (alertSuccess) {
+            setTimeout(() => alertSuccess.style.display = 'none', 5000);
         }
+
+        if (alertDanger) {
+            setTimeout(() => alertDanger.style.display = 'none', 5000);
+        }
+
     });
 </script>

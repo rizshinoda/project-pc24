@@ -110,6 +110,7 @@
                                         <!-- Kolom Pencarian -->
                                         <div class="col-md-6 mb-3">
                                             <input type="text" name="search" class="form-control contoh1" placeholder="Cari Data" value="{{ request('search') }}">
+
                                         </div>
 
                                         <!-- Filter Bulan -->
@@ -150,8 +151,10 @@
                                         <!-- Tombol Filter -->
                                         <div class="">
                                             <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
+                                            <a href="{{ route('work-OB.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a>
 
                                         </div>
+
                                     </div>
                                 </form>
 
@@ -208,7 +211,9 @@
                                 </div>
 
                             </div>
+
                         </div>
+
                     </div>
 
                 </div>
