@@ -57,7 +57,7 @@
 
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic2" aria-expanded="false" aria-controls="ui-basic2">
-                            <span class="menu-title">Work Orderr</span>
+                            <span class="menu-title">Work Order</span>
                             <i class="menu-arrow"></i>
                             <i class="mdi mdi-format-list-bulleted menu-icon"></i>
                         </a>
