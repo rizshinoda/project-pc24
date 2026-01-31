@@ -196,15 +196,17 @@
                                                         <option value="METRO" {{ old('layanan', $getOB->layanan) == 'METRO' ? 'selected' : '' }}>METRO</option>
                                                         <option value="METRO-E" {{ old('layanan', $getOB->layanan) == 'METRO-E' ? 'selected' : '' }}>METRO-E</option>
                                                         <option value="VPN" {{ old('layanan', $getOB->layanan) == 'VPN' ? 'selected' : '' }}>VPN</option>
-                                                        <option value="LOCAL LOOP" {{ old('layanan', $getOB->layanan) == 'LOCAL LOOP' ? 'selected' : '' }}>LOCAL LOOP</option>
+                                                        <option value="LOCALLOOP" {{ old('layanan', $getOB->layanan) == 'LOCALLOOP' ? 'selected' : '' }}>LOCALLOOP</option>
                                                         <option value="INTERCONECTION" {{ old('layanan', $getOB->layanan) == 'INTERCONECTION' ? 'selected' : '' }}>INTERCONECTION</option>
                                                         <option value="CROSSCONNECT" {{ old('layanan', $getOB->layanan) == 'CROSSCONNECT' ? 'selected' : '' }}>CROSSCONNECT</option>
                                                         <option value="COLOCATION" {{ old('layanan', $getOB->layanan) == 'COLOCATION' ? 'selected' : '' }}>COLOCATION</option>
                                                         <option value="INTERNET BROADBAND" {{ old('layanan', $getOB->layanan) == 'INTERNET BROADBAND' ? 'selected' : '' }}>INTERNET BROADBAND</option>
-                                                        <option value="DEDICATED" {{ old('layanan', $getOB->layanan) == 'DEDICATED' ? 'selected' : '' }}>DEDICATED</option>
+                                                        <option value="INTERNET BROADBAND 1:4" {{ old('layanan', $getOB->layanan) == 'INTERNET BROADBAND 1:4' ? 'selected' : '' }}>INTERNET BROADBAND 1:4</option>
+                                                        <option value="INTERNET BROADBAND 1:10" {{ old('layanan', $getOB->layanan) == 'INTERNET BROADBAND 1:10' ? 'selected' : '' }}>INTERNET BROADBAND 1:10</option>
+                                                        <option value="INTERNET DEDICATED" {{ old('layanan', $getOB->layanan) == 'INTERNET DEDICATED' ? 'selected' : '' }}>INTERNET DEDICATED</option>
+                                                        <option value="INTERNET BROADBAND+IP" {{ old('layanan', $getOB->layanan) == 'INTERNET BROADBAND+IP' ? 'selected' : '' }}>INTERNET BROADBAND+IP</option>
                                                         <option value="METRO - DARK FIBER" {{ old('layanan', $getOB->layanan) == 'METRO - DARK FIBER' ? 'selected' : '' }}>METRO - DARK FIBER</option>
                                                         <option value="IP TRANSIT" {{ old('layanan', $getOB->layanan) == 'IP TRANSIT' ? 'selected' : '' }}>IP TRANSIT</option>
-                                                        <option value="INTERNET DEDICATED" {{ old('layanan', $getOB->layanan) == 'INTERNET DEDICATED' ? 'selected' : '' }}>INTERNET DEDICATED</option>
                                                         <option value="METRO P2MP" {{ old('layanan', $getOB->layanan) == 'METRO P2MP' ? 'selected' : '' }}>METRO P2MP</option>
                                                         <option value="DARK FIBER" {{ old('layanan', $getOB->layanan) == 'DARK FIBER' ? 'selected' : '' }}>DARK FIBER</option>
                                                         <option value="Internet Kuota" {{ old('layanan', $getOB->layanan) == 'Internet Kuota' ? 'selected' : '' }}>Internet Kuota</option>
@@ -235,6 +237,10 @@
                                                         <option value="Gbps" {{ old('satuan', $getOB->satuan) == 'Gbps' ? 'selected' : '' }}>Gbps</option>
                                                         <option value="Mbps" {{ old('satuan', $getOB->satuan) == 'Mbps' ? 'selected' : '' }}>Mbps</option>
                                                         <option value="Kbps" {{ old('satuan', $getOB->satuan) == 'Kbps' ? 'selected' : '' }}>Kbps</option>
+                                                        <option value="RU(RACK UNIT)" {{ old('satuan', $getOB->satuan) == 'RU(RACK UNIT)' ? 'selected' : '' }}>RU(RACK UNIT)</option>
+                                                        <option value="CORE" {{ old('satuan', $getOB->satuan) == 'CORE' ? 'selected' : '' }}>CORE</option>
+                                                        <option value="PAIR" {{ old('satuan', $getOB->satuan) == 'PAIR' ? 'selected' : '' }}>PAIR</option>
+
                                                     </select>
                                                 </div>
                                             </div>
@@ -449,6 +455,7 @@
                                                         <option value="WIRELESS" {{ old('media', $getOB->media) == 'WIRELESS' ? 'selected' : '' }}>WIRELESS</option>
                                                         <option value="M2M" {{ old('media', $getOB->media) == 'M2M' ? 'selected' : '' }}>M2M</option>
                                                         <option value="NONE" {{ old('media', $getOB->media) == 'NONE' ? 'selected' : '' }}>NONE</option>
+                                                        <option value="STARLINK" {{ old('media', $getOB->media) == 'STARLINK' ? 'selected' : '' }}>STARLINK</option>
 
                                                     </select>
 

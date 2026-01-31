@@ -40,4 +40,9 @@ class WorkOrderDismantle extends Model
     {
         return $this->hasMany(StockBarang::class, 'dismantle_id');
     }
+    // WorkOrderDismantle.php
+    public function details()
+    {
+        return $this->hasMany(DismantleDetail::class, 'dismantle_id');
+    }
 }

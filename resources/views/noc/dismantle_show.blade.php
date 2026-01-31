@@ -348,7 +348,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($stockItems as $item)
+                                                @forelse ($dismantleItems as $item)
                                                 <tr>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $getDismantle->admin->name }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $item->jenis->nama_jenis }}</td>

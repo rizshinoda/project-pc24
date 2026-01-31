@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use App\Models\OnlineBilling;
 use App\Models\RequestBarang;
 use App\Models\SurveyProgress;
+use App\Models\DismantleDetail;
 use App\Models\InstallProgress;
 use App\Models\UpgradeProgress;
 use App\Models\WorkOrderSurvey;
@@ -312,6 +313,7 @@ class AdminController extends Controller
             'harga_instalasi_hidden' => 'required|integer',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
             // tambahkan validasi lain sesuai kebutuhan
@@ -367,6 +369,9 @@ class AdminController extends Controller
             'Instalasi',
             $getInstall->nama_site
         );
+
+
+
         // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
         if (!empty($validatedData['cart'])) {
             foreach ($validatedData['cart'] as $jenis => $merekArray) {
@@ -392,6 +397,26 @@ class AdminController extends Controller
             }
         }
 
+        $uploadedFiles = [];
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/instalasi',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
+
+        // Simpan path file ke kolom JSON attachments
+        $getInstall->attachments = $uploadedFiles;
+        $getInstall->save();
         // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
         $gaUsers = User::where('is_role', 2)->get();
         // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
@@ -415,6 +440,37 @@ class AdminController extends Controller
                 'message' => 'WO Instalasi baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
                 'url' => $url, // URL dengan hash #instalasi
             ]);
+        }
+
+        $detailBarang = WorkOrderInstallDetail::where('work_order_install_id', $getInstall->id)->get();
+
+
+        $psbUsers = User::where('is_role', 5)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($psbUsers as $psb) {
+            Mail::to($psb->email)->send(
+                new \App\Mail\InstalasiMail(
+                    $getInstall,
+                    $detailBarang,
+                    5 // PSB
+                )
+            );
+        }
+
+        $gaUsers = User::where('is_role', 2)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($gaUsers as $ga) {
+            Mail::to($ga->email)->send(
+                new \App\Mail\InstalasiMail(
+                    $getInstall,
+                    $detailBarang,
+                    2 // PSB
+                )
+            );
         }
         return redirect()->route('admin.instalasi')->with('success', 'Work order berhasil diterbitkan.');
     }
@@ -2408,8 +2464,9 @@ class AdminController extends Controller
         $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
         // Gabungkan data survey ke dalam data role
         $progressList = DismantleProgress::where('work_order_dismantle_id', $id)->get();
-        $stockItems = StockBarang::where('dismantle_id', $id)->with(['jenis', 'merek', 'tipe'])->get();
-
+        $dismantleItems = DismantleDetail::where('dismantle_id', $id)
+            ->with(['jenis', 'merek', 'tipe'])
+            ->get();
         // Menampilkan detail work order dengan relasi ke onlineBilling dan admin
         $getDismantle = WorkOrderDismantle::with([
             'admin',
@@ -2419,7 +2476,7 @@ class AdminController extends Controller
         ])->findOrFail($id);
 
         // Gabungkan data ke dalam array data role
-        $data = array_merge($this->ambilDataRole(), compact('stockItems', 'progressList', 'getDismantle', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('dismantleItems', 'progressList', 'getDismantle', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('dismantle_show', $data);
@@ -3716,47 +3773,60 @@ class AdminController extends Controller
         return $this->renderView('sitedismantle_show', $data);
     }
     public function progressinstall($id)
+
     {
-        // Ambil data pelanggan dan instansi dari database
+        // Ambil data master
         $pelanggans = Pelanggan::orderBy('nama_pelanggan', 'asc')->get();
-        $instansis = Instansi::orderBy('nama_instansi', 'asc')->get(); // Ambil semua instansi
-        $vendors = Vendor::orderBy('nama_vendor', 'asc')->get(); // Ambil semua Vendor
+        $instansis  = Instansi::orderBy('nama_instansi', 'asc')->get();
+        $vendors    = Vendor::orderBy('nama_vendor', 'asc')->get();
         // Menampilkan form untuk mengedit work order
         $getSurvey = WorkOrderSurvey::with('admin')->findOrFail($id);
 
-        // Mengambil daftar jenis unik dari StockBarang
+        // Jenis barang
         $jenisList = Jenis::select('id', 'nama_jenis')->get();
 
-        // Mengambil data stok dengan total jumlah berdasarkan tipe, merek, dan jenis, serta melakukan pagination
+        // Stok barang
         $stockBarangs = StockBarang::with(['merek', 'tipe', 'jenis'])
             ->selectRaw('tipe_id, merek_id, jenis_id, kualitas, SUM(jumlah) as total_jumlah')
             ->groupBy('tipe_id', 'merek_id', 'jenis_id', 'kualitas')
             ->get();
 
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
 
-        // Mendapatkan tahun 2 digit dan bulan saat ini
-        $currentYear = date('y'); // Tahun dengan dua digit terakhir
-        $currentMonth = date('m'); // Bulan saat ini
+        // Ambil nomor instalasi terakhir (TANPA reset harian)
+        $lastInstall = WorkOrderInstall::orderBy('id', 'desc')->first();
 
-        // Mendapatkan nomor SPK terakhir dari tahun ini dan bulan ini
-        $lastSpk = WorkOrderInstall::whereYear('created_at', date('Y')) // Tahun dengan 4 digit
-            ->whereMonth('created_at', $currentMonth) // Filter berdasarkan bulan
-            ->max('id'); // Dapatkan ID terbesar di bulan dan tahun yang sama
+        if ($lastInstall && preg_match('/\/(\d+)$/', $lastInstall->no_spk, $matches)) {
+            $lastNumber = (int) $matches[1];
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
 
-        // Jika ada nomor SPK di bulan ini, ambil nomor urut berikutnya
-        // Jika tidak ada, mulai dari 001
-        $nextNumber = $lastSpk ? ($lastSpk + 1) : 1;
+        // Pad minimal 4 digit (kalau lebih, tampil apa adanya)
+        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Format nomor SPK ke dalam format SRV-bulan-tahun-xxx (dengan xxx direset setiap bulan dan tahun)
-        $no_spk = 'INS-' . $currentMonth . $currentYear . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        // Generate nomor INSTALASI
+        $no_spk = 'PC24Telin/PSB-INSTALLASI/' . now()->format('Y-m-d') . '/' . $numberFormatted;
 
+        // Gabungkan data role
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'getSurvey',
+                'stockBarangs',
+                'jenisList',
+                'notifications',
+                'no_spk',
+                'pelanggans',
+                'instansis',
+                'vendors'
+            )
+        );
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('getSurvey', 'jenisList', 'stockBarangs', 'no_spk', 'notifications', 'pelanggans', 'instansis', 'vendors'));
-
-        // Render view berdasarkan role
         return $this->renderView('progress_instalasi', $data);
     }
 
@@ -3788,6 +3858,7 @@ class AdminController extends Controller
             'harga_instalasi_hidden' => 'required|integer',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
             // tambahkan validasi lain sesuai kebutuhan
@@ -3843,6 +3914,8 @@ class AdminController extends Controller
             'Instalasi',
             $getInstall->nama_site
         );
+
+
         // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
         if (!empty($validatedData['cart'])) {
             foreach ($validatedData['cart'] as $jenis => $merekArray) {
@@ -3867,7 +3940,26 @@ class AdminController extends Controller
                 }
             }
         }
+        $uploadedFiles = [];
 
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/instalasi',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
+
+        // Simpan path file ke kolom JSON attachments
+        $getInstall->attachments = $uploadedFiles;
+        $getInstall->save();
         // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
         $gaUsers = User::where('is_role', 2)->get();
         // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
@@ -3891,6 +3983,36 @@ class AdminController extends Controller
                 'message' => 'WO Instalasi baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
                 'url' => $url, // URL dengan hash #instalasi
             ]);
+        }
+        $detailBarang = WorkOrderInstallDetail::where('work_order_install_id', $getInstall->id)->get();
+
+
+        $psbUsers = User::where('is_role', 5)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($psbUsers as $psb) {
+            Mail::to($psb->email)->send(
+                new \App\Mail\InstalasiMail(
+                    $getInstall,
+                    $detailBarang,
+                    5 // PSB
+                )
+            );
+        }
+
+        $gaUsers = User::where('is_role', 2)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($gaUsers as $ga) {
+            Mail::to($ga->email)->send(
+                new \App\Mail\InstalasiMail(
+                    $getInstall,
+                    $detailBarang,
+                    2 // PSB
+                )
+            );
         }
         return redirect()->route('admin.instalasi')->with('success', 'Work order berhasil diterbitkan.');
     }

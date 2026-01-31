@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-    @include('psb.partials.style')
+    @include('helpdesk.partials.style')
 </head>
 
 <body>
     <div class="container-scroller">
 
-        @include('psb.partials.navbar')
+        @include('helpdesk.partials.navbar')
         <div class="container-fluid page-body-wrapper">
             <!-- partial:partials/_sidebar.html -->
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -28,7 +28,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('psb/dashboard') }}">
+                        <a class="nav-link" href="{{ url('helpdesk/dashboard') }}">
                             <span class="menu-title">Dashboard</span>
                             <i class="mdi mdi-home menu-icon"></i>
                         </a>
@@ -43,46 +43,40 @@
                         <div class="collapse" id="ui-basic">
                             <ul class="nav flex-column sub-menu">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/survey')}}">Survey</a>
+                                    <a class="nav-link" href="{{url('helpdesk/requestbarang')}}">Request Barang</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/instalasi')}}">Instalasi</a>
+                                    <a class="nav-link" href="{{url('helpdesk/maintenance')}}">Maintenance</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/gantivendor')}}">Ganti Vendor</a>
+                                    <a class="nav-link" href="{{url('helpdesk/gantivendor')}}">Ganti Vendor</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/relokasi')}}">Relokasi</a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/upgrade')}}">Upgrade</a>
+                                    <a class="nav-link" href="{{url('helpdesk/instalasi')}}">Instalasi</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/downgrade')}}">Downgrade</a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/dismantle')}}">Dismantle</a>
+                                    <a class="nav-link" href="{{url('helpdesk/upgrade')}}">Upgrade</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/maintenance')}}">Maintenance</a>
+                                    <a class="nav-link" href="{{url('helpdesk/downgrade')}}">Downgrade</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/requestbarang')}}">Request Barang</a>
+                                    <a class="nav-link" href="{{url('helpdesk/relokasi')}}">Relokasi</a>
                                 </li>
-
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('helpdesk/dismantle')}}">Dismantle</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('psb/OB')}}">
+                        <a class="nav-link" href="{{url('helpdesk/OB')}}">
                             <span class="menu-title">Online Billing</span>
                             <i class="mdi mdi-database-outline menu-icon"></i>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('psb.sitedismantle') }}">
+                        <a class="nav-link" href="{{ route('hd.sitedismantle') }}">
                             <span class="menu-title">Site Dismantle</span>
                             <i class="mdi mdi-delete-circle menu-icon"></i>
                         </a>
@@ -91,6 +85,8 @@
             </nav>
             <!-- partial -->
 
+            <!-- Main Panel -->
+            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -109,7 +105,6 @@
                         @endif
                     </div>
 
-
                     <!-- Menampilkan detail survey -->
                     <div class="row row-cols-1 row-cols-md-3 g-3">
                         <!-- Card 1: WO Info -->
@@ -117,27 +112,32 @@
                             <div class="card h-100">
                                 <div class="card-body ">
                                     <h5 class="card-title">Details:</h5>
-                                    <p><strong>No Order: </strong> {{ $getDismantle->no_spk }}</p>
-                                    <p><strong>Diterbitkan oleh:</strong> {{ $getDismantle->admin->name }}</p>
-                                    <p><strong>Tanggal Diterbitkan:</strong> {{ $getDismantle->created_at->translatedFormat('d M Y, H:i:s') }}</p>
+                                    <p><strong>No Order: </strong> {{ $getRelokasi->no_spk }}</p>
+                                    <p><strong>Diterbitkan oleh:</strong> {{ $getRelokasi->admin->name }}</p>
+                                    <p><strong>Tanggal Diterbitkan:</strong> {{ $getRelokasi->created_at->translatedFormat('d M Y, H:i:s') }}</p>
                                     <p><strong>Status:</strong>
-                                        @if($getDismantle->status=='Pending')
+                                        @if($getRelokasi->status=='Pending')
                                         <span class="badge badge-pill badge-danger">Pending</span>
-                                        @elseif($getDismantle->status=='On Progress')
+                                        @elseif($getRelokasi->status=='On Progress')
                                         <span class="badge badge-pill badge-info">On Progress</span>
-                                        @elseif($getDismantle->status=='Canceled')
+                                        @elseif($getRelokasi->status=='Shipped')
+                                        <span class="badge badge-pill badge-primary">Shipped</span>
+                                        @elseif($getRelokasi->status=='Rejected')
+                                        <span class="badge badge-pill badge-dark">Rejected</span>
+                                        @elseif($getRelokasi->status=='Canceled')
                                         <span class="badge badge-pill badge-warning">Cancelled</span>
-                                        @elseif($getDismantle->status=='Completed')
+                                        @elseif($getRelokasi->status=='Completed')
                                         <span class="badge badge-pill badge-success">Completed</span>
                                         @endif
                                     </p>
                                     <br>
                                     <!-- Foto Pelanggan -->
-                                    @if($getDismantle->onlineBilling->pelanggan && $getDismantle->onlineBilling->pelanggan->foto)
-                                    <img src="{{ asset('storage/pelanggan/' . $getDismantle->onlineBilling->pelanggan->foto) }}" alt="Foto Pelanggan" style="width: 150px; height: auto;">
+                                    @if($getRelokasi->onlineBilling->pelanggan && $getRelokasi->onlineBilling->pelanggan->foto)
+                                    <img src="{{ asset('storage/pelanggan/' . $getRelokasi->onlineBilling->pelanggan->foto) }}" alt="Foto Pelanggan" style="width: 150px; height: auto;">
                                     @else
                                     <p>Tidak ada foto pelanggan</p>
                                     @endif
+
                                 </div>
                             </div>
                         </div>
@@ -147,16 +147,19 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">Pelanggan: </h5>
-                                    <p><strong>Nama Pelanggan:</strong> {{ $getDismantle->onlineBilling->pelanggan->nama_pelanggan }}</p>
-                                    <p><strong>No Jaringan:</strong> {{ $getDismantle->onlineBilling->no_jaringan}}</p>
-                                    <p><strong>Nama Gedung:</strong> {{ $getDismantle->onlineBilling->pelanggan->nama_gedung}}</p>
-                                    <p><strong>Alamat:</strong> {{ $getDismantle->onlineBilling->pelanggan->alamat}}</p>
-                                    <p><strong>Layanan:</strong> {{ $getDismantle->onlineBilling->layanan }}</p>
+                                    <p><strong>Nama Pelanggan:</strong> {{ $getRelokasi->onlineBilling->pelanggan->nama_pelanggan }}</p>
+                                    <p><strong>No Jaringan:</strong> {{ $getRelokasi->onlineBilling->no_jaringan}}</p>
+                                    <p><strong>Nama Gedung:</strong> {{ $getRelokasi->onlineBilling->pelanggan->nama_gedung}}</p>
+                                    <p><strong>Alamat:</strong> {{ $getRelokasi->onlineBilling->pelanggan->alamat}}</p>
+                                    <p><strong>Layanan:</strong> {{ $getRelokasi->onlineBilling->layanan }}</p>
                                     <p>
                                         <strong>Volume:</strong>
-                                        {{ $getDismantle->onlineBilling->bandwidth }}
+                                        {{ $getRelokasi->onlineBilling->bandwidth }} {{ $getRelokasi->onlineBilling->satuan }}
+
                                     </p>
-                                    <p><strong>Vlan:</strong> {{ $getDismantle->onlineBilling->vlan }}</p>
+                                    <p><strong>Vlan:</strong> {{ $getRelokasi->onlineBilling->vlan }}</p>
+                                    <p><strong>Vendor:</strong> {{ $getRelokasi->onlineBilling->vendor?->nama_vendor }}</p>
+
                                 </div>
                             </div>
                         </div>
@@ -166,26 +169,26 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">Site: </h5>
-                                    <p><strong>Nama Perusahaan:</strong> {{ $getDismantle->onlineBilling->instansi?->nama_instansi }}</p>
-                                    <p><strong>Nama Site:</strong> {{ $getDismantle->onlineBilling->nama_site }}</p>
-                                    <p><strong>Alamat:</strong> {{ $getDismantle->onlineBilling->alamat_pemasangan }}</p>
-                                    <p><strong>PIC:</strong> {{ $getDismantle->onlineBilling->nama_pic }}</p>
-                                    <p><strong>Nomer PIC:</strong> {{ $getDismantle->onlineBilling->no_pic }}</p>
-                                    <p><strong>Vendor:</strong> {{ $getDismantle->onlineBilling->vendor?->nama_vendor }}</p>
-                                    <p><strong>Keterangan:</strong> {{ $getDismantle->keterangan }}</p>
+                                    <p><strong>Nama Perusahaan:</strong> {{ $getRelokasi->onlineBilling->instansi?->nama_instansi }}</p>
+                                    <p><strong>Nama Site:</strong> {{ $getRelokasi->onlineBilling->nama_site }}</p>
+                                    <p><strong>Alamat:</strong> {{ $getRelokasi->onlineBilling->alamat_pemasangan }}</p>
+                                    <p><strong>PIC:</strong> {{ $getRelokasi->onlineBilling->nama_pic }}</p>
+                                    <p><strong>Nomer PIC:</strong> {{ $getRelokasi->onlineBilling->no_pic }}</p>
+                                    <p><strong>Alamat Baru:</strong> {{ $getRelokasi->alamat_pemasangan_baru }}</p>
+                                    <p><strong>Keterangan:</strong> {{ $getRelokasi->keterangan }}</p>
+                                    <p><strong>Barang non stock:</strong> {{ $getRelokasi->non_stock }}</p>
 
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <div class="container mt-4">
                         @php
                         // Tahapan normal
-                        $steps = ['Pending', 'On Progress', 'Completed'];
+                        $steps = ['Pending', 'On Progress', 'Shipped', 'Completed'];
 
                         // Ambil status dari progress
-                        $currentStatus = ucfirst($getDismantle->status ?? 'Pending');
+                        $currentStatus = ucfirst($getRelokasi->status ?? 'Pending');
 
                         // Cek apakah status termasuk flow gagal
                         $isCanceledOrRejected = in_array(strtolower($currentStatus), ['canceled', 'cancelled', 'rejected']);
@@ -224,25 +227,104 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    @if($getDismantle->status == 'Pending')
-                                    <!-- Tombol Approve dan Reject -->
-                                    <!-- Tombol Approve -->
-                                    <form action="{{ route('psb.dismantle.approve', $getDismantle->id) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        <button type="button" class="btn btn-success" onclick="confirmApproval('{{ route('psb.dismantle.approve', $getDismantle->id) }}')">
-                                            <i class="fa fa-check"></i> Approve
-                                        </button>
-                                    </form>
+                                    <h4 class="card-title">Detail Barang</h4>
+                                    <div class=" table-responsive">
+
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style=" text-align: center; vertical-align: middle;">No</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Jenis</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Merek</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Tipe</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($getRelokasi->WorkOrderRelokasiDetail as $detail)
+                                                <tr>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
+
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->jenis->nama_jenis }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->merek->nama_merek }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->tipe->nama_tipe }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $detail->jumlah }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ ucfirst($detail->stockBarang->kualitas) }}</td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Status Barang yang Sudah Dikirim GA</h4>
 
 
-                                    @endif
-                                    <h4 class="card-title mt-2">Progres Dismantle</h4>
-                                    @if ($getDismantle->status === 'On Progress' || $getDismantle->status === 'Completed')
-                                    <a href="{{ route('psb_dismantle_add_progress', $getDismantle->id) }}" class="btn btn-info mb-3">
-                                        Add Progress</a>
-                                    <a href="{{ route('psb.dismantle.print', $getDismantle->id) }}" class="btn btn-info pull-right mb-3">Cetak SPK</a>
+                                    <div class=" table-responsive">
 
-                                    @endif
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style=" text-align: center; vertical-align: middle;">No</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">GA</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Jenis</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Merek</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Tipe</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Serial Number</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Status Konfigurasi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($getRelokasi->barangKeluar as $barangKeluar)
+                                                <tr>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->user->name }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->stockBarang->jenis->nama_jenis }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->stockBarang->merek->nama_merek }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->stockBarang->tipe->nama_tipe }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->serial_number }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->jumlah }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ ucfirst($barangKeluar->stockBarang->kualitas) }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                        @if($barangKeluar->is_configured)
+                                                        <span class="badge badge-pill bg-success">Sudah Dikonfigurasi</span>
+                                                        @else
+                                                        <span class="badge badge-pill bg-warning">Belum Dikonfigurasi</span>
+                                                        @endif
+                                                    </td>
+
+                                                </tr>
+                                                @empty
+                                                <tr>
+                                                    <td colspan="10" class="text-center">Belum ada barang yang diinput</td>
+                                                </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Progres Relokasi</h4>
+
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">
@@ -262,7 +344,7 @@
                                                 <tr>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $progress->created_at->translatedFormat('d F Y, H:i') }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $progress->userPSB->name }}</td>
+                                                    <td style=" text-align: center; vertical-align: middle;">{{ $progress->user->name }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">@if($progress->status=='Pending')
                                                         <span class="badge badge-pill badge-danger">Pending</span>
                                                         @elseif($progress->status=='On Progress')
@@ -331,53 +413,7 @@
                                         </table>
                                     </div>
                                     <!-- Tombol Kembali -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Barang Dismantle</h4>
-
-
-                                    <div class=" table-responsive">
-
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th style=" text-align: center; vertical-align: middle;">GA</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Jenis</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Merek</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Tipe</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Serial Number</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse ($dismantleItems as $item)
-                                                <tr>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $getDismantle->admin->name }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $item->jenis->nama_jenis }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $item->merek->nama_merek }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $item->tipe->nama_tipe }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $item->serial_number }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $item->jumlah }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ ucfirst($item->kualitas) }}</td>
-
-                                                </tr>
-                                                @empty
-                                                <tr>
-                                                    <td colspan="8" class="text-center">Tidak ada barang dismantle yang diinput.</td>
-                                                </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <!-- Tombol Kembali -->
-                                    <a href="{{ route('psb.dismantle') }}" class="btn btn-info mt-3">
+                                    <a href="{{ route('hd.relokasi') }}" class="btn btn-info mt-3">
                                         <i class="fa fa-arrow-left"></i> Kembali
                                     </a>
 
@@ -385,6 +421,9 @@
                             </div>
                         </div>
                     </div>
+
+
+
                 </div>
 
                 <!-- content-wrapper ends -->
@@ -401,7 +440,7 @@
         </div>
 
     </div>
-    @include('psb.partials.script')
+    @include('helpdesk.partials.script')
 </body>
 
 </html>

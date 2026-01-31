@@ -53,6 +53,18 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{url('helpdesk/instalasi')}}">Instalasi</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('helpdesk/upgrade')}}">Upgrade</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('helpdesk/downgrade')}}">Downgrade</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('helpdesk/relokasi')}}">Relokasi</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('helpdesk/dismantle')}}">Dismantle</a>
+                                </li>
                             </ul>
                         </div>
                     </li>

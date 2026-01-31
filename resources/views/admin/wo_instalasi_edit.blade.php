@@ -210,9 +210,7 @@
                                                         <option value="INTERNET BROADBAND 1:4" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND 1:4' ? 'selected' : '' }}>INTERNET BROADBAND 1:4</option>
                                                         <option value="INTERNET BROADBAND 1:10" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND 1:10' ? 'selected' : '' }}>INTERNET BROADBAND 1:10</option>
                                                         <option value="INTERNET DEDICATED" {{ old('layanan', $getInstall->layanan) == 'INTERNET DEDICATED' ? 'selected' : '' }}>INTERNET DEDICATED</option>
-
                                                         <option value="INTERNET BROADBAND+IP" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND+IP' ? 'selected' : '' }}>INTERNET BROADBAND+IP</option>
-
                                                         <option value="METRO - DARK FIBER" {{ old('layanan', $getInstall->layanan) == 'METRO - DARK FIBER' ? 'selected' : '' }}>METRO - DARK FIBER</option>
                                                         <option value="IP TRANSIT" {{ old('layanan', $getInstall->layanan) == 'IP TRANSIT' ? 'selected' : '' }}>IP TRANSIT</option>
                                                         <option value="METRO P2MP" {{ old('layanan', $getInstall->layanan) == 'METRO P2MP' ? 'selected' : '' }}>METRO P2MP</option>

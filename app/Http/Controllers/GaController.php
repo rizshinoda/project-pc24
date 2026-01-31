@@ -16,6 +16,7 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\OnlineBilling;
 use App\Models\RequestBarang;
+use App\Models\DismantleDetail;
 use App\Models\InstallProgress;
 use App\Models\UpgradeProgress;
 use App\Models\RelokasiProgress;
@@ -812,13 +813,14 @@ class GaController extends Controller
             'onlineBilling.instansi'
         ])->findOrFail($id);
 
-        // Ambil data barang yang diinput ke stok barang berdasarkan dismantle ID
-        $stockItems = StockBarang::where('dismantle_id', $id)->with(['jenis', 'merek', 'tipe'])->get();
+        $dismantleItems = DismantleDetail::where('dismantle_id', $id)
+            ->with(['jenis', 'merek', 'tipe'])
+            ->get();
 
         // Gabungkan data ke dalam array data role
         $data = array_merge(
             $this->ambilDataRole(),
-            compact('progressList', 'getDismantle', 'notifications', 'stockItems')
+            compact('progressList', 'getDismantle', 'notifications', 'dismantleItems')
         );
 
         // Render view berdasarkan role
@@ -873,24 +875,39 @@ class GaController extends Controller
 
     public function storeBarangDismantle(Request $request, $dismantleId)
     {
-        // Validasi input
-        $validatedData = $request->validate([
-            'jenis_id' => 'required|exists:jenis,id',
-            'merek_id' => 'required|exists:mereks,id',
-            'tipe_id' => 'required|exists:tipes,id',
-            'jumlah' => 'nullable|integer|min:1',  // Jumlah opsional, minimal 1
-            'serial_number' => 'nullable|string',
+        $validated = $request->validate([
+            'jenis_id' => 'required',
+            'merek_id' => 'required',
+            'tipe_id' => 'required',
             'kualitas' => 'required|in:baru,bekas',
+            'serial_number' => 'nullable|string',
+            'jumlah' => 'required|integer|min:1',
         ]);
 
-        // Set default jumlah ke 1 jika tidak diisi atau jika nilainya kurang dari 1
-        $validatedData['jumlah'] = $request->input('jumlah', 1);
+        // 1️⃣ SIMPAN HISTORI DISMANTLE
+        DismantleDetail::create([
+            'dismantle_id'  => $dismantleId,
+            'jenis_id'      => $validated['jenis_id'],
+            'merek_id'      => $validated['merek_id'],
+            'tipe_id'       => $validated['tipe_id'],
+            'kualitas'      => $validated['kualitas'],
+            'serial_number' => $validated['serial_number'],
+            'jumlah'   => $validated['jumlah'],
+        ]);
 
-        // Tambahkan dismantle_id ke data yang akan disimpan
-        $validatedData['dismantle_id'] = $dismantleId;
+        // 2️⃣ UPDATE STOK
+        $stock = StockBarang::firstOrCreate(
+            [
+                'jenis_id' => $validated['jenis_id'],
+                'merek_id' => $validated['merek_id'],
+                'tipe_id'  => $validated['tipe_id'],
+                'kualitas' => $validated['kualitas'],
+                'serial_number' => $validated['serial_number'],
+            ],
+            ['jumlah' => 0]
+        );
 
-        // Simpan data stok barang
-        StockBarang::create($validatedData);
+        $stock->increment('jumlah', $validated['jumlah']);
 
         // Redirect ke halaman sebelumnya dengan pesan sukses
         return redirect()->route('ga.dismantle_show', $dismantleId)

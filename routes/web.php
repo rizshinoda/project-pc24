@@ -358,6 +358,14 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
 
     Route::get('helpdesk/instalasi', [HelpdeskController::class, 'instalasi'])->name('hd.instalasi');
     Route::get('helpdesk/instalasi/{id}', [HelpdeskController::class, 'showinstalasi'])->name('hd.instalasi.show');
+    Route::get('helpdesk/upgrade', [HelpdeskController::class, 'upgrade'])->name('hd.upgrade');
+    Route::get('helpdesk/upgrade/show/{id}', [HelpdeskController::class, 'upgradeShow'])->name('hd.upgrade_show');
+    Route::get('helpdesk/downgrade', [HelpdeskController::class, 'downgrade'])->name('hd.downgrade');
+    Route::get('helpdesk/downgrade/show/{id}', [HelpdeskController::class, 'downgradeShow'])->name('hd.downgrade_show');
+    Route::get('helpdesk/relokasi', [HelpdeskController::class, 'relokasi'])->name('hd.relokasi');
+    Route::get('helpdesk/relokasi/{id}', [HelpdeskController::class, 'showrelokasi'])->name('hd.relokasi.show');
+    Route::get('helpdesk/dismantle', [HelpdeskController::class, 'dismantle'])->name('hd.dismantle');
+    Route::get('helpdesk/dismantle/show/{id}', [HelpdeskController::class, 'dismantleShow'])->name('hd.dismantle_show');
 
     Route::get('helpdesk/maintenance', [HelpdeskController::class, 'maintenance'])->name('hd.maintenance');
     Route::get('helpdesk/maintenance/create/{id}', [HelpdeskController::class, 'maintenanceCreate'])->name('hd.maintenance_create');
