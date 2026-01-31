@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('stock_barangs', function (Blueprint $table) {
-            // pastikan FK sudah tidak ada
+            // 1. Drop foreign key
             if (Schema::hasColumn('stock_barangs', 'dismantle_id')) {
+                $table->dropForeign(['dismantle_id']);
                 $table->dropColumn('dismantle_id');
             }
         });
