@@ -44,10 +44,16 @@ $basePath = match ((int) $targetRole) {
                 <td>{{ $billing->nama_site ?? '-' }}</td>
             </tr>
             <tr>
-                <td><strong>Alamat</strong></td>
+                <td><strong>Alamat Pemasangan Lama</strong></td>
                 <td>:</td>
                 <td>{{ $billing->alamat_pemasangan ?? '-' }}</td>
             </tr>
+            <tr>
+                <td><strong>Alamat Pemasangan Baru</strong></td>
+                <td>:</td>
+                <td>{{ $getRelokasi->alamat_pemasangan_baru ?? '-' }}</td>
+            </tr>
+
             <tr>
                 <td><strong>PIC</strong></td>
                 <td>:</td>

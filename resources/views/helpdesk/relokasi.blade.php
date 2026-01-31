@@ -75,16 +75,17 @@
                             <i class="mdi mdi-database-outline menu-icon"></i>
                         </a>
                     </li>
-
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('hd.sitedismantle') }}">
                             <span class="menu-title">Site Dismantle</span>
                             <i class="mdi mdi-delete-circle menu-icon"></i>
                         </a>
                     </li>
+
             </nav>
             <!-- partial -->
 
+            <!-- Main Panel -->
             <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
@@ -92,7 +93,7 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-danger text-white me-2">
                                 <i class="mdi mdi-home"></i>
-                            </span> Online Billing
+                            </span> Relokasi
                         </h3>
                         {{-- Alert untuk menampilkan pesan sukses --}}
                         @if (session('success'))
@@ -111,18 +112,18 @@
                             </button>
                         </div>
                         @endif
+
                     </div>
                     <div class="col-lg-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <h4>Daftar Online Billing</h4>
+                                <h4>Daftar WO Relokasi</h4>
                                 <!-- Form Pencarian dan Filter -->
-                                <form method="GET" action="{{ route('hd.OB') }}" class="mb-4">
+                                <form method="GET" action="{{ route('hd.relokasi') }}" class="mb-4">
                                     <div class="row">
                                         <!-- Kolom Pencarian -->
                                         <div class="col-md-6 mb-3">
                                             <input type="text" name="search" class="form-control contoh1" placeholder="Cari Data" value="{{ request('search') }}">
-
                                         </div>
 
                                         <!-- Filter Bulan -->
@@ -148,84 +149,110 @@
                                                 @endfor
                                             </select>
                                         </div>
-                                        <!-- Filter Provinsi -->
-                                        <div class="col-md-3 mb-3">
-                                            <select name="provinsi" class="form-control">
-                                                <option value="">Pilih Provinsi</option>
-                                                @php
-                                                $listProvinsi = ['Aceh', 'Bali', 'Banten', 'Bengkulu', 'DI Yogyakarta', 'DKI Jakarta', 'Gorontalo', 'Jambi', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Kalimantan Barat', 'Kalimantan Selatan', 'Kalimantan Tengah', 'Kalimantan Timur', 'Kalimantan Utara', 'Bangka Belitung', 'Kepulauan Riau', 'Lampung', 'Maluku', 'Maluku Utara', 'Nusa Tenggara Barat', 'Nusa Tenggara Timur', 'Papua', 'Papua Barat', 'Papua Selatan', 'Papua Tengah', 'Papua Pegunungan', 'Riau', 'Sulawesi Barat', 'Sulawesi Selatan', 'Sulawesi Tengah', 'Sulawesi Tenggara', 'Sulawesi Utara', 'Sumatera Barat', 'Sumatera Selatan', 'Sumatera Utara'];
-                                                @endphp
-                                                @foreach($listProvinsi as $item)
-                                                <option value="{{ $item }}" {{ request('provinsi') == $item ? 'selected' : '' }}>{{ $item }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+
                                         <!-- Tombol Filter -->
                                         <div class="">
                                             <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
-                                            <a href="{{ route('work-OB.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a>
 
                                         </div>
-
                                     </div>
                                 </form>
-
-                                <div class=" table-responsive">
+                                <!-- Tab Status -->
+                                <ul class="nav nav-tabs justify-content-center mb-4" id="surveyTab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" id="all-tab" href="{{ route('hd.relokasi', ['status' => 'all', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Semua</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Pending' ? 'active' : '' }}" id="pending-tab" href="{{ route('hd.relokasi', ['status' => 'Pending', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Pending</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'On Progress' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('hd.relokasi', ['status' => 'On Progress', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">On Progress</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Shipped' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('hd.relokasi', ['status' => 'Shipped', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Shipped</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Rejected' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('hd.relokasi', ['status' => 'Rejected', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Rejected</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Completed' ? 'active' : '' }}" id="completed-tab" href="{{ route('hd.relokasi', ['status' => 'Completed', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Completed</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Canceled' ? 'active' : '' }}" id="canceled-tab" href="{{ route('hd.relokasi', ['status' => 'Canceled', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Cancelled</a>
+                                    </li>
+                                </ul>
+                                <div class="table-responsive">
                                     <table class="table table-bordered wrap">
                                         <thead>
                                             <tr>
                                                 <th style="text-align: center; vertical-align: middle;">No</th>
-                                                <th style="text-align: center; vertical-align: middle;">No <br> Jaringan</th>
+                                                <th style="text-align: center; vertical-align: middle;">Nomor Work <br> Order</th>
+                                                <th style="text-align: center; vertical-align: middle;">Tanggal <br> Dibuat</th>
                                                 <th style="text-align: center; vertical-align: middle;">Nama <br> Pelanggan</th>
                                                 <th style="text-align: center; vertical-align: middle;">Perusahaan</th>
                                                 <th style="text-align: center; vertical-align: middle;">Nama <br> Site</th>
                                                 <th style="text-align: center; vertical-align: middle;">Alamat <br> Pemasangan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Vlan</th>
                                                 <th style="text-align: center; vertical-align: middle;">Volume</th>
-                                                <th style="text-align: center; vertical-align: middle;">Tanggal <br>Aktif</th>
+                                                <th style="text-align: center; vertical-align: middle;">Status</th>
                                                 <th style="text-align: center; vertical-align: middle;">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($onlinebilling as $key => $OB)
+                                            @foreach ($getRelokasi as $key => $relokasi)
                                             <tr>
-                                                <td style=" text-align: center; vertical-align: middle;">{{$onlinebilling->firstItem()+ $key}} </td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->no_jaringan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->pelanggan->nama_pelanggan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->instansi?->nama_instansi }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->nama_site }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $getRelokasi->firstItem() + $key }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $relokasi->no_spk }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $relokasi->created_at->format('d M Y') }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $relokasi->onlineBilling->pelanggan->nama_pelanggan }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $relokasi->onlineBilling->instansi?->nama_instansi}}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $relokasi->onlineBilling->nama_site ?? 'Tidak Ada Nama Site' }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    {{ \Illuminate\Support\Str::limit($OB->alamat_pemasangan, 60, '...') }}
+                                                    {{ \Illuminate\Support\Str::limit($relokasi->onlineBilling->alamat_pemasangan, 60, '...') }}
                                                 </td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->vlan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->bandwidth }} {{ $OB->satuan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->created_at->format('d M Y') }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $relokasi->onlineBilling->bandwidth }} {{ $relokasi->onlineBilling->satuan }}</td>
+
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    <a href="{{ route('hd.OB_show', $OB->id) }}" class="btn btn-success btn-sm " style="display:inline-block; padding: 8px 11px;"><i class="fa fa-eye"></i></a>
+                                                    @if($relokasi->status == 'Pending')
+                                                    <span class="badge badge-pill badge-danger">Pending</span>
+                                                    @elseif($relokasi->status == 'On Progress')
+                                                    <span class="badge badge-pill badge-info">On Progress</span>
+                                                    @elseif($relokasi->status=='Shipped')
+                                                    <span class="badge badge-pill badge-primary">Shipped</span>
+                                                    @elseif($relokasi->status=='Rejected')
+                                                    <span class="badge badge-pill badge-dark">Rejected</span>
+                                                    @elseif($relokasi->status == 'Canceled')
+                                                    <span class="badge badge-pill badge-warning">Cancelled</span>
+                                                    @elseif($relokasi->status == 'Completed')
+                                                    <span class="badge badge-pill badge-success">Completed</span>
+                                                    @endif
+                                                </td>
+
+                                                <td style="text-align: center; vertical-align: middle;">
+                                                    <a href="{{ route('hd.relokasi.show', $relokasi->id) }}" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a>
+
                                                 </td>
                                             </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 </div>
+
                                 <div class="mt-3">
                                     Showing
-                                    {{$onlinebilling->firstItem()}}
+                                    {{$getRelokasi->firstItem()}}
                                     to
-                                    {{$onlinebilling->lastItem()}}
+                                    {{$getRelokasi->lastItem()}}
                                     of
-                                    {{$onlinebilling->total()}}
+                                    {{$getRelokasi->total()}}
                                     entries
 
                                 </div>
                                 <div class="pull-right">
-                                    {{ $onlinebilling->links() }}
+                                    {{ $getRelokasi->links() }}
                                 </div>
 
                             </div>
-
                         </div>
-
                     </div>
 
                 </div>

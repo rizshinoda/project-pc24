@@ -15,11 +15,19 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\OnlineBilling;
 use App\Models\RequestBarang;
+use App\Models\DismantleDetail;
 use App\Models\InstallProgress;
+use App\Models\UpgradeProgress;
+use App\Models\RelokasiProgress;
 use App\Models\WorkOrderInstall;
+use App\Models\WorkOrderUpgrade;
+use App\Models\DismantleProgress;
+use App\Models\DowngradeProgress;
 use App\Models\ReqBarangProgress;
+use App\Models\WorkOrderRelokasi;
 use App\Mail\PermintaanBarangMail;
 use App\Models\WorkOrderDismantle;
+use App\Models\WorkOrderDowngrade;
 use App\Models\GantiVendorProgress;
 use App\Models\MaintenanceProgress;
 use Illuminate\Support\Facades\Log;
@@ -1365,6 +1373,321 @@ class HelpdeskController extends Controller
         return $this->renderView('instalasi_show', $data);
     }
 
+    public function upgrade(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey dengan eager loading
+        $query = WorkOrderUpgrade::with([
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        ])->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%')
+                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination
+        $getUpgrade = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getUpgrade', 'status', 'search', 'month', 'year', 'notifications'));
+
+        return $this->renderView('upgrade', $data);
+    }
+    public function upgradeShow($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Gabungkan data survey ke dalam data role
+        $progressList = UpgradeProgress::where('work_order_upgrade_id', $id)->get();
+
+        // Menampilkan detail work order dengan relasi ke onlineBilling dan admin
+        $getUpgrade = WorkOrderUpgrade::with([
+            'admin',
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        ])->findOrFail($id);
+
+        // Gabungkan data ke dalam array data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getUpgrade', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('upgrade_show', $data);
+    }
+
+    public function downgrade(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey dengan eager loading
+        $query = WorkOrderDowngrade::with([
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        ])->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%')
+                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination
+        $getDowngrade = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getDowngrade', 'status', 'search', 'month', 'year', 'notifications'));
+
+        return $this->renderView('downgrade', $data);
+    }
+    public function downgradeShow($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Gabungkan data survey ke dalam data role
+        $progressList = DowngradeProgress::where('work_order_downgrade_id', $id)->get();
+
+        // Menampilkan detail work order dengan relasi ke onlineBilling dan admin
+        $getDowngrade = WorkOrderDowngrade::with([
+            'admin',
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        ])->findOrFail($id);
+
+        // Gabungkan data ke dalam array data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getDowngrade', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('downgrade_show', $data);
+    }
+
+    public function relokasi(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey dengan eager loading
+        $query = WorkOrderRelokasi::with([
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        ])->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%')
+                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination
+        $getRelokasi = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getRelokasi', 'status', 'search', 'month', 'year', 'notifications'));
+
+
+        return $this->renderView('relokasi', $data);
+    }
+    public function showrelokasi($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = RelokasiProgress::where('work_order_relokasi_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getRelokasi = WorkOrderRelokasi::with('WorkOrderRelokasiDetail.stockBarang')->findOrFail($id);
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getRelokasi', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('relokasi_show', $data);
+    }
+
+    public function dismantle(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey dengan eager loading
+        $query = WorkOrderDismantle::with([
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        ])->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%')
+                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination
+        $getDismantle = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getDismantle', 'status', 'search', 'month', 'year', 'notifications'));
+
+        return $this->renderView('dismantle', $data);
+    }
+    public function dismantleShow($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Gabungkan data survey ke dalam data role
+        $progressList = DismantleProgress::where('work_order_dismantle_id', $id)->get();
+        $dismantleItems = DismantleDetail::where('dismantle_id', $id)
+            ->with(['jenis', 'merek', 'tipe'])
+            ->get();
+        // Menampilkan detail work order dengan relasi ke onlineBilling dan admin
+        $getDismantle = WorkOrderDismantle::with([
+            'admin',
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        ])->findOrFail($id);
+
+        // Gabungkan data ke dalam array data role
+        $data = array_merge($this->ambilDataRole(), compact('dismantleItems', 'progressList', 'getDismantle', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('dismantle_show', $data);
+    }
     public function exportOB()
     {
         return Excel::download(new OnlineBillingExport, ' Laporan OnlineBilling.xlsx');

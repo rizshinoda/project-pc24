@@ -362,7 +362,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($stockItems as $item)
+                                                @forelse ($dismantleItems as $item)
                                                 <tr>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $getDismantle->admin->name }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $item->jenis->nama_jenis }}</td>
@@ -375,11 +375,6 @@
 
                                                         <!-- Tampilkan tombol Batalkan hanya jika status bukan 'Completed' -->
 
-                                                        <form id="cancelForm{{ $item->id }}" action="{{ route('ga.cancel_barang_dismantle', $item->id) }}" method="POST" style="display: none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                        <button type="button" class="btn btn-danger btn-sm" onclick="canceldismantle({{ $item->id }})">Batalkan</button>
 
                                                     </td>
                                                 </tr>

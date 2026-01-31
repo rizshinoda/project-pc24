@@ -62,8 +62,4 @@ class StockBarang extends Model
     {
         return $this->belongsTo(WorkOrderInstall::class);
     }
-    public function dismantle()
-    {
-        return $this->belongsTo(WorkOrderDismantle::class, 'dismantle_id');
-    }
 }

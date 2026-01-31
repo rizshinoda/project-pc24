@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-    @include('psb.partials.style')
+    @include('helpdesk.partials.style')
 </head>
 
 <body>
     <div class="container-scroller">
 
-        @include('psb.partials.navbar')
+        @include('helpdesk.partials.navbar')
         <div class="container-fluid page-body-wrapper">
             <!-- partial:partials/_sidebar.html -->
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -28,7 +28,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('psb/dashboard') }}">
+                        <a class="nav-link" href="{{ url('helpdesk/dashboard') }}">
                             <span class="menu-title">Dashboard</span>
                             <i class="mdi mdi-home menu-icon"></i>
                         </a>
@@ -43,46 +43,40 @@
                         <div class="collapse" id="ui-basic">
                             <ul class="nav flex-column sub-menu">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/survey')}}">Survey</a>
+                                    <a class="nav-link" href="{{url('helpdesk/requestbarang')}}">Request Barang</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/instalasi')}}">Instalasi</a>
+                                    <a class="nav-link" href="{{url('helpdesk/maintenance')}}">Maintenance</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/gantivendor')}}">Ganti Vendor</a>
+                                    <a class="nav-link" href="{{url('helpdesk/gantivendor')}}">Ganti Vendor</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/relokasi')}}">Relokasi</a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/upgrade')}}">Upgrade</a>
+                                    <a class="nav-link" href="{{url('helpdesk/instalasi')}}">Instalasi</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/downgrade')}}">Downgrade</a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/dismantle')}}">Dismantle</a>
+                                    <a class="nav-link" href="{{url('helpdesk/upgrade')}}">Upgrade</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/maintenance')}}">Maintenance</a>
+                                    <a class="nav-link" href="{{url('helpdesk/downgrade')}}">Downgrade</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{url('psb/requestbarang')}}">Request Barang</a>
+                                    <a class="nav-link" href="{{url('helpdesk/relokasi')}}">Relokasi</a>
                                 </li>
-
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{url('helpdesk/dismantle')}}">Dismantle</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('psb/OB')}}">
+                        <a class="nav-link" href="{{url('helpdesk/OB')}}">
                             <span class="menu-title">Online Billing</span>
                             <i class="mdi mdi-database-outline menu-icon"></i>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('psb.sitedismantle') }}">
+                        <a class="nav-link" href="{{ route('hd.sitedismantle') }}">
                             <span class="menu-title">Site Dismantle</span>
                             <i class="mdi mdi-delete-circle menu-icon"></i>
                         </a>
@@ -91,6 +85,8 @@
             </nav>
             <!-- partial -->
 
+            <!-- Main Panel -->
+            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -224,25 +220,9 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    @if($getDismantle->status == 'Pending')
-                                    <!-- Tombol Approve dan Reject -->
-                                    <!-- Tombol Approve -->
-                                    <form action="{{ route('psb.dismantle.approve', $getDismantle->id) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        <button type="button" class="btn btn-success" onclick="confirmApproval('{{ route('psb.dismantle.approve', $getDismantle->id) }}')">
-                                            <i class="fa fa-check"></i> Approve
-                                        </button>
-                                    </form>
 
-
-                                    @endif
                                     <h4 class="card-title mt-2">Progres Dismantle</h4>
-                                    @if ($getDismantle->status === 'On Progress' || $getDismantle->status === 'Completed')
-                                    <a href="{{ route('psb_dismantle_add_progress', $getDismantle->id) }}" class="btn btn-info mb-3">
-                                        Add Progress</a>
-                                    <a href="{{ route('psb.dismantle.print', $getDismantle->id) }}" class="btn btn-info pull-right mb-3">Cetak SPK</a>
 
-                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">
@@ -377,7 +357,7 @@
                                         </table>
                                     </div>
                                     <!-- Tombol Kembali -->
-                                    <a href="{{ route('psb.dismantle') }}" class="btn btn-info mt-3">
+                                    <a href="{{ route('hd.dismantle') }}" class="btn btn-info mt-3">
                                         <i class="fa fa-arrow-left"></i> Kembali
                                     </a>
 
@@ -401,7 +381,7 @@
         </div>
 
     </div>
-    @include('psb.partials.script')
+    @include('helpdesk.partials.script')
 </body>
 
 </html>

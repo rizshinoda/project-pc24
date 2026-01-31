@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\OnlineBilling;
 use App\Models\RequestBarang;
 use App\Models\SurveyProgress;
+use App\Models\DismantleDetail;
 use App\Models\InstallProgress;
 use App\Models\UpgradeProgress;
 use App\Models\WorkOrderSurvey;
@@ -605,8 +606,9 @@ class DashboardController extends Controller
         $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
         // Gabungkan data survey ke dalam data role
         $progressList = DismantleProgress::where('work_order_dismantle_id', $id)->get();
-        $stockItems = StockBarang::where('dismantle_id', $id)->with(['jenis', 'merek', 'tipe'])->get();
-
+        $dismantleItems = DismantleDetail::where('dismantle_id', $id)
+            ->with(['jenis', 'merek', 'tipe'])
+            ->get();
         // Menampilkan detail work order dengan relasi ke onlineBilling dan admin
         $getDismantle = WorkOrderDismantle::with([
             'admin',
@@ -616,7 +618,7 @@ class DashboardController extends Controller
         ])->findOrFail($id);
 
         // Gabungkan data ke dalam array data role
-        $data = array_merge($this->ambilDataRole(), compact('stockItems', 'progressList', 'getDismantle', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('dismantleItems', 'progressList', 'getDismantle', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('dismantle_show', $data);
