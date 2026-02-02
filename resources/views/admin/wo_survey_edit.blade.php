@@ -302,7 +302,17 @@
                                                     </select>
                                                 </div>
                                             </div>
-
+                                            <div class="form-group row">
+                                                <label for="bandwidth" class="col-sm-4 col-form-label">
+                                                    Upload File
+                                                    <span class="d-block text-muted small">
+                                                        (pdf, doc, docx, jpg, png)
+                                                    </span>
+                                                </label>
+                                                <div class="col-sm-8">
+                                                    <input type="file" name="attachments[]" multiple>
+                                                </div>
+                                            </div>
                                             <div class="form-group row">
                                                 <label for="foto" class="col-sm-4 col-form-label">Foto</label>
                                                 <div class="col-sm-8">
