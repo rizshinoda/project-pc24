@@ -30,6 +30,12 @@ class WorkOrderSurvey extends Model
         'no_jaringan',
         'tanggal_rfs',
 
+        'attachments', // tambahkan ini supaya bisa diisi massal
+
+    ];
+
+    protected $casts = [
+        'attachments' => 'array', // penting supaya JSON di DB otomatis jadi array di PHP
     ];
     // const STATUS_PENDING = 'Pending';
     // const STATUS_IN_PROGRESS = 'In Progress';

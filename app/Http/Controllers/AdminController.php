@@ -556,6 +556,7 @@ class AdminController extends Controller
             'harga_instalasi_hidden' => 'required|integer',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // validasi file
 
             'cart' => 'nullable|array',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi untuk foto
@@ -563,6 +564,20 @@ class AdminController extends Controller
 
         // Temukan data Work Order Install
         $workOrder = WorkOrderInstall::findOrFail($id);
+        $uploadedFiles = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/instalasi',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
 
         // Update foto jika ada
         if ($request->hasFile('foto')) {
@@ -604,6 +619,7 @@ class AdminController extends Controller
             'harga_instalasi' => $validatedData['harga_instalasi_hidden'],
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'attachments' => $uploadedFiles,
 
         ]);
         LogActivity::add('Instalasi', $workOrder->nama_site, 'edit');
@@ -1282,6 +1298,27 @@ class AdminController extends Controller
             'Survey',
             $survey->nama_site
         );
+
+        $uploadedFiles = [];
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/survey',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
+
+        // Simpan path file ke kolom JSON attachments
+        $survey->attachments = $uploadedFiles;
+        $survey->save();
         // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
         $psbUsers = User::where('is_role', 5)->get();
         // Buat notifikasi untuk setiap pengguna General Affair
@@ -1293,6 +1330,19 @@ class AdminController extends Controller
                 'message' => 'WO Survey baru telah diterbitkan dengan No Order: ' . $survey->no_spk,
                 'url' => $url, // URL dengan hash #request
             ]);
+        }
+        $psbUsers = User::where('is_role', 5)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($psbUsers as $psb) {
+            Mail::to($psb->email)->send(
+                new \App\Mail\SurveyMail(
+                    $survey,
+
+                    5 // PSB
+                )
+            );
         }
 
         return redirect()->route('admin.survey')->with('success', 'Work order berhasil diterbitkan.');
@@ -1372,11 +1422,27 @@ class AdminController extends Controller
             'no_jaringan' => 'nullable|string',
             'tanggal_rfs' => 'required|date',
             'foto' => 'image|nullable|max:2048', // Validasi untuk foto
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // validasi file
 
             // tambahkan validasi lain sesuai kebutuhan
         ]);
         // Cari work order survey berdasarkan ID
         $getSurvey = WorkOrderSurvey::findOrFail($id);
+        $uploadedFiles = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/instalasi',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
         // Proses upload foto jika ada
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
@@ -1410,6 +1476,8 @@ class AdminController extends Controller
             'no_jaringan' => $request->no_jaringan,
             'tanggal_rfs' => $request->tanggal_rfs,
             'foto' => $filename, // Simpan nama file atau null jika tidak ada foto
+            'attachments' => $uploadedFiles,
+
         ]);
         LogActivity::add('Survey', $getSurvey->nama_site, 'edit');
 

@@ -36,7 +36,13 @@ class WorkOrderInstall extends Model
         'admin_id',
         'status',
         'keterangan',
-        'non_stock'
+        'non_stock',
+        'attachments', // tambahkan ini supaya bisa diisi massal
+
+    ];
+
+    protected $casts = [
+        'attachments' => 'array', // penting supaya JSON di DB otomatis jadi array di PHP
     ];
     public function survey()
     {
