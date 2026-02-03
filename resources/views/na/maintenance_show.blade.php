@@ -162,7 +162,7 @@
 
                                     </p>
                                     <p><strong>Vlan:</strong> {{ $getMaintenance->onlineBilling->vlan }}</p>
-                                    <p><strong>Vendor:</strong> {{ $getMaintenance->onlineBilling->vendor->nama_vendor }}</p>
+                                    <p><strong>Vendor:</strong> {{ $getMaintenance->onlineBilling->vendor?->nama_vendor }}</p>
 
                                 </div>
                             </div>

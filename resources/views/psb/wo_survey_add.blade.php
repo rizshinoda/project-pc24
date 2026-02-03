@@ -133,9 +133,16 @@
 
                                             <!-- Tombol untuk tambah progress -->
                                             <button type="submit" name="action" value="add_progress" class="btn btn-info">Tambah Progress</button>
+                                            <input type="hidden" name="action" id="actionInput">
 
-                                            <!-- Tombol untuk selesaikan survey -->
-                                            <button type="submit" name="action" value="complete" class="btn btn-success ">Selesaikan Proses Survey</button>
+                                            <button type="button"
+                                                class="btn btn-success btn-complete"
+                                                data-title="Selesaikan Survey?"
+                                                data-text="Progress Survey akan ditandai sebagai Completed dan tidak bisa diubah kembali."
+                                                data-action="complete">
+                                                Selesaikan Proses Survey
+                                            </button>
+
                                         </div>
                                     </form>
                                 </div>

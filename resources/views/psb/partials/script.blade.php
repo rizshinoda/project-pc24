@@ -359,3 +359,27 @@
         chart.render();
     });
 </script>
+<script>
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-complete')) {
+
+            const btn = e.target;
+
+            Swal.fire({
+                title: btn.dataset.title ?? 'Yakin?',
+                text: btn.dataset.text ?? 'Data akan diproses.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Selesaikan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('actionInput').value = btn.dataset.action;
+                    btn.closest('form').submit();
+                }
+            });
+        }
+    });
+</script>

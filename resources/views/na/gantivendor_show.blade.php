@@ -180,7 +180,7 @@
                                     <p><strong>Alamat:</strong> {{ $getGantivendor->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getGantivendor->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getGantivendor->onlineBilling->no_pic }}</p>
-                                    <p><strong>Vendor:</strong> {{ $getGantivendor->onlineBilling->vendor->nama_vendor }} ({{$getGantivendor->onlineBilling->sid_vendor}})</p>
+                                    <p><strong>Vendor:</strong> {{ $getGantivendor->onlineBilling->vendor?->nama_vendor }} ({{$getGantivendor->onlineBilling->sid_vendor}})</p>
                                     <p><strong>Keterangan:</strong> {{ $getGantivendor->keterangan }}</p>
 
                                 </div>
