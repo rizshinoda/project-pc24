@@ -175,7 +175,7 @@
 
                     <!-- Tombol Filter -->
                     <div class="">
-                      <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
+                      <button type="submit" class="btn btn-info btn-sm mb-4 ">Carii</button>
                       <a href="{{ route('work-order-dismantle.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a>
 
                     </div>
