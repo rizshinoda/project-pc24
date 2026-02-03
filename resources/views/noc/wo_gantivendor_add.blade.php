@@ -127,7 +127,15 @@
                                             <button type="submit" name="action" value="add_progress" class="btn btn-info">Tambah Progress</button>
 
                                             <!-- Tombol untuk selesaikan survey -->
-                                            <button type="submit" name="action" value="complete" class="btn btn-success">Selesaikan Proses Ganti Vendor</button>
+                                            <input type="hidden" name="action" id="actionInput">
+
+                                            <button type="button"
+                                                class="btn btn-success btn-complete"
+                                                data-title="Selesaikan Ganti Vendor?"
+                                                data-text="Progress Ganti Vendor akan ditandai sebagai Completed dan tidak bisa diubah kembali."
+                                                data-action="complete">
+                                                Selesaikan Proses Ganti Vendor
+                                            </button>
                                         </div>
                                     </form>
                                 </div>

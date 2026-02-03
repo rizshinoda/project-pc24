@@ -160,7 +160,7 @@
 
                                     </p>
                                     <p><strong>Vlan:</strong> {{ $getRelokasi->onlineBilling->vlan }}</p>
-                                    <p><strong>Vendor:</strong> {{ $getRelokasi->onlineBilling->vendor->nama_vendor }}</p>
+                                    <p><strong>Vendor:</strong> {{ $getRelokasi->onlineBilling->vendor?->nama_vendor }}</p>
 
                                 </div>
                             </div>

@@ -168,7 +168,7 @@
                                     <p><strong>Alamat:</strong> {{ $getDismantle->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getDismantle->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getDismantle->onlineBilling->no_pic }}</p>
-                                    <p><strong>Vendor:</strong> {{ $getDismantle->onlineBilling->vendor->nama_vendor }}</p>
+                                    <p><strong>Vendor:</strong> {{ $getDismantle->onlineBilling->vendor?->nama_vendor }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getDismantle->keterangan }}</p>
 
                                 </div>

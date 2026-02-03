@@ -127,7 +127,15 @@
                                             <button type="submit" name="action" value="add_progress" class="btn btn-info">Tambah Progress</button>
 
                                             <!-- Tombol untuk selesaikan survey -->
-                                            <button type="submit" name="action" value="complete" class="btn btn-success">Selesaikan Proses Upgrade</button>
+                                            <input type="hidden" name="action" id="actionInput">
+
+                                            <button type="button"
+                                                class="btn btn-success btn-complete"
+                                                data-title="Selesaikan Upgrade?"
+                                                data-text="Progress Upgrade akan ditandai sebagai Completed dan tidak bisa diubah kembali."
+                                                data-action="complete">
+                                                Selesaikan Proses Upgrade
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
