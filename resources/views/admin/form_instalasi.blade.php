@@ -238,7 +238,7 @@
                                             <div class="form-group row">
                                                 <label for="bandwidth" class="col-sm-4 col-form-label">Volume</label>
                                                 <div class="col-sm-4">
-                                                    <input type="number" name="bandwidth" id="bandwidth" class="form-control" min="1" required>
+                                                    <input type="number" name="bandwidth" id="bandwidth" class="form-control" required>
                                                 </div>
 
                                                 <div class="col-sm-4">

@@ -242,7 +242,7 @@
                                                         name="bandwidth"
                                                         id="bandwidth"
                                                         class="form-control"
-                                                        min="1"
+
                                                         value="{{ old('bandwidth', $getSurvey->bandwidth) }}"
                                                         required>
                                                 </div>
