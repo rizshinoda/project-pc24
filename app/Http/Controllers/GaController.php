@@ -166,8 +166,8 @@ class GaController extends Controller
         $year = $request->get('year');
 
         // Query untuk mendapatkan data survey
-        $query = WorkOrderInstall::orderBy('created_at', 'desc');
-
+        $query = WorkOrderInstall::where('jenis_pekerjaan', 'instalasi')
+            ->orderBy('created_at', 'desc');
         // Filter berdasarkan status
         if ($status != 'all') {
             $query->where('status', $status);
@@ -2406,6 +2406,518 @@ class GaController extends Controller
         ])->findOrFail($id);
 
         return view('ga.print_barang_upgrade', compact('getUpgrade'));
+    }
+    public function jasa(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey
+        $query = WorkOrderInstall::where('jenis_pekerjaan', 'jasa')
+            ->orderBy('created_at', 'desc');
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
+                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
+        $getInstall = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('jasa', $data);
+    }
+    public function showjasa($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = InstallProgress::where('work_order_install_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')->findOrFail($id);
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getInstall', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('jasa_show', $data);
+    }
+
+    public function poc(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey
+        $query = WorkOrderInstall::where('jenis_pekerjaan', 'poc')
+            ->orderBy('created_at', 'desc');
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
+                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
+        $getInstall = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('poc', $data);
+    }
+
+    public function showpoc($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = InstallProgress::where('work_order_install_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')->findOrFail($id);
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getInstall', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('poc_show', $data);
+    }
+
+    public function approvejasa($id)
+    {
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Ubah status menjadi 'approved'
+        $getInstall->status = 'On Progress';
+        $getInstall->save();
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('ga.jasa_show', $id)->with('success', 'Jasa telah disetujui.');
+    }
+    public function rejectjasa($id)
+    {
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Ubah status menjadi 'rejected'
+        $getInstall->status = 'Rejected';
+        $getInstall->save();
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('ga.jasa_show', $id)->with('error', 'Jasa telah ditolak.');
+    }
+    public function approvepoc($id)
+    {
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Ubah status menjadi 'approved'
+        $getInstall->status = 'On Progress';
+        $getInstall->save();
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('ga.poc_show', $id)->with('success', 'POC telah disetujui.');
+    }
+    public function rejectpoc($id)
+    {
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Ubah status menjadi 'rejected'
+        $getInstall->status = 'Rejected';
+        $getInstall->save();
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('ga.poc_show', $id)->with('error', 'POC telah ditolak.');
+    }
+    public function inputBarangjasacreate(Request $request, $workOrderId)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        $getInstall = WorkOrderInstall::findOrFail($workOrderId);
+        // Ambil data keranjang yang ada di session
+        $cartItems = session()->get('cart', []);  // Jika tidak ada data di session, defaultkan ke array kosong
+        // Ambil data stok barang dengan relasi yang diperlukan
+        $search = $request->input('search', ''); // Ambil nilai pencarian dari input
+
+        $stockBarangs = StockBarang::with(['jenis', 'merek', 'tipe'])
+            ->when($search, function ($query, $search) {
+                return $query->whereHas('jenis', function ($query) use ($search) {
+                    $query->where('nama_jenis', 'like', '%' . $search . '%');
+                })
+                    ->orWhereHas('merek', function ($query) use ($search) {
+                        $query->where('nama_merek', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('tipe', function ($query) use ($search) {
+                        $query->where('nama_tipe', 'like', '%' . $search . '%');
+                    });
+            })
+            ->orderBy('id', 'desc')
+            ->get(); // Mengambil semua data tanpa paginasi
+
+        return $this->renderView('input_barang_jasa', compact('getInstall', 'stockBarangs', 'search', 'cartItems', 'notifications'));
+    }
+    public function inputBarangjasastore(Request $request, $workOrderId)
+    {
+        // Jika `cartItems` dikirim sebagai JSON string, decode menjadi array terlebih dahulu
+        if (is_string($request->input('cartItems'))) {
+            $request->merge(['cartItems' => json_decode($request->input('cartItems'), true)]);
+        }
+
+        // Validasi data `cartItems`
+        $validated = $request->validate([
+            'cartItems' => 'required|array',
+            'cartItems.*.id' => 'required|exists:stock_barangs,id', // validasi ID barang dalam stok
+            'cartItems.*.jumlah' => 'required|integer|min:1',
+            'cartItems.*.serialNumber' => 'nullable|string',
+            'cartItems.*.kualitas' => 'required|string|in:baru,bekas',
+        ]);
+
+        $cartItems = $validated['cartItems'];
+
+        foreach ($cartItems as $item) {
+            $stockBarang = StockBarang::find($item['id']);
+
+            if ($stockBarang && $stockBarang->jumlah >= $item['jumlah']) {
+                // Menyimpan entri baru di tabel barang_keluars
+                BarangKeluar::create([
+                    'work_order_install_id' => $workOrderId, // ID Work Order untuk instalasi
+                    'stock_barang_id' => $item['id'],
+                    'jumlah' => $item['jumlah'],
+                    'serial_number' => $item['serialNumber'],
+                    'kualitas' => $item['kualitas'],
+                    'user_id' => Auth::user()->id,
+
+                ]);
+
+                // Update stok setelah barang dikirim
+                $stockBarang->jumlah -= $item['jumlah'];
+                $stockBarang->save();
+            } else {
+                // Redirect jika stok tidak mencukupi
+                return redirect()->back()->with('error', 'Stok tidak mencukupi untuk barang: ' . $item['id']);
+            }
+        }
+
+        // Kirim notifikasi ke pengguna NA setelah barang berhasil diinput
+        $naUsers = User::where('is_role', 6)->get(); // Role NA adalah 4
+        foreach ($naUsers as $naUser) {
+            $url = route('na.jasa_show', ['id' => $workOrderId]) . '#Jasa'; // URL menuju halaman konfigurasi NA
+            Notification::create([
+                'user_id' => $naUser->id,
+                'message' => 'Barang untuk Jasa telah diinput, Silahkan Konfigurasi Perangkat ',
+                'url' => $url,
+            ]);
+        }
+        return redirect()->route('ga.jasa_show', $workOrderId)->with('success', 'Barang berhasil dikirim!');
+    }
+
+    public function cancelBarangjasa($barangKeluarId)
+    {
+        // Cari barang yang akan dibatalkan
+        $barangKeluar = BarangKeluar::findOrFail($barangKeluarId);
+        $getInstall = $barangKeluar->WorkOrderInstall;
+
+        // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
+        if ($getInstall->status === 'Completed') {
+            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        }
+
+        // Kembalikan jumlah barang ke stok awal
+        $stockBarang = $barangKeluar->stockBarang;
+        $stockBarang->jumlah += $barangKeluar->jumlah;
+        $stockBarang->save();
+
+        // Hapus data barang keluar
+        $barangKeluar->delete();
+
+
+
+        // Arahkan ke halaman show requestBarang dengan id
+        return redirect()->route('ga.jasa_show', ['id' => $getInstall->id])
+            ->with('success', 'Barang berhasil dibatalkan dan stok dikembalikan.');
+    }
+
+    public function jasastoreShipped(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new InstallProgress();
+        $progress->work_order_install_id = $id;
+        $progress->keterangan = $request->keterangan;
+        $progress->status = 'Shipped'; // Set status langsung menjadi Shipped
+        $progress->user_id = Auth::id();
+        $progress->save();
+
+        // Ambil data WO Instalasi
+        $getInstall = WorkOrderInstall::findOrFail($id);
+        $getInstall->status = 'Shipped'; // Update status WO menjadi Shipped
+        $getInstall->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel install_progress_photos
+                InstallProgressPhoto::create([
+                    'install_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+
+
+        return redirect()->route('ga.jasa_show', $id)->with('success', 'Status berhasil diubah menjadi Shipped.');
+    }
+    public function inputBarangpoccreate(Request $request, $workOrderId)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        $getInstall = WorkOrderInstall::findOrFail($workOrderId);
+        // Ambil data keranjang yang ada di session
+        $cartItems = session()->get('cart', []);  // Jika tidak ada data di session, defaultkan ke array kosong
+        // Ambil data stok barang dengan relasi yang diperlukan
+        $search = $request->input('search', ''); // Ambil nilai pencarian dari input
+
+        $stockBarangs = StockBarang::with(['jenis', 'merek', 'tipe'])
+            ->when($search, function ($query, $search) {
+                return $query->whereHas('jenis', function ($query) use ($search) {
+                    $query->where('nama_jenis', 'like', '%' . $search . '%');
+                })
+                    ->orWhereHas('merek', function ($query) use ($search) {
+                        $query->where('nama_merek', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('tipe', function ($query) use ($search) {
+                        $query->where('nama_tipe', 'like', '%' . $search . '%');
+                    });
+            })
+            ->orderBy('id', 'desc')
+            ->get(); // Mengambil semua data tanpa paginasi
+
+        return $this->renderView('input_barang_poc', compact('getInstall', 'stockBarangs', 'search', 'cartItems', 'notifications'));
+    }
+    public function inputBarangpocstore(Request $request, $workOrderId)
+    {
+        // Jika `cartItems` dikirim sebagai JSON string, decode menjadi array terlebih dahulu
+        if (is_string($request->input('cartItems'))) {
+            $request->merge(['cartItems' => json_decode($request->input('cartItems'), true)]);
+        }
+
+        // Validasi data `cartItems`
+        $validated = $request->validate([
+            'cartItems' => 'required|array',
+            'cartItems.*.id' => 'required|exists:stock_barangs,id', // validasi ID barang dalam stok
+            'cartItems.*.jumlah' => 'required|integer|min:1',
+            'cartItems.*.serialNumber' => 'nullable|string',
+            'cartItems.*.kualitas' => 'required|string|in:baru,bekas',
+        ]);
+
+        $cartItems = $validated['cartItems'];
+
+        foreach ($cartItems as $item) {
+            $stockBarang = StockBarang::find($item['id']);
+
+            if ($stockBarang && $stockBarang->jumlah >= $item['jumlah']) {
+                // Menyimpan entri baru di tabel barang_keluars
+                BarangKeluar::create([
+                    'work_order_install_id' => $workOrderId, // ID Work Order untuk instalasi
+                    'stock_barang_id' => $item['id'],
+                    'jumlah' => $item['jumlah'],
+                    'serial_number' => $item['serialNumber'],
+                    'kualitas' => $item['kualitas'],
+                    'user_id' => Auth::user()->id,
+
+                ]);
+
+                // Update stok setelah barang dikirim
+                $stockBarang->jumlah -= $item['jumlah'];
+                $stockBarang->save();
+            } else {
+                // Redirect jika stok tidak mencukupi
+                return redirect()->back()->with('error', 'Stok tidak mencukupi untuk barang: ' . $item['id']);
+            }
+        }
+
+        // Kirim notifikasi ke pengguna NA setelah barang berhasil diinput
+        $naUsers = User::where('is_role', 6)->get(); // Role NA adalah 4
+        foreach ($naUsers as $naUser) {
+            $url = route('na.poc_show', ['id' => $workOrderId]) . '#POC'; // URL menuju halaman konfigurasi NA
+            Notification::create([
+                'user_id' => $naUser->id,
+                'message' => 'Barang untuk POC telah diinput, Silahkan Konfigurasi Perangkat ',
+                'url' => $url,
+            ]);
+        }
+        return redirect()->route('ga.poc_show', $workOrderId)->with('success', 'Barang berhasil dikirim!');
+    }
+
+    public function cancelBarangpoc($barangKeluarId)
+    {
+        // Cari barang yang akan dibatalkan
+        $barangKeluar = BarangKeluar::findOrFail($barangKeluarId);
+        $getInstall = $barangKeluar->WorkOrderInstall;
+
+        // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
+        if ($getInstall->status === 'Completed') {
+            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        }
+
+        // Kembalikan jumlah barang ke stok awal
+        $stockBarang = $barangKeluar->stockBarang;
+        $stockBarang->jumlah += $barangKeluar->jumlah;
+        $stockBarang->save();
+
+        // Hapus data barang keluar
+        $barangKeluar->delete();
+
+
+
+        // Arahkan ke halaman show requestBarang dengan id
+        return redirect()->route('ga.poc_show', ['id' => $getInstall->id])
+            ->with('success', 'Barang berhasil dibatalkan dan stok dikembalikan.');
+    }
+
+    public function pocstoreShipped(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:2048', // Validasi untuk banyak file
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new InstallProgress();
+        $progress->work_order_install_id = $id;
+        $progress->keterangan = $request->keterangan;
+        $progress->status = 'Shipped'; // Set status langsung menjadi Shipped
+        $progress->user_id = Auth::id();
+        $progress->save();
+
+        // Ambil data WO Instalasi
+        $getInstall = WorkOrderInstall::findOrFail($id);
+        $getInstall->status = 'Shipped'; // Update status WO menjadi Shipped
+        $getInstall->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel install_progress_photos
+                InstallProgressPhoto::create([
+                    'install_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+
+
+        return redirect()->route('ga.poc_show', $id)->with('success', 'Status berhasil diubah menjadi Shipped.');
+    }
+
+    public function jasacreateShipped($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getInstall = WorkOrderInstall::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'notifications'));
+
+        return $this->renderView('wo_jasa_createshipped', $data);
+    }
+    public function poccreateShipped($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getInstall = WorkOrderInstall::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'notifications'));
+
+        return $this->renderView('wo_poc_createshipped', $data);
     }
 }
 

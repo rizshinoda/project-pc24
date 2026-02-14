@@ -91,7 +91,18 @@
               </ul>
             </div>
           </li>
-
+          <li class="nav-item">
+            <a class="nav-link" href="{{route('admin.jasa')}}">
+              <span class="menu-title">Jasa</span>
+              <i class="mdi mdi-wrench menu-icon"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{route('admin.poc')}}">
+              <span class="menu-title">POC</span>
+              <i class="mdi mdi-wrench menu-icon"></i>
+            </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="{{route('admin.OB')}}">
               <span class="menu-title">Online Billing</span>

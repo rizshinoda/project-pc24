@@ -91,7 +91,18 @@
                             </ul>
                         </div>
                     </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('admin.jasa')}}">
+                            <span class="menu-title">Jasa</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('admin.poc')}}">
+                            <span class="menu-title">POC</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('admin.OB')}}">
                             <span class="menu-title">Online Billing</span>
@@ -124,7 +135,7 @@
                     <div class="col-lg-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="mb-5 text-center">Edit Instalasi</h4>
+                                <h4 class="mb-5 text-center">Edit Instalasi/Jasa/POC</h4>
                                 <!-- {{-- Menampilkan pesan error jika ada --}}
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -456,6 +467,18 @@
                                         </div>
 
                                         <div class="col-md-6">
+                                            <div class="form-group row">
+                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Jenis Pekerjaan</label>
+                                                <div class="col-sm-8">
+                                                    <select class="form-control" id="jenis_pekerjaan" name="jenis_pekerjaan" required>
+                                                        <option value="">Pilih Jenis Pekerjaan</option>
+                                                        <option value="instalasi" {{ $getInstall->jenis_pekerjaan == 'instalasi' ? 'selected' : '' }}>Instalasi</option>
+                                                        <option value="jasa" {{ $getInstall->jenis_pekerjaan == 'jasa' ? 'selected' : '' }}>Jasa</option>
+                                                        <option value="poc" {{ $getInstall->jenis_pekerjaan == 'poc' ? 'selected' : '' }}>POC</option>
+
+                                                    </select>
+                                                </div>
+                                            </div>
                                             <!-- Kolom kedua -->
                                             <div class="form-group row">
                                                 <label for="instansi_id" class="col-sm-4 col-form-label">Nama Instansi</label>

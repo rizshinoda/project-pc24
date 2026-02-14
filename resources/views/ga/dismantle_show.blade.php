@@ -89,6 +89,18 @@
                         </div>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{url('ga/jasa')}}">
+                            <span class="menu-title">Jasa</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url('ga/poc')}}">
+                            <span class="menu-title">POC</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{url('ga/OB')}}">
                             <span class="menu-title">Online Billing</span>
                             <i class="mdi mdi-database-outline menu-icon"></i>
@@ -351,7 +363,6 @@
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th style=" text-align: center; vertical-align: middle;">GA</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Jenis</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Merek</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Tipe</th>
@@ -364,7 +375,6 @@
                                             <tbody>
                                                 @forelse ($dismantleItems as $item)
                                                 <tr>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $getDismantle->admin->name }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $item->jenis->nama_jenis }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $item->merek->nama_merek }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $item->tipe->nama_tipe }}</td>

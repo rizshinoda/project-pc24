@@ -107,6 +107,14 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::get('admin/instalasi/billing/sid/{id}', [AdminController::class, 'sidform'])->name('sid.form');
     Route::post('admin/instalasi/billing/sid/{id}', [AdminController::class, 'storebilling'])->name('online_billing.store');
 
+
+    Route::get('admin/jasa', [AdminController::class, 'jasa'])->name('admin.jasa');
+    Route::get('admin/jasa/{id}', [AdminController::class, 'showjasa'])->name('admin.wo_jasa_show');
+
+    Route::get('admin/poc', [AdminController::class, 'poc'])->name('admin.poc');
+    Route::get('admin/poc/{id}', [AdminController::class, 'showpoc'])->name('admin.wo_poc_show');
+
+
     // Routes untuk Pelanggan
     Route::get('/admin/pelanggan', [AdminController::class, 'pelanggan'])->name('admin.pelanggan');
     Route::get('/admin/pelanggan/create', [AdminController::class, 'CreatePelanggan'])->name('pelanggan.create');
@@ -339,6 +347,30 @@ Route::group(['middleware' => ['ga', SessionTimeout::class]], function () {
     Route::get('ga/relokasi/{id}/print/detailbarangrelokasi', [GaController::class, 'printDetailBarangRelokasi'])->name('ga.relokasi_barang.printdetailbarang');
     Route::get('ga/upgrade/{id}/print/detailbarangupgrade', [GaController::class, 'printDetailBarangUpgrade'])->name('ga.upgrade_barang.printdetailbarang');
 
+    Route::get('ga/jasa', [GaController::class, 'jasa'])->name('ga.jasa');
+    Route::get('ga/jasa/{id}', [GaController::class, 'showjasa'])->name('ga.jasa_show');
+
+    Route::get('ga/poc', [GaController::class, 'poc'])->name('ga.poc');
+    Route::get('ga/poc/{id}', [GaController::class, 'showpoc'])->name('ga.poc_show');
+
+    Route::post('ga/jasa/{id}/approve', [GaController::class, 'approvejasa'])->name('ga.jasa.approve');
+    Route::post('ga/jasa/{id}/reject', [GaController::class, 'rejectjasa'])->name('ga.jasa.reject');
+    Route::post('ga/poc/{id}/approve', [GaController::class, 'approvepoc'])->name('ga.poc.approve');
+    Route::post('ga/poc/{id}/reject', [GaController::class, 'rejectpoc'])->name('ga.poc.reject');
+
+    Route::get('ga/jasa/{id}/input_barang/create', [GaController::class, 'inputBarangjasacreate'])->name('ga.input_barang_jasa.create');
+    Route::post('ga/jasa/{id}/input_barang', [GaController::class, 'inputBarangjasastore'])->name('ga.input_barang_jasa.store');
+    Route::delete('ga/cancel_barang_jasa/{barangKeluar}', [GAController::class, 'cancelBarangjasa'])->name('ga.cancel_barang.jasa');
+    Route::get('ga/jasa/{id}/createshipped', [GaController::class, 'jasacreateShipped'])->name('ga.jasa.create.shipped');
+    Route::post('ga/jasa/{id}/storeshipped', [GaController::class, 'jasastoreShipped'])->name('ga.jasa.store.shipped');
+
+    Route::get('ga/poc/{id}/input_barang/create', [GaController::class, 'inputBarangpoccreate'])->name('ga.input_barang_poc.create');
+    Route::post('ga/poc/{id}/input_barang', [GaController::class, 'inputBarangpocstore'])->name('ga.input_barang_poc.store');
+    Route::delete('ga/cancel_barang_poc/{barangKeluar}', [GAController::class, 'cancelBarangpoc'])->name('ga.cancel_barang.poc');
+    Route::get('ga/poc/{id}/createshipped', [GaController::class, 'poccreateShipped'])->name('ga.poc.create.shipped');
+
+    Route::post('ga/poc/{id}/storeshipped', [GaController::class, 'pocstoreShipped'])->name('ga.poc.store.shipped');
+
     Route::get('ga/chat', Index::class)->name('ga.chat.index');
     Route::get('ga/chat/{query}', Chat::class)->name('ga.chat');
     Route::get('ga/users', Users::class)->name('ga.users');
@@ -389,6 +421,11 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
     Route::get('helpdesk/sitedismantle{id}', [HelpdeskController::class, 'showsitedismantle'])->name('hd.showsitedismantle');
     Route::get('helpdesk/Online-Billing/export', [HelpdeskController::class, 'exportOB'])->name('work-OB.export');
 
+    Route::get('helpdesk/jasa', [HelpdeskController::class, 'jasa'])->name('hd.jasa');
+    Route::get('helpdesk/jasa/{id}', [HelpdeskController::class, 'showjasa'])->name('hd.wo_jasa_show');
+
+    Route::get('helpdesk/poc', [HelpdeskController::class, 'poc'])->name('hd.poc');
+    Route::get('helpdesk/poc/{id}', [HelpdeskController::class, 'showpoc'])->name('hd.wo_poc_show');
 
     Route::get('helpdesk/chat', Index::class)->name('helpdesk.chat.index');
     Route::get('helpdesk/chat/{query}', Chat::class)->name('helpdesk.chat');
@@ -449,6 +486,14 @@ Route::group(['middleware' => ['na', SessionTimeout::class]], function () {
     Route::get('na/requestbarang/{id}/edit', [NaController::class, 'editrequest'])->name('na.request_barang.edit');
     Route::put('na/requestbarang/{id}/update', [NaController::class, 'updateRequest'])->name('na.request_barang.update');
     Route::patch('notifications/{id}/mark-as-read/na', [NaController::class, 'markAsReadNa'])->name('notifications.markAsReadNa');
+
+
+    Route::get('na/jasa', [NaController::class, 'jasa'])->name('na.jasa');
+    Route::get('na/jasa/{id}', [NaController::class, 'showjasa'])->name('na.jasa_show');
+
+    Route::get('na/poc', [NaController::class, 'poc'])->name('na.poc');
+    Route::get('na/poc/{id}', [NaController::class, 'showpoc'])->name('na.poc_show');
+
 
     Route::get('na/chat', Index::class)->name('na.chat.index');
     Route::get('na/chat/{query}', Chat::class)->name('na.chat');
@@ -515,6 +560,20 @@ Route::group(['middleware' => ['noc', SessionTimeout::class]], function () {
     Route::get('noc/requestbarang/{id}/edit', [NocController::class, 'editrequest'])->name('noc.request_barang.edit');
     Route::put('noc/requestbarang/{id}/update', [NocController::class, 'updateRequest'])->name('noc.request_barang.update');
     Route::patch('notifications/{id}/mark-as-read/noc', [NocController::class, 'markAsReadnoc'])->name('notifications.markAsReadnoc');
+
+
+    Route::get('noc/jasa', [NocController::class, 'jasa'])->name('noc.jasa');
+    Route::get('noc/jasa/{id}', [NocController::class, 'showjasa'])->name('noc.jasa_show');
+    Route::post('noc/jasa/{id}/approve', [NocController::class, 'approvejasa'])->name('noc.jasa.approve');
+    Route::get('noc/jasa/{id}/add-progress-jasa', [NocController::class, 'addProgressjasa'])->name('noc_jasa_add_progress');
+    Route::post('noc/jasa/{id}/add-progress-jasa', [NocController::class, 'storeProgressjasa'])->name('noc_jasa_store_progress');
+
+    Route::get('noc/poc', [NocController::class, 'poc'])->name('noc.poc');
+    Route::get('noc/poc/{id}', [NocController::class, 'showpoc'])->name('noc.poc_show');
+    Route::post('noc/poc/{id}/approve', [NocController::class, 'approvepoc'])->name('noc.poc.approve');
+
+    Route::get('noc/poc/{id}/add-progress-poc', [NocController::class, 'addProgresspoc'])->name('noc_poc_add_progress');
+    Route::post('noc/poc/{id}/add-progress-poc', [NocController::class, 'storeProgresspoc'])->name('noc_poc_store_progress');
 
     Route::get('noc/chat', Index::class)->name('noc.chat.index');
     Route::get('noc/chat/{query}', Chat::class)->name('noc.chat');
@@ -604,7 +663,20 @@ Route::group(['middleware' => ['psb', SessionTimeout::class]], function () {
     Route::get('psb/gantivendor/{id}/print/gantivendor', [PsbController::class, 'printGantiVendorPDF'])->name('psb.gantivendor.print');
     Route::get('psb/dismantle/{id}/print/dismantle', [PsbController::class, 'printDismantlePDF'])->name('psb.dismantle.print');
     Route::get('psb/relokasi/{id}/print/relokasi', [PsbController::class, 'printRelokasiPDF'])->name('psb.relokasi.print');
+    Route::get('psb/jasa/{id}/print/jasa', [PsbController::class, 'printJasaPDF'])->name('psb.jasa.print');
+    Route::get('psb/poc/{id}/print/poc', [PsbController::class, 'printPocPDF'])->name('psb.poc.print');
 
+    Route::get('psb/jasa', [PsbController::class, 'jasa'])->name('psb.jasa');
+    Route::get('psb/jasa/{id}', [PsbController::class, 'showjasa'])->name('psb.jasa_show');
+    Route::post('psb/jasa/{id}/approve', [PsbController::class, 'approvejasa'])->name('psb.jasa.approve');
+    Route::get('psb/jasa/{id}/add-progress-jasa', [PsbController::class, 'addProgressjasa'])->name('psb_jasa_add_progress');
+    Route::post('psb/jasa/{id}/add-progress-jasa', [PsbController::class, 'storeProgressjasa'])->name('psb_jasa_store_progress');
+
+    Route::get('psb/poc', [PsbController::class, 'poc'])->name('psb.poc');
+    Route::get('psb/poc/{id}', [PsbController::class, 'showpoc'])->name('psb.poc_show');
+    Route::post('psb/poc/{id}/approve', [PsbController::class, 'approvepoc'])->name('psb.poc.approve');
+    Route::get('psb/poc/{id}/add-progress-poc', [PsbController::class, 'addProgresspoc'])->name('psb_poc_add_progress');
+    Route::post('psb/poc/{id}/add-progress-poc', [PsbController::class, 'storeProgresspoc'])->name('psb_poc_store_progress');
 
     Route::get('psb/chat', Index::class)->name('psb.chat.index');
     Route::get('psb/chat/{query}', Chat::class)->name('psb.chat');

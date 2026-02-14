@@ -257,7 +257,6 @@
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th style=" text-align: center; vertical-align: middle;">GA</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Jenis</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Merek</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Tipe</th>
@@ -269,7 +268,6 @@
                                             <tbody>
                                                 @forelse ($dismantleItems as $item)
                                                 <tr>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $getDismantle->admin->name }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;"> {{ $item->jenis->nama_jenis }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $item->merek->nama_merek }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $item->tipe->nama_tipe }}</td>

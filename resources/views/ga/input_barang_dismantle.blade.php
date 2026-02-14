@@ -88,6 +88,18 @@
                         </div>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{url('ga/jasa')}}">
+                            <span class="menu-title">Jasa</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url('ga/poc')}}">
+                            <span class="menu-title">POC</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{url('ga/OB')}}">
                             <span class="menu-title">Online Billing</span>
                             <i class="mdi mdi-database-outline menu-icon"></i>
