@@ -182,8 +182,8 @@ class AdminController extends Controller
         $year = $request->get('year');
 
         // Query untuk mendapatkan data survey
-        $query = WorkOrderInstall::orderBy('created_at', 'desc');
-
+        $query = WorkOrderInstall::where('jenis_pekerjaan', 'instalasi')
+            ->orderBy('created_at', 'desc');
         // Filter berdasarkan status
         if ($status != 'all') {
             $query->where('status', $status);
@@ -314,6 +314,7 @@ class AdminController extends Controller
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+            'jenis_pekerjaan' => 'required|in:instalasi,jasa,poc',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
             // tambahkan validasi lain sesuai kebutuhan
@@ -362,6 +363,7 @@ class AdminController extends Controller
             'harga_instalasi' => $hargaInstalasi, // Simpan harga instalasi (angka murni)
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'jenis_pekerjaan' => $validatedData['jenis_pekerjaan'],
 
 
         ]);
@@ -422,57 +424,73 @@ class AdminController extends Controller
         // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
         $psbUsers = User::where('is_role', 5)->get();
         // Buat notifikasi untuk setiap pengguna General Affair
+        $jenis = $getInstall->jenis_pekerjaan;
+
+        $routeMap = [
+            'instalasi' => [
+                'ga'  => 'ga.instalasi.show',
+                'psb' => 'psb.instalasi.show',
+            ],
+            'jasa' => [
+                'ga'  => 'ga.jasa_show',
+                'psb' => 'psb.jasa_show',
+            ],
+            'poc' => [
+                'ga'  => 'ga.poc_show',
+                'psb' => 'psb.poc_show',
+            ],
+        ];
+
+        $hash = "#{$jenis}";
         foreach ($gaUsers as $gaUser) {
-            $url = route('ga.instalasi.show', ['id' => $getInstall->id]) . '#instalasi';
+            $url = route($routeMap[$jenis]['ga'], ['id' => $getInstall->id]) . $hash;
 
             Notification::create([
                 'user_id' => $gaUser->id,
-                'message' => 'WO Instalasi baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
-                'url' => $url, // URL dengan hash #request
+                'message' => 'WO ' . ucfirst($jenis) . ' baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
+                'url' => $url,
             ]);
         }
-        // Buat notifikasi untuk setiap pengguna PSB
         foreach ($psbUsers as $psbUser) {
-            $url = route('psb.instalasi.show', ['id' => $getInstall->id]) . '#instalasi';
+            $url = route($routeMap[$jenis]['psb'], ['id' => $getInstall->id]) . $hash;
 
             Notification::create([
                 'user_id' => $psbUser->id,
-                'message' => 'WO Instalasi baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'message' => 'WO ' . ucfirst($jenis) . ' baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
+                'url' => $url,
             ]);
         }
+
 
         $detailBarang = WorkOrderInstallDetail::where('work_order_install_id', $getInstall->id)->get();
 
 
-        $psbUsers = User::where('is_role', 5)
-            ->whereNotNull('email')
-            ->get();
+        $mailClass = match ($getInstall->jenis_pekerjaan) {
+            'instalasi' => \App\Mail\InstalasiMail::class,
+            'jasa'      => \App\Mail\JasaMail::class,
+            'poc'       => \App\Mail\PocMail::class,
+        };
 
         foreach ($psbUsers as $psb) {
             Mail::to($psb->email)->send(
-                new \App\Mail\InstalasiMail(
-                    $getInstall,
-                    $detailBarang,
-                    5 // PSB
-                )
+                new $mailClass($getInstall, $detailBarang, 5)
             );
         }
-
-        $gaUsers = User::where('is_role', 2)
-            ->whereNotNull('email')
-            ->get();
-
         foreach ($gaUsers as $ga) {
             Mail::to($ga->email)->send(
-                new \App\Mail\InstalasiMail(
-                    $getInstall,
-                    $detailBarang,
-                    2 // PSB
-                )
+                new $mailClass($getInstall, $detailBarang, 2)
             );
         }
-        return redirect()->route('admin.instalasi')->with('success', 'Work order berhasil diterbitkan.');
+
+        $route = match ($getInstall->jenis_pekerjaan) {
+            'instalasi' => 'admin.instalasi',
+            'jasa'      => 'admin.jasa',
+            'poc'       => 'admin.poc',
+        };
+
+        return redirect()
+            ->route($route)
+            ->with('success', 'Work order berhasil diterbitkan.');
     }
     public function showinstalasi($id)
     {
@@ -557,6 +575,7 @@ class AdminController extends Controller
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // validasi file
+            'jenis_pekerjaan' => 'required|in:instalasi,jasa,poc',
 
             'cart' => 'nullable|array',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi untuk foto
@@ -620,6 +639,7 @@ class AdminController extends Controller
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
             'attachments' => $uploadedFiles,
+            'jenis_pekerjaan' => $validatedData['jenis_pekerjaan'],
 
         ]);
         LogActivity::add('Instalasi', $workOrder->nama_site, 'edit');
@@ -652,7 +672,15 @@ class AdminController extends Controller
             }
         }
 
-        return redirect()->route('admin.instalasi')->with('success', 'Work order berhasil diperbarui.');
+        $route = match ($workOrder->jenis_pekerjaan) {
+            'instalasi' => 'admin.instalasi',
+            'jasa'      => 'admin.jasa',
+            'poc'       => 'admin.poc',
+        };
+
+        return redirect()
+            ->route($route)
+            ->with('success', 'Work order berhasil diperbaharui.');
     }
 
     public function destroyinstalasi($id)
@@ -3927,6 +3955,7 @@ class AdminController extends Controller
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+            'jenis_pekerjaan' => 'required|in:instalasi,jasa,poc',
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
             // tambahkan validasi lain sesuai kebutuhan
@@ -3976,6 +4005,7 @@ class AdminController extends Controller
             'harga_instalasi' => $hargaInstalasi, // Simpan harga instalasi (angka murni)
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
+            'jenis_pekerjaan' => $validatedData['jenis_pekerjaan'],
 
         ]);
         LogActivity::add(
@@ -4052,37 +4082,36 @@ class AdminController extends Controller
                 'url' => $url, // URL dengan hash #instalasi
             ]);
         }
+
         $detailBarang = WorkOrderInstallDetail::where('work_order_install_id', $getInstall->id)->get();
 
 
-        $psbUsers = User::where('is_role', 5)
-            ->whereNotNull('email')
-            ->get();
+        $mailClass = match ($getInstall->jenis_pekerjaan) {
+            'instalasi' => \App\Mail\InstalasiMail::class,
+            'jasa'      => \App\Mail\JasaMail::class,
+            'poc'       => \App\Mail\PocMail::class,
+        };
 
         foreach ($psbUsers as $psb) {
             Mail::to($psb->email)->send(
-                new \App\Mail\InstalasiMail(
-                    $getInstall,
-                    $detailBarang,
-                    5 // PSB
-                )
+                new $mailClass($getInstall, $detailBarang, 5)
             );
         }
-
-        $gaUsers = User::where('is_role', 2)
-            ->whereNotNull('email')
-            ->get();
-
         foreach ($gaUsers as $ga) {
             Mail::to($ga->email)->send(
-                new \App\Mail\InstalasiMail(
-                    $getInstall,
-                    $detailBarang,
-                    2 // PSB
-                )
+                new $mailClass($getInstall, $detailBarang, 2)
             );
         }
-        return redirect()->route('admin.instalasi')->with('success', 'Work order berhasil diterbitkan.');
+
+        $route = match ($getInstall->jenis_pekerjaan) {
+            'instalasi' => 'admin.instalasi',
+            'jasa'      => 'admin.jasa',
+            'poc'       => 'admin.poc',
+        };
+
+        return redirect()
+            ->route($route)
+            ->with('success', 'Work order berhasil diterbitkan.');
     }
     public function exportWoSurvey()
     {
@@ -4127,5 +4156,164 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimpor: ' . $e->getMessage());
         }
+    }
+
+    public function jasa(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey
+        $query = WorkOrderInstall::where('jenis_pekerjaan', 'jasa')
+            ->orderBy('created_at', 'desc');
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
+                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
+        $getInstall = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('jasa', $data);
+    }
+    public function showjasa($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = InstallProgress::where('work_order_install_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')->findOrFail($id);
+        // Cek apakah sudah ada di tabel online_billing
+        $billingExists = OnlineBilling::where('work_order_install_id', $getInstall->id)->exists();
+        // Mendapatkan berita acara yang terkait dengan work order ini
+        $beritaAcaras = BeritaAcara::where('work_order_install_id', $id)->get();
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('billingExists', 'beritaAcaras', 'progressList', 'getInstall', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('wo_jasa_show', $data);
+    }
+
+    public function poc(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey
+        $query = WorkOrderInstall::where('jenis_pekerjaan', 'poc')
+            ->orderBy('created_at', 'desc');
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
+                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
+        $getInstall = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('poc', $data);
+    }
+
+    public function showpoc($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = InstallProgress::where('work_order_install_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')->findOrFail($id);
+        // Cek apakah sudah ada di tabel online_billing
+        $billingExists = OnlineBilling::where('work_order_install_id', $getInstall->id)->exists();
+        // Mendapatkan berita acara yang terkait dengan work order ini
+        $beritaAcaras = BeritaAcara::where('work_order_install_id', $id)->get();
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('billingExists', 'beritaAcaras', 'progressList', 'getInstall', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('wo_poc_show', $data);
     }
 }

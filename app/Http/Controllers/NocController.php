@@ -159,8 +159,8 @@ class NocController extends Controller
         $year = $request->get('year');
 
         // Query untuk mendapatkan data survey
-        $query = WorkOrderInstall::orderBy('created_at', 'desc');
-
+        $query = WorkOrderInstall::where('jenis_pekerjaan', 'instalasi')
+            ->orderBy('created_at', 'desc');
         // Filter berdasarkan status
         if ($status != 'all') {
             $query->where('status', $status);
@@ -1806,6 +1806,366 @@ class NocController extends Controller
 
 
         return $this->renderView('requestbarang_show', $data);
+    }
+    public function jasa(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey
+        $query = WorkOrderInstall::where('jenis_pekerjaan', 'jasa')
+            ->orderBy('created_at', 'desc');
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
+                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
+        $getInstall = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('jasa', $data);
+    }
+    public function showjasa($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = InstallProgress::where('work_order_install_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')->findOrFail($id);
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getInstall', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('jasa_show', $data);
+    }
+
+    public function poc(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey
+        $query = WorkOrderInstall::where('jenis_pekerjaan', 'poc')
+            ->orderBy('created_at', 'desc');
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
+                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
+        $getInstall = $query->paginate(5)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('poc', $data);
+    }
+
+    public function showpoc($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = InstallProgress::where('work_order_install_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')->findOrFail($id);
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getInstall', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('poc_show', $data);
+    }
+
+    public function approvepoc($id)
+    {
+        // Cari work order upgrade berdasarkan ID
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Ubah status di tabel work_order_upgrades
+        $getInstall->status = 'On Progress';
+        $getInstall->save();
+
+
+
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('noc.poc_show', $id)
+            ->with('success', 'POC telah disetujui.');
+    }
+
+
+    public function addProgresspoc($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getInstall = WorkOrderInstall::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'notifications'));
+
+        return $this->renderView('wo_poc_add', $data);
+    }
+    public function storeProgresspoc(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new InstallProgress();
+        $progress->work_order_install_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+        // Ambil data upgrade
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+            // Ubah status upgrade menjadi Completed
+            $getInstall->status = 'Completed';
+            $getInstall->save();
+
+
+
+            $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
+
+            // Buat notifikasi "Survey Completed" untuk setiap admin
+            foreach ($adminUsers as $admin) {
+                // Cek role pengguna
+                if ($admin->is_role == 1) { // Role PSB
+                    $url = route('admin.wo_poc_show', ['id' => $getInstall->id]) . '#POC'; // Tambahkan #no_spk untuk PSB
+                } else if ($admin->is_role == 4) { // Role Admin
+                    $url = route('noc.poc_show', ['id' => $getInstall->id]) . '#POC'; // Tambahkan #no_spk untuk Admin
+                }
+
+                // Buat notifikasi
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'message' => 'WO POC telah diselesaikan dengan No Order: ' . $getInstall->no_spk,
+                    'url' => $url, // URL dengan hash #no_spk
+                ]);
+            }
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+
+
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->user_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                InstallProgressPhoto::create([
+                    'install_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('noc.poc', $id)->with('success', 'POC berhasil diselesaikan.');
+        }
+
+        return redirect()->route('noc.poc_show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function approvejasa($id)
+    {
+        // Cari work order upgrade berdasarkan ID
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Ubah status di tabel work_order_upgrades
+        $getInstall->status = 'On Progress';
+        $getInstall->save();
+
+
+
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('noc.jasa_show', $id)
+            ->with('success', 'Jasa telah disetujui.');
+    }
+
+
+    public function addProgressjasa($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getInstall = WorkOrderInstall::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'notifications'));
+
+        return $this->renderView('wo_jasa_add', $data);
+    }
+    public function storeProgressjasa(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new InstallProgress();
+        $progress->work_order_install_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+        // Ambil data upgrade
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+            // Ubah status upgrade menjadi Completed
+            $getInstall->status = 'Completed';
+            $getInstall->save();
+
+
+
+            $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
+
+            // Buat notifikasi "Survey Completed" untuk setiap admin
+            foreach ($adminUsers as $admin) {
+                // Cek role pengguna
+                if ($admin->is_role == 1) { // Role PSB
+                    $url = route('admin.wo_jasa_show', ['id' => $getInstall->id]) . '#Jasa'; // Tambahkan #no_spk untuk PSB
+                } else if ($admin->is_role == 4) { // Role Admin
+                    $url = route('noc.jasa_show', ['id' => $getInstall->id]) . '#Jasa'; // Tambahkan #no_spk untuk Admin
+                }
+
+                // Buat notifikasi
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'message' => 'WO Jasa telah diselesaikan dengan No Order: ' . $getInstall->no_spk,
+                    'url' => $url, // URL dengan hash #no_spk
+                ]);
+            }
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+
+
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->user_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                InstallProgressPhoto::create([
+                    'install_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('noc.jasa', $id)->with('success', 'Jasa berhasil diselesaikan.');
+        }
+
+        return redirect()->route('noc.jasa_show', $id)->with('success', 'Progress berhasil ditambahkan.');
     }
 }
 

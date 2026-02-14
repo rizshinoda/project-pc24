@@ -91,7 +91,18 @@
                             </ul>
                         </div>
                     </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('admin.jasa')}}">
+                            <span class="menu-title">Jasa</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('admin.poc')}}">
+                            <span class="menu-title">POC</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('admin.OB')}}">
                             <span class="menu-title">Online Billing</span>
@@ -227,7 +238,7 @@
                                             <div class="form-group row">
                                                 <label for="bandwidth" class="col-sm-4 col-form-label">Volume</label>
                                                 <div class="col-sm-4">
-                                                    <input type="number" name="bandwidth" id="bandwidth" class="form-control" min="1" required>
+                                                    <input type="number" name="bandwidth" id="bandwidth" class="form-control" required>
                                                 </div>
 
                                                 <div class="col-sm-4">
@@ -413,7 +424,18 @@
 
                                         <div class="col-md-6">
                                             <!-- Kolom kedua -->
+                                            <div class="form-group row">
+                                                <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Jenis Pekerjaan</label>
+                                                <div class="col-sm-8">
+                                                    <select class="form-control" id="jenis_pekerjaan" name="jenis_pekerjaan" required>
+                                                        <option value="">Pilih Jenis Pekerjaan</option>
+                                                        <option value="instalasi">Instalasi</option>
+                                                        <option value="jasa">Jasa</option>
+                                                        <option value="poc">POC</option>
 
+                                                    </select>
+                                                </div>
+                                            </div>
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Instansi</label>
                                                 <div class="col-sm-8">

@@ -70,6 +70,18 @@
                         </div>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{url('na/jasa')}}">
+                            <span class="menu-title">Jasa</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url('na/poc')}}">
+                            <span class="menu-title">POC</span>
+                            <i class="mdi mdi-wrench menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{url('na/OB')}}">
                             <span class="menu-title">Online Billing</span>
                             <i class="mdi mdi-database-outline menu-icon"></i>
@@ -116,6 +128,8 @@
                                     <h5 class="card-title">Details:</h5>
                                     <p><strong>No Order: </strong> {{ $getInstall->no_spk }}</p>
                                     <p><strong>No Survey:</strong> {{ $getInstall->survey_id ? $getInstall->survey->no_spk : '-' }}</p>
+                                    <p><strong>Jenis Pekerjaan:</strong> {{ ucfirst($getInstall->jenis_pekerjaan) }}</p>
+
                                     <p><strong>Diterbitkan oleh:</strong> {{ $getInstall->admin->name }}</p>
                                     <p><strong>Tanggal Diterbitkan:</strong> {{ $getInstall->created_at->translatedFormat('d M Y, H:i:s') }}</p>
                                     <p><strong>Status:</strong> @if($getInstall->status=='Pending')

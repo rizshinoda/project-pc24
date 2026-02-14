@@ -38,6 +38,7 @@ class WorkOrderInstall extends Model
         'keterangan',
         'non_stock',
         'attachments', // tambahkan ini supaya bisa diisi massal
+        'jenis_pekerjaan',
 
     ];
 
