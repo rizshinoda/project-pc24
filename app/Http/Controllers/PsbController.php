@@ -1911,11 +1911,14 @@ class PsbController extends Controller
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('no_spk', 'like', '%' . $search . '%')
-                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    ->orWhereHas('onlineBilling', function ($q) use ($search) {
+                        $q->where('nama_site', 'like', '%' . $search . '%')
+                            ->orWhereHas('pelanggan', function ($q) use ($search) {
+                                $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                            })
+                            ->orWhereHas('instansi', function ($q) use ($search) {
+                                $q->where('nama_instansi', 'like', '%' . $search . '%');
+                            });
                     });
             });
         }
@@ -2128,11 +2131,14 @@ class PsbController extends Controller
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('no_spk', 'like', '%' . $search . '%')
-                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    ->orWhereHas('onlineBilling', function ($q) use ($search) {
+                        $q->where('nama_site', 'like', '%' . $search . '%')
+                            ->orWhereHas('pelanggan', function ($q) use ($search) {
+                                $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                            })
+                            ->orWhereHas('instansi', function ($q) use ($search) {
+                                $q->where('nama_instansi', 'like', '%' . $search . '%');
+                            });
                     });
             });
         }
@@ -2345,15 +2351,17 @@ class PsbController extends Controller
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('no_spk', 'like', '%' . $search . '%')
-                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    ->orWhereHas('onlineBilling', function ($q) use ($search) {
+                        $q->where('nama_site', 'like', '%' . $search . '%')
+                            ->orWhereHas('pelanggan', function ($q) use ($search) {
+                                $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                            })
+                            ->orWhereHas('instansi', function ($q) use ($search) {
+                                $q->where('nama_instansi', 'like', '%' . $search . '%');
+                            });
                     });
             });
         }
-
         // Filter berdasarkan bulan dan tahun
         if (!empty($month) && !empty($year)) {
             $query->whereMonth('created_at', $month)
@@ -2504,16 +2512,18 @@ class PsbController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
         // Pencarian di semua kolom yang relevan
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('no_spk', 'like', '%' . $search . '%')
-                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    ->orWhereHas('onlineBilling', function ($q) use ($search) {
+                        $q->where('nama_site', 'like', '%' . $search . '%')
+                            ->orWhereHas('pelanggan', function ($q) use ($search) {
+                                $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                            })
+                            ->orWhereHas('instansi', function ($q) use ($search) {
+                                $q->where('nama_instansi', 'like', '%' . $search . '%');
+                            });
                     });
             });
         }
@@ -2738,11 +2748,14 @@ class PsbController extends Controller
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('no_spk', 'like', '%' . $search . '%')
-                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    ->orWhereHas('onlineBilling', function ($q) use ($search) {
+                        $q->where('nama_site', 'like', '%' . $search . '%')
+                            ->orWhereHas('pelanggan', function ($q) use ($search) {
+                                $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                            })
+                            ->orWhereHas('instansi', function ($q) use ($search) {
+                                $q->where('nama_instansi', 'like', '%' . $search . '%');
+                            });
                     });
             });
         }
@@ -3024,11 +3037,14 @@ class PsbController extends Controller
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('no_spk', 'like', '%' . $search . '%')
-                    ->orWhereHas('onlineBilling.pelanggan', function ($q) use ($search) {
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('onlineBilling.instansi', function ($q) use ($search) {
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    ->orWhereHas('onlineBilling', function ($q) use ($search) {
+                        $q->where('nama_site', 'like', '%' . $search . '%')
+                            ->orWhereHas('pelanggan', function ($q) use ($search) {
+                                $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                            })
+                            ->orWhereHas('instansi', function ($q) use ($search) {
+                                $q->where('nama_instansi', 'like', '%' . $search . '%');
+                            });
                     });
             });
         }
