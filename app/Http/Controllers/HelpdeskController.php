@@ -1128,7 +1128,7 @@ class HelpdeskController extends Controller
 
         $data = array_merge($this->ambilDataRole(), compact('workOrder', 'onlineBilling', 'notifications'));
         // Kirim data ke view
-        return $this->renderView('gantivendor_Edit', $data);
+        return $this->renderView('gantivendor_edit', $data);
     }
     public function gantivendorUpdate(Request $request, $id)
     {
