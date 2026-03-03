@@ -324,14 +324,14 @@
                                     <div class="d-flex justify-content-between mb-3">
                                         <!-- Tombol Input Barang di kiri -->
                                         <div>
-                                            @if ($getInstall->status === 'On Progress' || $getInstall->status === 'Shipped')
+                                            @if ($getInstall->status === 'On Progress' || $getInstall->status === 'Shipped' || $getInstall->status === 'Completed')
                                             <a href="{{ route('ga.input_barang_poc.create', $getInstall->id) }}" class="btn btn-info">Input Barang</a>
                                             @endif
                                         </div>
 
                                         <!-- Tombol Kirim di kanan -->
                                         <div>
-                                            @if ($getInstall->status === 'On Progress' || $getInstall->status === 'Shipped' )
+                                            @if ($getInstall->status === 'On Progress' || $getInstall->status === 'Shipped' || $getInstall->status === 'Completed')
                                             <a href="javascript:void(0);" id="btn-kirim-perangkat" data-url="{{ route('ga.poc.create.shipped', $getInstall->id) }}" class="btn btn-primary">
                                                 <i class="fa fa-truck"></i> Kirim Perangkat
                                             </a>

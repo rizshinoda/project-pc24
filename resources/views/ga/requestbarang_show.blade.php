@@ -298,13 +298,13 @@
                                     <h4 class="card-title">Status Barang yang Sudah Dikirim GA</h4>
                                     <div class="d-flex justify-content-between mb-3">
                                         <!-- Tombol untuk menambah input barang -->
-                                        @if ($requestBarang->status === 'approved' || $requestBarang->status === 'shipped')
+                                        @if ($requestBarang->status === 'approved' || $requestBarang->status === 'shipped' || $requestBarang->status === 'completed' )
                                         <a href="{{ route('ga.input_barang.create', $requestBarang->id) }}" class="btn btn-info">Input Barang</a>
                                         @endif
 
                                         <!-- Tombol aksi di kanan -->
                                         <div>
-                                            @if ($requestBarang->status === 'approved' || $requestBarang->status === 'shipped' )
+                                            @if ($requestBarang->status === 'approved' || $requestBarang->status === 'shipped' || $requestBarang->status === 'completed' )
                                             <a href="javascript:void(0);" id="btn-kirim-perangkat" data-url="{{ route('ga.request.create.shipped', $requestBarang->id) }}" class="btn btn-primary">
                                                 <i class="fa fa-truck"></i> Kirim Perangkat
                                             </a>

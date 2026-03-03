@@ -321,14 +321,14 @@
                                     <div class="d-flex justify-content-between mb-3">
                                         <!-- Tombol Input Barang di kiri -->
                                         <div>
-                                            @if ($getMaintenance->status === 'On Progress' || $getMaintenance->status === 'Shipped')
+                                            @if ($getMaintenance->status === 'On Progress' || $getMaintenance->status === 'Shipped'|| $getMaintenance->status === 'Completed')
                                             <a href="{{ route('ga.input_barang_maintenance.create', $getMaintenance->id) }}" class="btn btn-info">Input Barang</a>
                                             @endif
                                         </div>
 
                                         <!-- Tombol Kirim di kanan -->
                                         <div>
-                                            @if ($getMaintenance->status === 'On Progress' || $getMaintenance->status === 'Shipped' )
+                                            @if ($getMaintenance->status === 'On Progress' || $getMaintenance->status === 'Shipped'|| $getMaintenance->status === 'Completed')
                                             <a href="javascript:void(0);" id="btn-kirim-perangkat" data-url="{{ route('ga.maintenance.create.shipped', $getMaintenance->id) }}" class="btn btn-primary">
                                                 <i class="fa fa-truck"></i> Kirim Perangkat
                                             </a>
