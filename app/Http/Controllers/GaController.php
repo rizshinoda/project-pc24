@@ -343,9 +343,9 @@ class GaController extends Controller
         $getInstall = $barangKeluar->WorkOrderInstall;
 
         // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
-        if ($getInstall->status === 'Completed') {
-            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
-        }
+        // if ($getInstall->status === 'Completed') {
+        //     return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        // }
 
         // Kembalikan jumlah barang ke stok awal
         $stockBarang = $barangKeluar->stockBarang;
@@ -1189,9 +1189,9 @@ class GaController extends Controller
         $getMaintenance = $barangKeluar->WorkOrderMaintenance;
 
         // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
-        if ($getMaintenance->status === 'Completed') {
-            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
-        }
+        // if ($getMaintenance->status === 'Completed') {
+        //     return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        // }
 
         // Kembalikan jumlah barang ke stok awal
         $stockBarang = $barangKeluar->stockBarang;
@@ -1624,9 +1624,9 @@ class GaController extends Controller
         $getRelokasi = $barangKeluar->WorkOrderRelokasi;
 
         // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
-        if ($getRelokasi->status === 'Completed') {
-            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
-        }
+        // if ($getRelokasi->status === 'Completed') {
+        //     return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        // }
 
         // Kembalikan jumlah barang ke stok awal
         $stockBarang = $barangKeluar->stockBarang;
@@ -1934,9 +1934,9 @@ class GaController extends Controller
         $requestBarang = $barangKeluar->requestBarang;
 
         // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
-        if ($requestBarang->status === 'completed') {
-            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
-        }
+        // if ($requestBarang->status === 'completed') {
+        //     return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        // }
 
         // Kembalikan jumlah barang ke stok awal
         $stockBarang = $barangKeluar->stockBarang;
@@ -2265,9 +2265,9 @@ class GaController extends Controller
         $getUpgrade = $barangKeluar->workOrderUpgrade;
 
         // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
-        if ($getUpgrade->status === 'Completed') {
-            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
-        }
+        // if ($getUpgrade->status === 'Completed') {
+        //     return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        // }
 
         // Kembalikan jumlah barang ke stok awal
         $stockBarang = $barangKeluar->stockBarang;
@@ -2705,9 +2705,9 @@ class GaController extends Controller
         $getInstall = $barangKeluar->WorkOrderInstall;
 
         // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
-        if ($getInstall->status === 'Completed') {
-            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
-        }
+        // if ($getInstall->status === 'Completed') {
+        //     return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        // }
 
         // Kembalikan jumlah barang ke stok awal
         $stockBarang = $barangKeluar->stockBarang;
@@ -2852,9 +2852,9 @@ class GaController extends Controller
         $getInstall = $barangKeluar->WorkOrderInstall;
 
         // Cek status permintaan, jika 'completed' maka pembatalan tidak diizinkan
-        if ($getInstall->status === 'Completed') {
-            return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
-        }
+        // if ($getInstall->status === 'Completed') {
+        //     return redirect()->back()->withErrors('Barang tidak dapat dibatalkan karena status sudah completed.');
+        // }
 
         // Kembalikan jumlah barang ke stok awal
         $stockBarang = $barangKeluar->stockBarang;

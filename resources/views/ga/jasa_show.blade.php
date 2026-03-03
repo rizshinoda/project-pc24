@@ -380,15 +380,12 @@
                                                     </td>
                                                     <td style=" text-align: center; vertical-align: middle;">
                                                         <!-- Tampilkan tombol Batalkan hanya jika status bukan 'Completed' -->
-                                                        @if ($getInstall->status !== 'Completed')
                                                         <form id="cancelForm{{ $barangKeluar->id }}" action="{{ route('ga.cancel_barang.jasa', $barangKeluar->id) }}" method="POST" style="display: none;">
                                                             @csrf
                                                             @method('DELETE')
                                                         </form>
                                                         <button type="button" class="btn btn-danger btn-sm" onclick="confirmCancellation({{ $barangKeluar->id }})">Batalkan</button>
-                                                        @else
-                                                        <span class="text-muted">Tidak bisa dibatalkan</span>
-                                                        @endif
+
                                                     </td>
                                                 </tr>
                                                 @empty
