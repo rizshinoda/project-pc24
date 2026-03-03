@@ -321,14 +321,14 @@
                                     <div class="d-flex justify-content-between mb-3">
                                         <!-- Tombol Input Barang di kiri -->
                                         <div>
-                                            @if ($getRelokasi->status === 'On Progress' || $getRelokasi->status === 'Shipped')
+                                            @if ($getRelokasi->status === 'On Progress' || $getRelokasi->status === 'Shipped' || $getRelokasi->status === 'Completed')
                                             <a href="{{ route('ga.input_barang_relokasi.create', $getRelokasi->id) }}" class="btn btn-info">Input Barang</a>
                                             @endif
                                         </div>
 
                                         <!-- Tombol Kirim di kanan -->
                                         <div>
-                                            @if ($getRelokasi->status === 'On Progress' || $getRelokasi->status === 'Shipped' )
+                                            @if ($getRelokasi->status === 'On Progress' || $getRelokasi->status === 'Shipped' || $getRelokasi->status === 'Completed')
                                             <a href="javascript:void(0);" id="btn-kirim-perangkat" data-url="{{ route('ga.relokasi.create.shipped', $getRelokasi->id) }}" class="btn btn-primary">
                                                 <i class="fa fa-truck"></i> Kirim Perangkat
                                             </a>

@@ -322,14 +322,14 @@
                                     <div class="d-flex justify-content-between mb-3">
                                         <!-- Tombol Input Barang di kiri -->
                                         <div>
-                                            @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Shipped')
+                                            @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Shipped' || $getUpgrade->status === 'Completed')
                                             <a href="{{ route('ga.input_barang_upgrade.create', $getUpgrade->id) }}" class="btn btn-info">Input Barang</a>
                                             @endif
                                         </div>
 
                                         <!-- Tombol Kirim di kanan -->
                                         <div>
-                                            @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Shipped' )
+                                            @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Shipped' || $getUpgrade->status === 'Completed')
                                             <a href="javascript:void(0);" id="btn-kirim-perangkat" data-url="{{ route('ga.upgrade.create.shipped', $getUpgrade->id) }}" class="btn btn-primary">
                                                 <i class="fa fa-truck"></i> Kirim Perangkat
                                             </a>
