@@ -1202,10 +1202,25 @@ class PsbController extends Controller
         $pdf->Write(0, $getMaintenance->onlineBilling->no_pic);
         $pdf->SetXY(140, 60.9);
         $pdf->Write(1, $getMaintenance->onlineBilling->no_jaringan);
-        $pdf->SetXY(140, 69.9);
-        $pdf->Write(1, $getMaintenance->onlineBilling->bandwidth);
-        $pdf->SetXY(143, 70);
-        $pdf->Write(1, $getMaintenance->onlineBilling->satuan);
+
+        $x = 140;
+        $y = 69.9;
+
+        $bandwidth = $getMaintenance->onlineBilling->bandwidth;
+        $satuan    = $getMaintenance->onlineBilling->satuan;
+
+        $pdf->SetXY($x, $y);
+        $pdf->Write(1, $bandwidth);
+
+        // hitung lebar teks bandwidth
+        $textWidth = $pdf->GetStringWidth($bandwidth);
+
+        // jarak kecil antar teks (atur sesuai kebutuhan)
+        $gap = 1;
+
+        // set posisi satuan tepat setelah bandwidth
+        $pdf->SetXY($x + $textWidth + $gap, $y);
+        $pdf->Write(1, $satuan);
         $pdf->SetXY(140, 78.5);
         $pdf->Write(1, $getMaintenance->onlineBilling->vlan);
 
