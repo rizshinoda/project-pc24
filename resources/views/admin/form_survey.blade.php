@@ -224,6 +224,8 @@
                                                         <option value="INTERNET DEDICATED">INTERNET DEDICATED</option>
                                                         <option value="METRO - DARK FIBER">METRO - DARK FIBER</option>
                                                         <option value="IP TRANSIT">IP TRANSIT</option>
+                                                        <option value="IP VPN">IP VPN</option>
+
                                                         <option value="METRO P2MP">METRO P2MP</option>
                                                         <option value="DARK FIBER">DARK FIBER</option>
                                                         <option value="Internet Kuota">Internet Kuota</option>
