@@ -224,6 +224,8 @@
                                                         <option value="INTERNET BROADBAND+IP" {{ old('layanan', $getInstall->layanan) == 'INTERNET BROADBAND+IP' ? 'selected' : '' }}>INTERNET BROADBAND+IP</option>
                                                         <option value="METRO - DARK FIBER" {{ old('layanan', $getInstall->layanan) == 'METRO - DARK FIBER' ? 'selected' : '' }}>METRO - DARK FIBER</option>
                                                         <option value="IP TRANSIT" {{ old('layanan', $getInstall->layanan) == 'IP TRANSIT' ? 'selected' : '' }}>IP TRANSIT</option>
+                                                        <option value="IP VPN" {{ old('layanan', $getInstall->layanan) == 'IP VPN' ? 'selected' : '' }}>IP VPN</option>
+
                                                         <option value="METRO P2MP" {{ old('layanan', $getInstall->layanan) == 'METRO P2MP' ? 'selected' : '' }}>METRO P2MP</option>
                                                         <option value="DARK FIBER" {{ old('layanan', $getInstall->layanan) == 'DARK FIBER' ? 'selected' : '' }}>DARK FIBER</option>
                                                         <option value="Internet Kuota" {{ old('layanan', $getInstall->layanan) == 'Internet Kuota' ? 'selected' : '' }}>Internet Kuota</option>
