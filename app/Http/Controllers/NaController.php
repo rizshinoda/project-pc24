@@ -190,7 +190,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $getInstall = $query->paginate(5)->appends([
+        $getInstall = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -340,7 +340,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination
-        $getUpgrade = $query->paginate(5)->appends([
+        $getUpgrade = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -558,7 +558,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination
-        $getDowngrade = $query->paginate(5)->appends([
+        $getDowngrade = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -779,7 +779,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination
-        $getDismantle = $query->paginate(5)->appends([
+        $getDismantle = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -883,7 +883,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination
-        $getRelokasi = $query->paginate(5)->appends([
+        $getRelokasi = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -1020,7 +1020,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination
-        $getGantivendor = $query->paginate(5)->appends([
+        $getGantivendor = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -1254,7 +1254,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $onlinebilling = $query->paginate(5)->appends([
+        $onlinebilling = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -1328,7 +1328,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $onlinebilling = $query->paginate(5)->appends([
+        $onlinebilling = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -1395,7 +1395,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data request barang dengan pagination, dan tambahkan query ke pagination URL
-        $requestBarangs = $query->paginate(5)->appends([
+        $requestBarangs = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -1649,7 +1649,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination
-        $getMaintenance = $query->paginate(5)->appends([
+        $getMaintenance = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -1726,7 +1726,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $getInstall = $query->paginate(5)->appends([
+        $getInstall = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
@@ -1802,7 +1802,7 @@ class NaController extends Controller
         }
 
         // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $getInstall = $query->paginate(5)->appends([
+        $getInstall = $query->paginate(10)->appends([
             'status' => $status,
             'search' => $search,
             'month' => $month,
