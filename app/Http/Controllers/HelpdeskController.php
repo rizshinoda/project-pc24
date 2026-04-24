@@ -1049,6 +1049,8 @@ class HelpdeskController extends Controller
             'no_spk' => 'required|string|unique:work_order_ganti_vendors',
             'online_billing_id' => 'required|exists:online_billings,id',
             'keterangan' => 'nullable|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+
         ]);
 
         // Simpan data ke tabel work_order_upgrades
@@ -1072,7 +1074,26 @@ class HelpdeskController extends Controller
             'Ganti Vendor',
             $workOrder->onlineBilling->nama_site
         );
+        $uploadedFiles = [];
 
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                // Simpan file dengan nama asli (sesuai input user)
+                $path = $file->storeAs(
+                    'attachments/gantivendor',
+                    $file->getClientOriginalName(),
+                    'public'
+                );
+
+                $uploadedFiles[] = $path;
+            }
+        }
+
+
+        // Simpan path file ke kolom JSON attachments
+        $workOrder->attachments = $uploadedFiles;
+        $workOrder->save();
         // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
         $adminUsers = User::where('is_role', 1)->get();
 
@@ -1090,6 +1111,21 @@ class HelpdeskController extends Controller
             ]);
         }
 
+        // Load relasi onlineBilling untuk email
+        $workOrder->load('onlineBilling', 'admin');
+
+        $adminUsers = User::where('is_role', 1)
+            ->whereNotNull('email')
+            ->get();
+
+        foreach ($adminUsers as $admin) {
+            Mail::to([$admin->email, 'rizalkrenz4@gmail.com'])->send(
+                new \App\Mail\GantiVendorMail(
+                    $workOrder,
+                    1 // PSB
+                )
+            );
+        }
         return redirect()->route('hd.gantivendor')->with('success', 'Work order berhasil diterbitkan.');
     }
     public function gantivendorShow($id)

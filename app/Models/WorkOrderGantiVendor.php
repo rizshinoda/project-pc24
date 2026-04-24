@@ -16,8 +16,14 @@ class WorkOrderGantiVendor extends Model
         'vendor_id',
         'sid_baru',
         'admin_id',
-        'approved_by'
+        'approved_by',
+        'attachments', // tambahkan ini supaya bisa diisi massal
 
+
+    ];
+
+    protected $casts = [
+        'attachments' => 'array', // penting supaya JSON di DB otomatis jadi array di PHP
     ];
     /**
      * Relationship with the OnlineBilling model.
