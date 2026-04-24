@@ -1119,7 +1119,7 @@ class HelpdeskController extends Controller
             ->get();
 
         foreach ($adminUsers as $admin) {
-            Mail::to([$admin->email, 'rizalkrenz4@gmail.com'])->send(
+            Mail::to([$admin->email, 'presales@pc24.co.id'])->send(
                 new \App\Mail\GantiVendorMail(
                     $workOrder,
                     1 // PSB
