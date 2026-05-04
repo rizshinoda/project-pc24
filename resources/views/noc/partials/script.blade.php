@@ -380,4 +380,23 @@
             });
         }
     });
+
+    function confirmDelete(formId) {
+        // SweetAlert2 Konfirmasi
+        Swal.fire({
+            title: 'Hapus',
+            text: "Apakah Anda yakin untuk menghapusnya?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Jika dikonfirmasi, submit form
+                document.getElementById('delete-form-' + formId).submit();
+            }
+        });
+    }
 </script>

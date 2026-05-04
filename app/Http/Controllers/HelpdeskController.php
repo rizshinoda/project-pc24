@@ -241,7 +241,7 @@ class HelpdeskController extends Controller
             'subject_manual' => 'nullable|string',
             'nama_penerima' => 'required|string|max:255',
             'alamat_penerima' => 'required|string|max:255',
-            'no_penerima' => 'required|string|max:20',
+            'no_penerima' => 'required|string',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
@@ -464,7 +464,7 @@ class HelpdeskController extends Controller
         $validatedData = $request->validate([
             'nama_penerima' => 'required|string|max:255',
             'alamat_penerima' => 'required|string|max:255',
-            'no_penerima' => 'required|string|max:20',
+            'no_penerima' => 'required|string',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
@@ -1282,10 +1282,9 @@ class HelpdeskController extends Controller
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
-                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
+                $q->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                    $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                })
                     ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
                         $q->where('nama_instansi', 'like', '%' . $search . '%');
                     })
@@ -1897,6 +1896,20 @@ class HelpdeskController extends Controller
 
         // Render view berdasarkan role
         return $this->renderView('poc_show', $data);
+    }
+
+    public function requestDestroy($id)
+    {
+        // Menghapus work order
+        $requestBarang = RequestBarang::findOrFail($id);
+        if ($requestBarang->status !== 'completed') {
+            $requestBarang->delete();
+            LogActivity::add('Request Barang', $requestBarang->nama_penerima, 'delete');
+
+            return redirect()->back()->with('success', 'Request Barang berhasil diHapus.');
+        }
+
+        return redirect()->back()->with('error', 'Request Barang sudah selesai dan tidak bisa dihapus.');
     }
 }
 

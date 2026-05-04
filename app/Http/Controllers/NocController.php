@@ -2,40 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Jenis;
-use App\Models\Status;
-use App\Models\StockBarang;
+use App\Helpers\LogActivity;
 use App\Models\BarangKeluar;
-use App\Models\Notification;
-use Illuminate\Http\Request;
-use App\Models\OnlineBilling;
-use App\Models\RequestBarang;
 use App\Models\DismantleDetail;
-use App\Models\InstallProgress;
-use App\Models\UpgradeProgress;
-use App\Models\RelokasiProgress;
-use App\Models\WorkOrderInstall;
-use App\Models\WorkOrderUpgrade;
 use App\Models\DismantleProgress;
 use App\Models\DowngradeProgress;
+use App\Models\DowngradeProgressPhoto;
+use App\Models\GantiVendorProgress;
+use App\Models\GantiVendorProgressPhoto;
+use App\Models\InstallProgress;
+use App\Models\InstallProgressPhoto;
+use App\Models\Jenis;
+use App\Models\MaintenanceProgress;
+use App\Models\MaintenanceProgressPhoto;
+use App\Models\Notification;
+use App\Models\OnlineBilling;
+use App\Models\RelokasiProgress;
+use App\Models\RelokasiProgressPhoto;
 use App\Models\ReqBarangProgress;
-use App\Models\WorkOrderRelokasi;
+use App\Models\RequestBarang;
+use App\Models\RequestBarangDetails;
+use App\Models\Status;
+use App\Models\StockBarang;
+use App\Models\UpgradeProgress;
+use App\Models\UpgradeProgressPhoto;
+use App\Models\User;
 use App\Models\WorkOrderDismantle;
 use App\Models\WorkOrderDowngrade;
-use App\Models\GantiVendorProgress;
-use App\Models\MaintenanceProgress;
-use App\Models\InstallProgressPhoto;
-use App\Models\RequestBarangDetails;
-use App\Models\UpgradeProgressPhoto;
 use App\Models\WorkOrderGantiVendor;
+use App\Models\WorkOrderInstall;
 use App\Models\WorkOrderMaintenance;
+use App\Models\WorkOrderRelokasi;
+use App\Models\WorkOrderUpgrade;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\RelokasiProgressPhoto;
-use App\Models\DowngradeProgressPhoto;
-use App\Models\GantiVendorProgressPhoto;
-use App\Models\MaintenanceProgressPhoto;
 
 class NocController extends Controller
 {
@@ -1517,10 +1518,9 @@ class NocController extends Controller
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
-                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
+                $q->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                    $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                })
                     ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
                         $q->where('nama_instansi', 'like', '%' . $search . '%');
                     })
@@ -1651,7 +1651,7 @@ class NocController extends Controller
         $validatedData = $request->validate([
             'nama_penerima' => 'required|string|max:255',
             'alamat_penerima' => 'required|string|max:255',
-            'no_penerima' => 'required|string|max:20',
+            'no_penerima' => 'required|string',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
@@ -1756,7 +1756,7 @@ class NocController extends Controller
         $validatedData = $request->validate([
             'nama_penerima' => 'required|string|max:255',
             'alamat_penerima' => 'required|string|max:255',
-            'no_penerima' => 'required|string|max:20',
+            'no_penerima' => 'required|string',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
@@ -2182,6 +2182,20 @@ class NocController extends Controller
         }
 
         return redirect()->route('noc.jasa_show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function requestDestroy($id)
+    {
+        // Menghapus work order
+        $requestBarang = RequestBarang::findOrFail($id);
+        if ($requestBarang->status !== 'completed') {
+            $requestBarang->delete();
+            LogActivity::add('Request Barang', $requestBarang->nama_penerima, 'delete');
+
+            return redirect()->back()->with('success', 'Request Barang berhasil diHapus.');
+        }
+
+        return redirect()->back()->with('error', 'Request Barang sudah selesai dan tidak bisa dihapus.');
     }
 }
 

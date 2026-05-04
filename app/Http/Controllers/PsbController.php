@@ -2,56 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Jenis;
-use App\Models\Status;
-use setasign\Fpdi\Fpdi;
-use Endroid\QrCode\QrCode;
-use App\Models\StockBarang;
-use App\Models\Notification;
-use Illuminate\Http\Request;
-use App\Models\OnlineBilling;
-use App\Models\RequestBarang;
-use App\Models\SurveyProgress;
+use App\Helpers\LogActivity;
 use App\Models\DismantleDetail;
-use App\Models\InstallProgress;
-use App\Models\UpgradeProgress;
-use App\Models\WorkOrderSurvey;
-use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Label\Label;
-use App\Models\RelokasiProgress;
-use App\Models\WorkOrderInstall;
-use App\Models\WorkOrderUpgrade;
 use App\Models\DismantleProgress;
+use App\Models\DismantleProgressPhoto;
 use App\Models\DowngradeProgress;
+use App\Models\DowngradeProgressPhoto;
+use App\Models\GantiVendorProgress;
+use App\Models\GantiVendorProgressPhoto;
+use App\Models\InstallProgress;
+use App\Models\InstallProgressPhoto;
+use App\Models\Jenis;
+use App\Models\MaintenanceProgress;
+use App\Models\MaintenanceProgressPhoto;
+use App\Models\Notification;
+use App\Models\OnlineBilling;
+use App\Models\RelokasiProgress;
+use App\Models\RelokasiProgressPhoto;
 use App\Models\ReqBarangProgress;
-use App\Models\WorkOrderRelokasi;
+use App\Models\RequestBarang;
+use App\Models\RequestBarangDetails;
+use App\Models\Status;
+use App\Models\StockBarang;
+use App\Models\SurveyProgress;
+use App\Models\SurveyProgressPhoto;
+use App\Models\UpgradeProgress;
+use App\Models\UpgradeProgressPhoto;
+use App\Models\User;
 use App\Models\WorkOrderDismantle;
 use App\Models\WorkOrderDowngrade;
-use App\Models\GantiVendorProgress;
-use App\Models\MaintenanceProgress;
-use App\Models\SurveyProgressPhoto;
-use Endroid\QrCode\Builder\Builder;
-use App\Models\InstallProgressPhoto;
-use App\Models\RequestBarangDetails;
-use App\Models\UpgradeProgressPhoto;
 use App\Models\WorkOrderGantiVendor;
+use App\Models\WorkOrderInstall;
 use App\Models\WorkOrderMaintenance;
-use Endroid\QrCode\Writer\PngWriter;
-use Illuminate\Support\Facades\Auth;
-use App\Models\RelokasiProgressPhoto;
-use Endroid\QrCode\Encoding\Encoding;
-use Intervention\Image\Facades\Image;
-use App\Models\DismantleProgressPhoto;
-use App\Models\DowngradeProgressPhoto;
+use App\Models\WorkOrderRelokasi;
+use App\Models\WorkOrderSurvey;
+use App\Models\WorkOrderUpgrade;
 use App\Notifications\SurveyCompleted;
-use Endroid\QrCode\RoundBlockSizeMode;
-use App\Models\GantiVendorProgressPhoto;
-use App\Models\MaintenanceProgressPhoto;
+use Carbon\Carbon;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Intervention\Image\Facades\Image;
+use setasign\Fpdi\Fpdi;
 
 class PsbController extends Controller
 {
@@ -350,13 +351,18 @@ class PsbController extends Controller
         }
 
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%')
-                    ->orWhere('nama_pelanggan', 'like', '%' . $search . '%')
-                    ->orWhere('nama_instansi', 'like', '%' . $search . '%')
-                    ->orWhere('nama_site', 'like', '%' . $search . '%')
-                    ->orWhereHas('admin', function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
+                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
+                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
                         $q->where('name', 'like', '%' . $search . '%');
                     });
             });
@@ -2973,10 +2979,9 @@ class PsbController extends Controller
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
-                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
+                $q->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                    $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                })
                     ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
                         $q->where('nama_instansi', 'like', '%' . $search . '%');
                     })
@@ -3281,7 +3286,7 @@ class PsbController extends Controller
         $validatedData = $request->validate([
             'nama_penerima' => 'required|string|max:255',
             'alamat_penerima' => 'required|string|max:255',
-            'no_penerima' => 'required|string|max:20',
+            'no_penerima' => 'required|string',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
@@ -3381,7 +3386,7 @@ class PsbController extends Controller
         $validatedData = $request->validate([
             'nama_penerima' => 'required|string|max:255',
             'alamat_penerima' => 'required|string|max:255',
-            'no_penerima' => 'required|string|max:20',
+            'no_penerima' => 'required|string',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
@@ -3806,5 +3811,19 @@ class PsbController extends Controller
         }
 
         return redirect()->route('psb.jasa_show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function requestDestroy($id)
+    {
+        // Menghapus work order
+        $requestBarang = RequestBarang::findOrFail($id);
+        if ($requestBarang->status !== 'completed') {
+            $requestBarang->delete();
+            LogActivity::add('Request Barang', $requestBarang->nama_penerima, 'delete');
+
+            return redirect()->back()->with('success', 'Request Barang berhasil diHapus.');
+        }
+
+        return redirect()->back()->with('error', 'Request Barang sudah selesai dan tidak bisa dihapus.');
     }
 }
