@@ -3644,7 +3644,7 @@ class AdminController extends Controller
         $validatedData = $request->validate([
             'nama_penerima' => 'required|string|max:255',
             'alamat_penerima' => 'required|string|max:255',
-            'no_penerima' => 'required|string|max:20',
+            'no_penerima' => 'required|string',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
@@ -3744,7 +3744,7 @@ class AdminController extends Controller
         $validatedData = $request->validate([
             'nama_penerima' => 'required|string|max:255',
             'alamat_penerima' => 'required|string|max:255',
-            'no_penerima' => 'required|string|max:20',
+            'no_penerima' => 'required|string',
             'keterangan' => 'nullable|string',
             'non_stock' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
@@ -3829,10 +3829,9 @@ class AdminController extends Controller
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
-                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
+                $q->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                    $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                })
                     ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
                         $q->where('nama_instansi', 'like', '%' . $search . '%');
                     })
@@ -3842,7 +3841,6 @@ class AdminController extends Controller
                     });
             });
         }
-
         // Filter berdasarkan bulan dan tahun
         if (!empty($month) && !empty($year)) {
             $query->whereMonth('created_at', $month)
@@ -4330,5 +4328,19 @@ class AdminController extends Controller
 
         // Render view berdasarkan role
         return $this->renderView('wo_poc_show', $data);
+    }
+
+    public function requestDestroy($id)
+    {
+        // Menghapus work order
+        $requestBarang = RequestBarang::findOrFail($id);
+        if ($requestBarang->status !== 'completed') {
+            $requestBarang->delete();
+            LogActivity::add('Request Barang', $requestBarang->nama_penerima, 'delete');
+
+            return redirect()->back()->with('success', 'Request Barang berhasil diHapus.');
+        }
+
+        return redirect()->back()->with('error', 'Request Barang sudah selesai dan tidak bisa dihapus.');
     }
 }

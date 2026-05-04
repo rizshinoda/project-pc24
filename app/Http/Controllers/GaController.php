@@ -1360,10 +1360,9 @@ class GaController extends Controller
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
-                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                    })
+                $q->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
+                    $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                })
                     ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
                         $q->where('nama_instansi', 'like', '%' . $search . '%');
                     })
@@ -1373,7 +1372,6 @@ class GaController extends Controller
                     });
             });
         }
-
         // Filter berdasarkan bulan dan tahun
         if (!empty($month) && !empty($year)) {
             $query->whereMonth('created_at', $month)

@@ -199,7 +199,7 @@
                                 </ul>
                                 <div class=" table-responsive">
                                     <!-- Tabel Request Barang -->
-                                    <table class="table table-bordered" style="table-layout: fixed; width: 100%;">
+                                    <table class="table table-bordered" style="table-layout: fixed; width: 160%;">
                                         <thead>
                                             <tr>
                                                 <th style="width: 80px; text-align: center; vertical-align: middle;">No</th>
@@ -219,7 +219,7 @@
                                                 <td style="text-align: center; vertical-align: middle;">{{ $requestBarang->created_at->format('d M Y') }}</td>
                                                 <td style="text-align: center; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">{{ $requestBarang->nama_penerima }}</td>
                                                 <td style="text-align: center; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">{{ $requestBarang->alamat_penerima }}</td>
-                                                <td style="text-align: center; vertical-align: middle; ">{{ $requestBarang->no_penerima }}</td>
+                                                <td style="text-align: center; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">{{ $requestBarang->no_penerima }}</td>
                                                 <td style="text-align: justify; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">
                                                     {{ $requestBarang->keterangan }}
                                                 </td>
@@ -242,7 +242,13 @@
                                                     <a href="{{ route('psb.request_barang.edit', $requestBarang->id) }}" class="btn btn-info btn-sm">
                                                         <i class="fa fa-edit"></i>
                                                     </a>
-
+                                                    <form id="delete-form-{{ $requestBarang->id }}" action="{{ route('psb.request_destroy', $requestBarang->id) }}" method="POST" style="display:inline-block;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $requestBarang->id }})">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
 
                                                 </td>
                                             </tr>

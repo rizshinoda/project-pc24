@@ -219,6 +219,7 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::post('admin/requestbarang/add-to-cart', [AdminController::class, 'addToCart'])->name('admin.request_barang.add_to_cart');
     Route::get('admin/requestbarang/{id}/edit', [AdminController::class, 'editrequest'])->name('admin.request_barang.edit');
     Route::put('admin/requestbarang/{id}/update', [AdminController::class, 'updateRequest'])->name('admin.request_barang.update');
+    Route::delete('admin/requestbarang/{id}', [AdminController::class, 'requestDestroy'])->name('admin.request_destroy');
 
 
     Route::get('admin/chat', Index::class)->name('admin.chat.index');
@@ -387,6 +388,7 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
     Route::put('helpdesk/requestbarang/{id}/update', [HelpdeskController::class, 'updateRequest'])->name('hd.request_barang.update');
     Route::patch('notifications/{id}/mark-as-read/hd', [HelpdeskController::class, 'markAsReadhd'])->name('notifications.markAsReadhd');
     Route::get('helpdesk/requestbarang/{id}/print/requestbarang', [HelpdeskController::class, 'printSuratRequest'])->name('hd.request_barang.print');
+    Route::delete('helpdesk/requestbarang/{id}', [HelpdeskController::class, 'requestDestroy'])->name('hd.request_destroy');
 
     Route::get('helpdesk/instalasi', [HelpdeskController::class, 'instalasi'])->name('hd.instalasi');
     Route::get('helpdesk/instalasi/{id}', [HelpdeskController::class, 'showinstalasi'])->name('hd.instalasi.show');
@@ -486,6 +488,7 @@ Route::group(['middleware' => ['na', SessionTimeout::class]], function () {
     Route::get('na/requestbarang/{id}/edit', [NaController::class, 'editrequest'])->name('na.request_barang.edit');
     Route::put('na/requestbarang/{id}/update', [NaController::class, 'updateRequest'])->name('na.request_barang.update');
     Route::patch('notifications/{id}/mark-as-read/na', [NaController::class, 'markAsReadNa'])->name('notifications.markAsReadNa');
+    Route::delete('na/requestbarang/{id}', [NaController::class, 'requestDestroy'])->name('na.request_destroy');
 
 
     Route::get('na/jasa', [NaController::class, 'jasa'])->name('na.jasa');
@@ -560,6 +563,7 @@ Route::group(['middleware' => ['noc', SessionTimeout::class]], function () {
     Route::get('noc/requestbarang/{id}/edit', [NocController::class, 'editrequest'])->name('noc.request_barang.edit');
     Route::put('noc/requestbarang/{id}/update', [NocController::class, 'updateRequest'])->name('noc.request_barang.update');
     Route::patch('notifications/{id}/mark-as-read/noc', [NocController::class, 'markAsReadnoc'])->name('notifications.markAsReadnoc');
+    Route::delete('noc/requestbarang/{id}', [NocController::class, 'requestDestroy'])->name('noc.request_destroy');
 
 
     Route::get('noc/jasa', [NocController::class, 'jasa'])->name('noc.jasa');
@@ -638,6 +642,8 @@ Route::group(['middleware' => ['psb', SessionTimeout::class]], function () {
     Route::post('psb/requestbarang/add-to-cart', [PsbController::class, 'addToCart'])->name('psb.request_barang.add_to_cart');
     Route::get('psb/requestbarang/{id}/edit', [PsbController::class, 'editrequest'])->name('psb.request_barang.edit');
     Route::put('psb/requestbarang/{id}/update', [PsbController::class, 'updateRequest'])->name('psb.request_barang.update');
+    Route::delete('psb/requestbarang/{id}', [PsbController::class, 'requestDestroy'])->name('psb.request_destroy');
+
 
     Route::get('psb/survey', [PsbController::class, 'survey'])->name('psb.survey');
     Route::get('/psb/survey/{id}', [PsbController::class, 'show'])->name('psb.survey_show');

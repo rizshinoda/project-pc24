@@ -229,7 +229,7 @@
                                                 <td style="text-align: center; vertical-align: middle;">{{ $requestBarang->created_at->format('d M Y') }}</td>
                                                 <td style="text-align: center; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">{{ $requestBarang->nama_penerima }}</td>
                                                 <td style="text-align: center; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">{{ $requestBarang->alamat_penerima }}</td>
-                                                <td style="text-align: center; vertical-align: middle; ">{{ $requestBarang->no_penerima }}</td>
+                                                <td style="text-align: center; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">{{ $requestBarang->no_penerima }}</td>
                                                 <td style="text-align: justify; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">
                                                     {{ $requestBarang->keterangan }}
                                                 </td>
