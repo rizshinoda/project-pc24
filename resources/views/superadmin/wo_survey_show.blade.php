@@ -98,6 +98,37 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">
+                                        <i class="mdi mdi-paperclip"></i> Lampiran Work Order
+                                    </h4>
+
+                                    @if (!empty($getSurvey->attachments))
+                                    <div class="list-group">
+                                        @foreach ($getSurvey->attachments as $file)
+                                        <a href="{{ asset('storage/'.$file) }}"
+                                            target="_blank"
+                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                                            <span>
+                                                <i class="mdi mdi-file"></i>
+                                                {{ basename($file) }}
+                                            </span>
+
+                                            <span class="badge badge-info">Download</span>
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                    @else
+                                    <p class="text-muted mb-0">Tidak ada file terlampir.</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="container mt-4">
                         @php
                         // Tahapan normal
@@ -184,6 +215,7 @@
                                                         </button>
 
                                                         <!-- Modal untuk menampilkan foto -->
+                                                        <!-- Modal untuk menampilkan foto -->
                                                         <div class="modal fade" id="photoModal{{ $progress->id }}" tabindex="-1" role="dialog" aria-labelledby="photoModalLabel{{ $progress->id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg" role="document">
                                                                 <div class="modal-content">
@@ -193,14 +225,19 @@
                                                                             <span aria-hidden="true">&times;</span>
                                                                         </button>
                                                                     </div>
-                                                                    <div class="modal-body text-center">
+                                                                    <div class="modal-body d-flex flex-row flex-wrap justify-content-center">
                                                                         @foreach ($photos as $photo)
-                                                                        <div class="mb-2">
-                                                                            <a href="{{ asset('uploads/' . $photo->file_path) }}" download class="btn btn-success mb-2">Download Foto</a>
-                                                                            <img src="{{ asset('uploads/' . $photo->file_path) }}" alt="Foto Progress" class="photo-square" style="width: 200px; height: 200px; object-fit: cover;">
+                                                                        <div class="m-2 d-flex flex-column align-items-center">
+                                                                            <img src="{{ asset('uploads/' . $photo->file_path) }}"
+                                                                                alt="Logo"
+                                                                                style="width: 150px; height: 150px; object-fit: contain; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+
+                                                                            <a href="{{ asset('uploads/' . $photo->file_path) }}" download class="btn btn-info mt-2">Download Foto</a>
                                                                         </div>
                                                                         @endforeach
                                                                     </div>
+
+
                                                                     <div class="modal-footer">
                                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                                                                     </div>
