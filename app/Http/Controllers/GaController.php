@@ -1719,7 +1719,9 @@ class GaController extends Controller
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama_penerima', 'like', '%' . $search . '%') // Pencarian di kolom nama_penerima
-                    ->orWhere('alamat_penerima', 'like', '%' . $search . '%'); // Pencarian di kolom alamat_penerima
+                    ->orWhere('alamat_penerima', 'like', '%' . $search . '%') // Pencarian di kolom alamat_penerima
+                    ->orWhere('keterangan', 'like', '%' . $search . '%'); // Pencarian di kolom alamat_penerima
+
             });
         }
 
