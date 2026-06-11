@@ -16,10 +16,10 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->is_role == 1) {
+        if (Auth::check() && Auth::user()->is_role == 1 && Auth::user()->status == 'active') {
             return $next($request);
         }
-    
+
         Auth::logout();
         return redirect(url('login'));
     }
