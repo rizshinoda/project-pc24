@@ -19,6 +19,8 @@
 
 
             <!-- Main Panel -->
+            <!-- Main Panel -->
+            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -117,6 +119,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="card">
@@ -289,7 +292,7 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title">Progres Instalasi</h4>
+                                    <h4 class="card-title">Progres Jasa</h4>
 
                                     <div class=" table-responsive">
 
@@ -333,7 +336,6 @@
                                                             Lihat Foto
                                                         </button>
 
-                                                        <!-- Modal untuk menampilkan foto -->
                                                         <!-- Modal untuk menampilkan foto -->
                                                         <div class="modal fade" id="photoModal{{ $progress->id }}" tabindex="-1" role="dialog" aria-labelledby="photoModalLabel{{ $progress->id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg" role="document">
@@ -379,73 +381,8 @@
                                             </tbody>
                                         </table>
                                     </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Status Berita Acara</h4>
-
-
-
-                                    <div class="form-group">
-                                        <!-- Tombol Kirim Berita Acara hanya muncul jika status instalasi 'Completed' dan status BA 'pending' -->
-                                        @if ($getInstall->status === 'Completed' && !$beritaAcaras->contains('status', 'sent') && !$beritaAcaras->contains('status', 'received'))
-                                        <form action="{{ route('berita_acara.send', $getInstall->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-paper-plane"></i> Kirim Berita Acara
-                                            </button>
-                                        </form>
-                                        @endif
-                                    </div>
-                                    <div class=" table-responsive">
-
-                                        <!-- Tabel Berita Acara -->
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th style=" text-align: center; vertical-align: middle;">No</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Admin</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Tanggal Kirim</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Tanggal Terima</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse ($beritaAcaras as $key => $ba)
-                                                <tr>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $key + 1 }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $ba->user->name ?? 'N/A' }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $ba->tanggal_kirim ? $ba->tanggal_kirim->translatedFormat('d F Y, H:i') : '-' }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $ba->tanggal_terima ? $ba->tanggal_terima->translatedFormat('d F Y, H:i') : '-' }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">
-                                                        @if($ba->status=='sent')
-                                                        <span class="badge badge-pill badge-info">Sent</span>
-                                                        @elseif($ba->status=='received')
-                                                        <span class="badge badge-pill badge-success">Received</span>
-                                                        @else
-                                                        <span class="badge badge-pill badge-warning">Pending</span>
-                                                        @endif
-                                                    </td>
-
-
-                                                </tr>
-                                                @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center">Belum ada berita acara</td>
-                                                </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
                                     <!-- Tombol Kembali -->
-                                    <a href="{{ route('superadmin.instalasi') }}" class="btn btn-info mt-3">
+                                    <a href="{{ route('superadmin.jasa') }}" class="btn btn-info mt-3">
                                         <i class="fa fa-arrow-left"></i> Kembali
                                     </a>
 

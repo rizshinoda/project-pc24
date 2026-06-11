@@ -119,7 +119,6 @@
             </nav>
             <!-- partial -->
 
-            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -203,7 +202,8 @@
                     </div>
                 </footer>
                 <!-- partial -->
-            </div>
+            </div> <!-- Main Panel -->
+
             <!-- main-panel ends -->
         </div>
 

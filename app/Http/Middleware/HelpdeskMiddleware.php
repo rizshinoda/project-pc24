@@ -16,10 +16,10 @@ class HelpdeskMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->is_role == 3) {
+        if (Auth::check() && Auth::user()->is_role == 3 && Auth::user()->status == 'active') {
             return $next($request);
         }
-    
+
         Auth::logout();
         return redirect(url('login'));
     }

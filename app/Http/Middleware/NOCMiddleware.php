@@ -17,7 +17,7 @@ class NOCMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
-            if (Auth::user()->is_role == 4) {
+            if (Auth::user()->is_role == 4 && Auth::user()->status == 'active') {
                 return $next($request);
             } else {
                 Auth::logout();

@@ -89,6 +89,14 @@ Route::group(['middleware' => ['superadmin', SessionTimeout::class]], function (
     Route::get('superadmin/chat/{query}', Chat::class)->name('superadmin.chat');
     Route::get('superadmin/users', Users::class)->name('superadmin.users');
 
+    Route::get('superadmin/jasa', [DashboardController::class, 'jasa'])->name('superadmin.jasa');
+    Route::get('superadmin/jasa/{id}', [DashboardController::class, 'showjasa'])->name('superadmin.wo_jasa_show');
+
+    Route::get('superadmin/poc', [DashboardController::class, 'poc'])->name('superadmin.poc');
+    Route::get('superadmin/poc/{id}', [DashboardController::class, 'showpoc'])->name('superadmin.wo_poc_show');
+
+    Route::get('superadmin/userlist/{id}/edit', [DashboardController::class, 'editUser'])->name('superadmin.editUser');
+    Route::put('superadmin/userlist/{id}/update', [DashboardController::class, 'updateUser'])->name('superadmin.updateUser');
     Route::post('superadmin/OB/import-online-billing', [DashboardController::class, 'importOB'])->name('import.prosesOB');
 });
 

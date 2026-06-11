@@ -61,6 +61,18 @@
             </div>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="{{url('superadmin/jasa')}}">
+                <span class="menu-title">Jasa</span>
+                <i class="mdi mdi-database-outline menu-icon"></i>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url('superadmin/poc')}}">
+                <span class="menu-title">POC</span>
+                <i class="mdi mdi-database-outline menu-icon"></i>
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="{{url('superadmin/OB')}}">
                 <span class="menu-title">Online Billing</span>
                 <i class="mdi mdi-database-outline menu-icon"></i>

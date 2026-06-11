@@ -92,13 +92,13 @@
                                                 @endif
                                             </td>
                                             <td>
+                                                <a href="{{ route('superadmin.editUser', $value->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
 
                                                 @if ($value->status == 'active')
                                                 <button type="button"
                                                     class="btn btn-danger btn-sm btn-unverify"
                                                     data-id="{{ $value->id }}">
-                                                    Hapus Akses
-                                                </button>
+                                                    <i class="fa fa-close"></i> </button>
                                                 @else
                                                 @endif
 

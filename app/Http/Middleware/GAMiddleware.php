@@ -16,10 +16,10 @@ class GAMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->is_role == 2) {
+        if (Auth::check() && Auth::user()->is_role == 2 && Auth::user()->status == 'active') {
             return $next($request);
         }
-    
+
         Auth::logout();
         return redirect(url('login'));
     }
