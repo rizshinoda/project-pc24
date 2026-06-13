@@ -98,7 +98,6 @@
             <!-- partial -->
 
             <!-- Main Panel -->
-            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -192,6 +191,37 @@
                                     <p><strong>Vendor:</strong> {{ $getUpgrade->onlineBilling->vendor?->nama_vendor }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getUpgrade->keterangan }}</p>
                                     <p><strong>Barang non stock:</strong> {{ $getUpgrade->non_stock }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">
+                                        <i class="mdi mdi-paperclip"></i> Lampiran Work Order
+                                    </h4>
+
+                                    @if (!empty($getUpgrade->attachments))
+                                    <div class="list-group">
+                                        @foreach ($getUpgrade->attachments as $file)
+                                        <a href="{{ asset('storage/'.$file) }}"
+                                            target="_blank"
+                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                                            <span>
+                                                <i class="mdi mdi-file"></i>
+                                                {{ basename($file) }}
+                                            </span>
+
+                                            <span class="badge badge-info">Download</span>
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                    @else
+                                    <p class="text-muted mb-0">Tidak ada file terlampir.</p>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -297,6 +327,8 @@
                                                     <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Status Konfigurasi</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Aksi</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -310,11 +342,23 @@
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->serial_number }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $barangKeluar->jumlah }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ ucfirst($barangKeluar->stockBarang->kualitas) }}</td>
+
                                                     <td style=" text-align: center; vertical-align: middle;">
                                                         @if($barangKeluar->is_configured)
                                                         <span class="badge badge-pill bg-success">Sudah Dikonfigurasi</span>
                                                         @else
                                                         <span class="badge badge-pill bg-warning">Belum Dikonfigurasi</span>
+                                                        @endif
+                                                    </td>
+                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                        @if(!$barangKeluar->is_configured)
+                                                        <form action="{{ route('hd.configure-barang', $barangKeluar->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="btn btn-info btn-sm">Konfigurasikan</button>
+                                                        </form>
+                                                        @else
+                                                        <button class="btn btn-secondary btn-sm" disabled>Sudah Dikonfigurasi</button>
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -338,9 +382,24 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
+                                    @if($getUpgrade->status == 'Pending')
+                                    <!-- Tombol Approve dan Reject -->
+                                    <!-- Tombol Approve -->
+                                    <form action="{{ route('hd.upgrade.approve', $getUpgrade->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        <button type="button" class="btn btn-success" onclick="confirmApproval('{{ route('hd.upgrade.approve', $getUpgrade->id) }}')">
+                                            <i class="fa fa-check"></i> Approve
+                                        </button>
+                                    </form>
 
+
+                                    @endif
                                     <h4 class="card-title mt-2">Progres Upgrade</h4>
+                                    @if ($getUpgrade->status === 'On Progress' || $getUpgrade->status === 'Completed' || $getUpgrade->status === 'Shipped')
+                                    <a href="{{ route('hd_upgrade_add_progress', $getUpgrade->id) }}" class="btn btn-info mb-3">
+                                        Add Progress</a>
 
+                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">

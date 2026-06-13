@@ -442,3 +442,106 @@
 
     });
 </script>
+<script>
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-complete')) {
+
+            const btn = e.target;
+
+            Swal.fire({
+                title: btn.dataset.title ?? 'Yakin?',
+                text: btn.dataset.text ?? 'Data akan diproses.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Selesaikan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('actionInput').value = btn.dataset.action;
+                    btn.closest('form').submit();
+                }
+            });
+        }
+    });
+
+    function confirmDelete(formId) {
+        // SweetAlert2 Konfirmasi
+        Swal.fire({
+            title: 'Hapus',
+            text: "Apakah Anda yakin untuk menghapusnya?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Jika dikonfirmasi, submit form
+                document.getElementById('delete-form-' + formId).submit();
+            }
+        });
+    }
+
+    function confirmApproval(url) {
+        Swal.fire({
+            title: 'Apakah Anda yakin ingin menyetujui permintaan ini?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Setujui',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to the approve route
+                let form = document.createElement('form');
+                form.action = url;
+                form.method = 'POST';
+                form.innerHTML = '@csrf';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+
+    // Fungsi konfirmasi untuk reject
+    function confirmRejection(url) {
+        Swal.fire({
+            title: 'Apakah Anda yakin ingin menolak permintaan ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Tolak',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to the reject route
+                let form = document.createElement('form');
+                form.action = url;
+                form.method = 'POST';
+                form.innerHTML = '@csrf';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const alertSuccess = document.querySelector('.alert-success');
+        if (alertSuccess) {
+            // Menghilangkan alert setelah 5 detik
+            setTimeout(function() {
+                alertSuccess.style.display = 'none';
+            }, 5000);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const alertDanger = document.querySelector('.alert-danger');
+
+        if (alertDanger) {
+            setTimeout(function() {
+                alertDanger.style.display = 'none';
+            }, 5000);
+        }
+    });
+</script>

@@ -130,7 +130,6 @@
                                     <p><strong>Diterbitkan oleh:</strong> {{ $getMaintenance->admin->name }}</p>
                                     <p><strong>Tanggal Diterbitkan:</strong> {{ $getMaintenance->created_at->translatedFormat('d M Y, H:i:s') }}</p>
                                     <p><strong>Tanggal Maintenance:</strong>{{ \Carbon\Carbon::parse($getMaintenance->tanggal_maintenance)->translatedFormat('d M Y') }}
-                                    </p>
 
                                     <p><strong>Status:</strong>
                                         @if($getMaintenance->status=='Pending')
@@ -154,6 +153,25 @@
                                     @else
                                     <p>Tidak ada foto pelanggan</p>
                                     @endif
+                                    @if($getMaintenance->status == 'Pending' && \Carbon\Carbon::now()->isWeekend())
+                                    <!-- Tombol Approve dan Reject -->
+                                    <div class="mt-5">
+                                        <form action="{{ route('hd.maintenance.approve', $getMaintenance->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            <button type="button" class="btn btn-success" onclick="confirmApproval('{{ route('hd.maintenance.approve', $getMaintenance->id) }}')">
+                                                <i class="fa fa-check"></i> Approve
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('hd.maintenance.reject', $getMaintenance->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            <button type="button" class="btn btn-danger" onclick="confirmRejection('{{ route('hd.maintenance.reject', $getMaintenance->id) }}')">
+                                                <i class="fa fa-times"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                    @endif
+
                                 </div>
                             </div>
                         </div>
@@ -245,6 +263,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Detail Barang</h4>
                                     <div class=" table-responsive">
+
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
@@ -260,6 +279,7 @@
                                                 @foreach ($getMaintenance->WorkOrderMaintenanceDetail as $detail)
                                                 <tr>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
+
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->jenis->nama_jenis }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->merek->nama_merek }}</td>
                                                     <td style=" text-align: center; vertical-align: middle;">{{ $detail->stockBarang->tipe->nama_tipe }}</td>
@@ -296,6 +316,8 @@
                                                     <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Status Konfigurasi</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Aksi</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -316,6 +338,17 @@
                                                         <span class="badge badge-pill bg-warning">Belum Dikonfigurasi</span>
                                                         @endif
                                                     </td>
+                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                        @if(!$barangKeluar->is_configured)
+                                                        <form action="{{ route('hd.configure-barang', $barangKeluar->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="btn btn-info btn-sm">Konfigurasikan</button>
+                                                        </form>
+                                                        @else
+                                                        <button class="btn btn-secondary btn-sm" disabled>Sudah Dikonfigurasi</button>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                                 @empty
                                                 <tr>
@@ -332,12 +365,17 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Card untuk tabel progress survey -->
                     <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Progres Maintenance</h4>
+                                    @if ($getMaintenance->status === 'On Progress' || $getMaintenance->status === 'Completed' || $getMaintenance->status === 'Shipped')
+                                    <a href="{{ route('hd_maintenance_add_progress', $getMaintenance->id) }}" class="btn btn-info mb-3">
+                                        Add Progress</a>
 
+                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">
@@ -366,7 +404,8 @@
                                                         <span class="badge badge-pill badge-dark">Rejected</span>
                                                         @elseif($progress->status=='Completed')
                                                         <span class="badge badge-pill badge-success">Completed</span>
-
+                                                        @elseif($progress->status=='Shipped')
+                                                        <span class="badge badge-pill badge-primary">Shipped</span>
                                                         @endif
                                                     </td>
                                                     <td style=" text-align: center; vertical-align: middle;">

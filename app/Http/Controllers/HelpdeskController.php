@@ -2,46 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Jenis;
-use App\Models\Status;
-use setasign\Fpdi\Fpdi;
-use App\Models\NomorSurat;
-use App\Models\StockBarang;
-use Illuminate\Support\Str;
-use App\Helpers\LogActivity;
-use App\Models\Notification;
-use Illuminate\Http\Request;
-use App\Models\OnlineBilling;
-use App\Models\RequestBarang;
-use App\Models\DismantleDetail;
-use App\Models\InstallProgress;
-use App\Models\UpgradeProgress;
-use App\Models\RelokasiProgress;
-use App\Models\WorkOrderInstall;
-use App\Models\WorkOrderUpgrade;
-use App\Models\DismantleProgress;
-use App\Models\DowngradeProgress;
-use App\Models\ReqBarangProgress;
-use App\Models\WorkOrderRelokasi;
-use App\Mail\PermintaanBarangMail;
-use App\Models\WorkOrderDismantle;
-use App\Models\WorkOrderDowngrade;
-use App\Models\GantiVendorProgress;
-use App\Models\MaintenanceProgress;
-use Illuminate\Support\Facades\Log;
 use App\Exports\OnlineBillingExport;
+use App\Helpers\LogActivity;
 use App\Imports\OnlineBillingImport;
 use App\Mail\MaintenanceRequestMail;
+use App\Mail\PermintaanBarangMail;
+use App\Models\BarangKeluar;
+use App\Models\DismantleDetail;
+use App\Models\DismantleProgress;
+use App\Models\DowngradeProgress;
+use App\Models\DowngradeProgressPhoto;
+use App\Models\GantiVendorProgress;
+use App\Models\GantiVendorProgressPhoto;
+use App\Models\InstallProgress;
+use App\Models\InstallProgressPhoto;
+use App\Models\Jenis;
+use App\Models\MaintenanceProgress;
+use App\Models\MaintenanceProgressPhoto;
+use App\Models\NomorSurat;
+use App\Models\Notification;
+use App\Models\OnlineBilling;
+use App\Models\RelokasiProgress;
+use App\Models\RelokasiProgressPhoto;
+use App\Models\ReqBarangProgress;
+use App\Models\RequestBarang;
 use App\Models\RequestBarangDetails;
-use App\Models\WorkOrderGantiVendor;
-use App\Models\WorkOrderMaintenance;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Models\RequestBarangStockBarang;
+use App\Models\Status;
+use App\Models\StockBarang;
+use App\Models\UpgradeProgress;
+use App\Models\UpgradeProgressPhoto;
+use App\Models\User;
+use App\Models\WorkOrderDismantle;
+use App\Models\WorkOrderDowngrade;
+use App\Models\WorkOrderGantiVendor;
+use App\Models\WorkOrderInstall;
+use App\Models\WorkOrderMaintenance;
 use App\Models\WorkOrderMaintenanceDetail;
+use App\Models\WorkOrderRelokasi;
+use App\Models\WorkOrderUpgrade;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use setasign\Fpdi\Fpdi;
 
 class HelpdeskController extends Controller
 {
@@ -60,10 +67,19 @@ class HelpdeskController extends Controller
         $role = Auth::user()->is_role;
         $roleText = $this->roles[$role] ?? 'Unknown Role';
 
+        // return [
+        //     'getRecord' => User::find(Auth::user()->id),
+        //     'roleText' => $roleText,
+
+        // ];
+        // Alias untuk tampilan
+        $displayRole = [
+            'Helpdesk' => 'Support',
+        ];
+
         return [
             'getRecord' => User::find(Auth::user()->id),
-            'roleText' => $roleText,
-
+            'roleText' => $displayRole[$roleText] ?? $roleText,
         ];
     }
 
@@ -1911,6 +1927,912 @@ class HelpdeskController extends Controller
         }
 
         return redirect()->back()->with('error', 'Request Barang sudah selesai dan tidak bisa dihapus.');
+    }
+    public function configureBarang($id)
+    {
+        // Cari data barang keluar berdasarkan ID
+        $barangKeluar = BarangKeluar::findOrFail($id);
+
+        // Ubah status konfigurasi
+        $barangKeluar->update(['is_configured' => true]);
+
+        // Redirect dengan pesan sukses
+        return redirect()->back()->with('success', 'Barang berhasil dikonfigurasi.');
+    }
+    public function addProgressInstalasi($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getInstall = WorkOrderInstall::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'notifications'));
+
+        return $this->renderView('wo_install_add', $data);
+    }
+
+
+    public function storeProgressInstalasi(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new InstallProgress();
+        $progress->work_order_install_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->user_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                InstallProgressPhoto::create([
+                    'install_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('hd.instalasi.show', $id)->with('success', 'Progress berhasil diselesaikan.');
+        }
+
+        return redirect()->route('hd.instalasi.show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+    public function approvemaintenance($id)
+    {
+        $getMaintenance = WorkOrderMaintenance::findOrFail($id);
+
+        // Ubah status menjadi 'approved'
+        $getMaintenance->status = 'On Progress';
+        $getMaintenance->save();
+
+        // Cari entri terkait di tabel statuses
+        $status = Status::where('work_orderable_id', $getMaintenance->id)
+            ->where('process', 'Maintenance') // Pastikan prosesnya adalah 'Upgrade'
+            ->first();
+
+        // Perbarui status di tabel statuses jika entri ditemukan
+        if ($status) {
+            $status->status = 'On Progress'; // Sesuaikan dengan status baru
+            $status->save();
+        }
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('hd.maintenance_show', $id)->with('success', 'Maintenance telah disetujui.');
+    }
+    public function rejectmaintenance($id)
+    {
+        $getMaintenance = WorkOrderMaintenance::findOrFail($id);
+
+        // Ubah status menjadi 'rejected'
+        $getMaintenance->status = 'Rejected';
+        $getMaintenance->save();
+
+        // Cari entri terkait di tabel statuses
+        $status = Status::where('work_orderable_id', $getMaintenance->id)
+            ->where('process', 'Maintenance') // Pastikan prosesnya adalah 'Upgrade'
+            ->first();
+
+        // Perbarui status di tabel statuses jika entri ditemukan
+        if ($status) {
+            $status->status = 'Rejected'; // Sesuaikan dengan status baru
+            $status->save();
+        }
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('hd.maintenance_show', $id)->with('error', 'Maintenance telah ditolak.');
+    }
+    public function addProgressMaintenance($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getMaintenance = WorkOrderMaintenance::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getMaintenance', 'notifications'));
+
+        return $this->renderView('wo_maintenance_add', $data);
+    }
+
+
+    public function storeProgressMaintenance(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new MaintenanceProgress();
+        $progress->work_order_maintenance_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+        // Ambil data survey
+        $getMaintenance = WorkOrderMaintenance::findOrFail($id);
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+            // Ubah status survey menjadi Completed
+            $getMaintenance->status = 'Completed';
+            $getMaintenance->save();
+            // Perbarui status di tabel statuses
+            $status = Status::where('work_orderable_id', $getMaintenance->id)
+                ->where('process', 'Maintenance')
+                ->first();
+            if ($status) {
+                $status->status = 'Completed';
+                $status->save();
+            }
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+            // // Update status di tabel WorkOrderInstall
+            // if ($getMaintenance->status !== 'Completed') { // Hanya jika status belum Completed
+            //     $getMaintenance->status = 'On Progress';
+            //     $getMaintenance->save();
+            // }
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->psb_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                MaintenanceProgressPhoto::create([
+                    'maintenance_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view survey atau detail survey berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('hd.maintenance_show', $id)->with('success', 'Progress berhasil diselesaikan.');
+        }
+
+        return redirect()->route('hd.maintenance_show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function approveupgrade($id)
+    {
+        // Cari work order upgrade berdasarkan ID
+        $getUpgrade = WorkOrderUpgrade::findOrFail($id);
+
+        // Ubah status di tabel work_order_upgrades
+        $getUpgrade->status = 'On Progress';
+        $getUpgrade->save();
+
+        // Cari entri terkait di tabel statuses
+        $status = Status::where('work_orderable_id', $getUpgrade->id)
+            ->where('process', 'Upgrade') // Pastikan prosesnya adalah 'upgrade'
+            ->first();
+
+        // Perbarui status jika entri ditemukan
+        if ($status) {
+            $status->status = 'On Progress'; // Sesuaikan dengan status baru
+            $status->save();
+        }
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('hd.upgrade_show', $id)
+            ->with('success', 'Upgrade telah disetujui.');
+    }
+
+
+    public function addProgressUpgrade($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getUpgrade = WorkOrderUpgrade::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getUpgrade', 'notifications'));
+
+        return $this->renderView('wo_upgrade_add', $data);
+    }
+    public function storeProgressUpgrade(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new UpgradeProgress();
+        $progress->work_order_upgrade_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+        // Ambil data upgrade
+        $getUpgrade = WorkOrderUpgrade::findOrFail($id);
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+            // Ubah status upgrade menjadi Completed
+            $getUpgrade->status = 'Completed';
+            $getUpgrade->save();
+
+            // Perbarui status di tabel statuses
+            $status = Status::where('work_orderable_id', $getUpgrade->id)
+                ->where('process', 'Upgrade')
+                ->first();
+            if ($status) {
+                $status->status = 'Completed';
+                $status->save();
+            }
+
+            // Update bandwidth lama dengan bandwidth baru di tabel online_billings
+            $onlineBilling = $getUpgrade->onlineBilling; // Ambil data online billing terkait
+            $onlineBilling->bandwidth = $getUpgrade->bandwidth_baru; // Set bandwidth baru
+            $onlineBilling->satuan = $getUpgrade->satuan; // Update satuan jika perlu
+            $onlineBilling->save(); // Simpan perubahan
+            $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
+
+            // Buat notifikasi "Survey Completed" untuk setiap admin
+            foreach ($adminUsers as $admin) {
+                // Cek role pengguna
+                if ($admin->is_role == 1) { // Role PSB
+                    $url = route('admin.upgrade_show', ['id' => $getUpgrade->id]) . '#upgrade'; // Tambahkan #no_spk untuk PSB
+                } else if ($admin->is_role == 3) { // Role Admin
+                    $url = route('hd.upgrade_show', ['id' => $getUpgrade->id]) . '#upgrade'; // Tambahkan #no_spk untuk Admin
+                }
+
+                // Buat notifikasi
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'message' => 'WO Upgrade telah diselesaikan dengan No Order: ' . $getUpgrade->no_spk,
+                    'url' => $url, // URL dengan hash #no_spk
+                ]);
+            }
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+
+            // Update status di tabel WorkOrderUpgrade jika belum Completed
+            if ($getUpgrade->status !== 'Completed') {
+                $getUpgrade->status = 'On Progress';
+                $getUpgrade->save();
+            }
+
+            // Perbarui status di tabel statuses
+            $status = Status::where('work_orderable_id', $getUpgrade->id)
+                ->where('process', 'Upgrade')
+                ->first();
+            if ($status) {
+                $status->status = 'On Progress';
+                $status->save();
+            }
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->psb_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                UpgradeProgressPhoto::create([
+                    'upgrade_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('hd.upgrade_show', $id)->with('success', 'Upgrade berhasil diselesaikan.');
+        }
+
+        return redirect()->route('hd.upgrade_show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function approvedowngrade($id)
+    {
+        // Cari work order upgrade berdasarkan ID
+        $getDowngrade = WorkOrderDowngrade::findOrFail($id);
+
+        // Ubah status di tabel work_order_upgrades
+        $getDowngrade->status = 'On Progress';
+        $getDowngrade->save();
+
+        // Cari entri terkait di tabel statuses
+        $status = Status::where('work_orderable_id', $getDowngrade->id)
+            ->where('process', 'Downgrade') // Pastikan prosesnya adalah 'upgrade'
+            ->first();
+
+        // Perbarui status jika entri ditemukan
+        if ($status) {
+            $status->status = 'On Progress'; // Sesuaikan dengan status baru
+            $status->save();
+        }
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('hd.downgrade_show', $id)
+            ->with('success', 'Downgrade telah disetujui.');
+    }
+
+
+    public function addProgressDowngrade($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getDowngrade = WorkOrderDowngrade::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getDowngrade', 'notifications'));
+
+        return $this->renderView('wo_downgrade_add', $data);
+    }
+    public function storeProgressDowngrade(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new DowngradeProgress();
+        $progress->work_order_downgrade_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+        // Ambil data upgrade
+        $getDowngrade = WorkOrderDowngrade::findOrFail($id);
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+            // Ubah status upgrade menjadi Completed
+            $getDowngrade->status = 'Completed';
+            $getDowngrade->save();
+
+            // Perbarui status di tabel statuses
+            $status = Status::where('work_orderable_id', $getDowngrade->id)
+                ->where('process', 'Downgrade')
+                ->first();
+            if ($status) {
+                $status->status = 'Completed';
+                $status->save();
+            }
+
+            // Update bandwidth lama dengan bandwidth baru di tabel online_billings
+            $onlineBilling = $getDowngrade->onlineBilling; // Ambil data online billing terkait
+            $onlineBilling->bandwidth = $getDowngrade->bandwidth_baru; // Set bandwidth baru
+            $onlineBilling->satuan = $getDowngrade->satuan; // Update satuan jika perlu
+            $onlineBilling->save(); // Simpan perubahan
+            // Dapatkan semua admin (atau role yang sesuai)
+            // Dapatkan semua admin (atau role yang sesuai)
+            $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
+
+            // Buat notifikasi "Survey Completed" untuk setiap admin
+            foreach ($adminUsers as $admin) {
+                // Cek role pengguna
+                if ($admin->is_role == 1) { // Role PSB
+                    $url = route('admin.downgrade_show', ['id' => $getDowngrade->id]) . '#downgrade'; // Tambahkan #no_spk untuk PSB
+                } else if ($admin->is_role == 3) { // Role Admin
+                    $url = route('hd.downgrade_show', ['id' => $getDowngrade->id]) . '#downgrade'; // Tambahkan #no_spk untuk Admin
+                }
+
+                // Buat notifikasi
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'message' => 'WO Downgrade telah diselesaikan dengan No Order: ' . $getDowngrade->no_spk,
+                    'url' => $url, // URL dengan hash #no_spk
+                ]);
+            }
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+
+            // Update status di tabel WorkOrderUpgrade jika belum Completed
+            if ($getDowngrade->status !== 'Completed') {
+                $getDowngrade->status = 'On Progress';
+                $getDowngrade->save();
+            }
+
+            // Perbarui status di tabel statuses
+            $status = Status::where('work_orderable_id', $getDowngrade->id)
+                ->where('process', 'Downgrade')
+                ->first();
+            if ($status) {
+                $status->status = 'On Progress';
+                $status->save();
+            }
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->psb_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                DowngradeProgressPhoto::create([
+                    'downgrade_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('hd.downgrade_show', $id)->with('success', 'Downgrade berhasil diselesaikan.');
+        }
+
+        return redirect()->route('hd.downgrade_show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function inputsidbaru($id)
+    {
+        $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
+
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('notifications', 'getGantivendor'));
+
+        // Menampilkan form untuk membuat work order baru dengan nomor SPK baru
+        return $this->renderView('inputsidbaru', $data);
+    }
+
+    public function storeinputsidbaru(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'sid_baru' => 'nullable|string', // Vendor harus valid dan ada di tabel vendors
+        ]);
+
+        // Temukan Work Order berdasarkan ID
+        $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
+
+
+        // Update kolom vendor_baru dengan nama vendor yang dipilih
+        $getGantivendor->sid_baru = $request->sid_baru;
+        $getGantivendor->save();
+
+        // Redirect dengan pesan sukses
+        return redirect()->route('hd.gantivendor.show', $id)->with('success', 'SID Baru berhasil disimpan.');
+    }
+    public function addProgressGantivendor($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getGantivendor', 'notifications'));
+
+        return $this->renderView('wo_gantivendor_add', $data);
+    }
+
+
+    public function storeProgressGantivendor(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new GantiVendorProgress();
+        $progress->work_order_ganti_vendor_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+        // Ambil data survey
+        $getGantivendor = WorkOrderGantiVendor::findOrFail($id);
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            // ✅ Cek apakah sid_baru sudah diisi
+            if (empty($getGantivendor->sid_baru)) {
+                return redirect()
+                    ->route('hd.gantivendor.show', $id) // arahkan tetap ke halaman detail WO
+                    ->withErrors(['sid_baru' => 'SID Baru wajib diisi sebelum menyelesaikan WO Ganti Vendor.'])
+                    ->withInput();
+            }
+
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+            // Ubah status survey menjadi Completed
+            $getGantivendor->status = 'Completed';
+            $getGantivendor->save();
+            // Perbarui status di tabel statuses
+            $status = Status::where('work_orderable_id', $getGantivendor->id)
+                ->where('process', 'Ganti Vendor')
+                ->first();
+            if ($status) {
+                $status->status = 'Completed';
+                $status->save();
+            }
+            // **Update vendor_id di OnlineBilling**
+            $onlineBilling = $getGantivendor->onlineBilling; // Relasi ke onlineBilling
+            if ($onlineBilling) {
+                $onlineBilling->vendor_id = $getGantivendor->vendor_id; // Ganti vendor_id dengan vendor_id baru
+                $onlineBilling->sid_vendor = $getGantivendor->sid_baru;
+                $onlineBilling->save();
+            }
+            // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+            $helpdeskUsers = User::where('is_role', 3)->get();
+            // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
+            $adminUsers = User::where('is_role', 1)->get();
+            // Buat notifikasi untuk setiap pengguna General Affair
+            foreach ($adminUsers as $adminUser) {
+                $url = route('admin.gantivendor.show', ['id' => $getGantivendor->id]) . '#gantivendor';
+
+                Notification::create([
+                    'user_id' => $adminUser->id,
+                    'message' => 'WO Ganti Vendor baru telah diselesaikan dengan No Order: ' . $getGantivendor->no_spk,
+                    'url' => $url, // URL dengan hash #request
+                ]);
+            }
+            // Buat notifikasi untuk setiap pengguna PSB
+            foreach ($helpdeskUsers as $helpdeskUser) {
+                $url = route('hd.gantivendor.show', ['id' => $getGantivendor->id]) . '#gantivendor';
+
+                Notification::create([
+                    'user_id' => $helpdeskUser->id,
+                    'message' => 'WO Ganti Vendor baru telah diselesaikan dengan No Order: ' . $getGantivendor->no_spk,
+                    'url' => $url, // URL dengan hash #instalasi
+                ]);
+            }
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+            // Update status di tabel WorkOrderInstall
+            if ($getGantivendor->status !== 'Completed') { // Hanya jika status belum Completed
+                $getGantivendor->status = 'On Progress';
+                $getGantivendor->save();
+            }
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->psb_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                GantiVendorProgressPhoto::create([
+                    'ganti_vendor_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view survey atau detail survey berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('hd.gantivendor.show', $id)->with('success', 'Progress berhasil diselesaikan.');
+        }
+
+        return redirect()->route('hd.gantivendor.show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function storeDisable(Request $request, $id)
+    {
+        // Validasi Work Order Instalasi
+        $workOrderDismantle = WorkOrderDismantle::findOrFail($id);
+
+        // Simpan progres baru dengan status "Shipped"
+        $progress = new DismantleProgress();
+        $progress->work_order_dismantle_id = $workOrderDismantle->id;
+        $progress->keterangan = 'Done Disable Ethernet ke arah Client.';
+        $progress->status = 'On Progress';
+        $progress->psb_id = Auth::id(); // ID user yang menekan tombol
+        $progress->save();
+
+        // Update status Work Order Instalasi menjadi Shipped
+        $workOrderDismantle->status = 'On Progress';
+        $workOrderDismantle->save();
+
+        // Redirect kembali dengan pesan sukses
+        return redirect()->route('hd.dismantle_show', $id)->with('success', 'Eth ke arah Client berhasil di Disable');
+    }
+
+    public function addProgressRelokasi($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getRelokasi = WorkOrderRelokasi::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getRelokasi', 'notifications'));
+
+        return $this->renderView('wo_relokasi_add', $data);
+    }
+    public function storeProgressRelokasi(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new RelokasiProgress();
+        $progress->work_order_relokasi_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->psb_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                RelokasiProgressPhoto::create([
+                    'relokasi_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('hd.relokasi.show', $id)->with('success', 'Progress berhasil diselesaikan.');
+        }
+
+        return redirect()->route('hd.relokasi.show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function approvejasa($id)
+    {
+        // Cari work order upgrade berdasarkan ID
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Ubah status di tabel work_order_upgrades
+        $getInstall->status = 'On Progress';
+        $getInstall->save();
+
+
+
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('hd.jasa_show', $id)
+            ->with('success', 'Jasa telah disetujui.');
+    }
+
+
+    public function addProgressjasa($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getInstall = WorkOrderInstall::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'notifications'));
+
+        return $this->renderView('wo_jasa_add', $data);
+    }
+    public function storeProgressjasa(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new InstallProgress();
+        $progress->work_order_install_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+        // Ambil data upgrade
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+            // Ubah status upgrade menjadi Completed
+            $getInstall->status = 'Completed';
+            $getInstall->save();
+
+
+
+            $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
+
+            // Buat notifikasi "Survey Completed" untuk setiap admin
+            foreach ($adminUsers as $admin) {
+                // Cek role pengguna
+                if ($admin->is_role == 1) { // Role PSB
+                    $url = route('admin.wo_jasa_show', ['id' => $getInstall->id]) . '#Jasa'; // Tambahkan #no_spk untuk PSB
+                } else if ($admin->is_role == 3) { // Role Admin
+                    $url = route('hd.jasa_show', ['id' => $getInstall->id]) . '#Jasa'; // Tambahkan #no_spk untuk Admin
+                }
+
+                // Buat notifikasi
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'message' => 'WO Jasa telah diselesaikan dengan No Order: ' . $getInstall->no_spk,
+                    'url' => $url, // URL dengan hash #no_spk
+                ]);
+            }
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+
+
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->user_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                InstallProgressPhoto::create([
+                    'install_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('hd.jasa_show', $id)->with('success', 'Jasa berhasil diselesaikan.');
+        }
+
+        return redirect()->route('hd.jasa_show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function approvepoc($id)
+    {
+        // Cari work order upgrade berdasarkan ID
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Ubah status di tabel work_order_upgrades
+        $getInstall->status = 'On Progress';
+        $getInstall->save();
+
+
+
+
+        // Redirect ke halaman sebelumnya dengan pesan sukses
+        return redirect()->route('hd.poc_show', $id)
+            ->with('success', 'POC telah disetujui.');
+    }
+
+
+    public function addProgresspoc($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        $getInstall = WorkOrderInstall::findOrFail($id);
+        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'notifications'));
+
+        return $this->renderView('wo_poc_add', $data);
+    }
+    public function storeProgresspoc(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'keterangan' => 'required',
+            'foto.*' => 'nullable|image|max:10240',
+        ]);
+
+        // Menyimpan progress baru
+        $progress = new InstallProgress();
+        $progress->work_order_install_id = $id;
+        $progress->keterangan = $request->keterangan;
+
+        // Ambil data upgrade
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        // Set status default atau complete sesuai tombol yang ditekan
+        if ($request->has('action') && $request->action === 'complete') {
+            $progress->status = 'Completed'; // Ubah status progress jadi Completed
+
+            // Ubah status upgrade menjadi Completed
+            $getInstall->status = 'Completed';
+            $getInstall->save();
+
+
+
+            $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
+
+            // Buat notifikasi "Survey Completed" untuk setiap admin
+            foreach ($adminUsers as $admin) {
+                // Cek role pengguna
+                if ($admin->is_role == 1) { // Role PSB
+                    $url = route('admin.wo_poc_show', ['id' => $getInstall->id]) . '#POC'; // Tambahkan #no_spk untuk PSB
+                } else if ($admin->is_role == 3) { // Role Admin
+                    $url = route('hd.poc_show', ['id' => $getInstall->id]) . '#POC'; // Tambahkan #no_spk untuk Admin
+                }
+
+                // Buat notifikasi
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'message' => 'WO POC telah diselesaikan dengan No Order: ' . $getInstall->no_spk,
+                    'url' => $url, // URL dengan hash #no_spk
+                ]);
+            }
+        } else {
+            $progress->status = 'On Progress'; // Default status progress jika belum complete
+
+
+        }
+
+        // Menyimpan ID user PSB yang sedang login
+        $progress->user_id = Auth::id();
+        $progress->save();
+
+        // Upload dan simpan banyak foto jika ada
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $foto) {
+                $fileName = time() . '_' . $foto->getClientOriginalName();
+                $foto->move(public_path('uploads'), $fileName);
+
+                // Simpan foto ke tabel survey_progress_photos
+                InstallProgressPhoto::create([
+                    'install_progress_id' => $progress->id,
+                    'file_path' => $fileName
+                ]);
+            }
+        }
+
+        // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
+        if ($request->action === 'complete') {
+            return redirect()->route('hd.poc_show', $id)->with('success', 'POC berhasil diselesaikan.');
+        }
+
+        return redirect()->route('hd.poc_show', $id)->with('success', 'Progress berhasil ditambahkan.');
     }
 }
 

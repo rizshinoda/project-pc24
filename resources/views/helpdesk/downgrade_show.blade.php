@@ -98,7 +98,6 @@
             <!-- partial -->
 
             <!-- Main Panel -->
-            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -116,6 +115,8 @@
                         </div>
                         @endif
                     </div>
+
+
 
 
                     <!-- Menampilkan detail survey -->
@@ -186,6 +187,38 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">
+                                        <i class="mdi mdi-paperclip"></i> Lampiran Work Order
+                                    </h4>
+
+                                    @if (!empty($getDowngrade->attachments))
+                                    <div class="list-group">
+                                        @foreach ($getDowngrade->attachments as $file)
+                                        <a href="{{ asset('storage/'.$file) }}"
+                                            target="_blank"
+                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                                            <span>
+                                                <i class="mdi mdi-file"></i>
+                                                {{ basename($file) }}
+                                            </span>
+
+                                            <span class="badge badge-info">Download</span>
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                    @else
+                                    <p class="text-muted mb-0">Tidak ada file terlampir.</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="container mt-4">
                         @php
                         // Tahapan normal
@@ -231,9 +264,24 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
+                                    @if($getDowngrade->status == 'Pending')
+                                    <!-- Tombol Approve dan Reject -->
+                                    <!-- Tombol Approve -->
+                                    <form action="{{ route('hd.downgrade.approve', $getDowngrade->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        <button type="button" class="btn btn-success" onclick="confirmApproval('{{ route('hd.downgrade.approve', $getDowngrade->id) }}')">
+                                            <i class="fa fa-check"></i> Approve
+                                        </button>
+                                    </form>
 
+
+                                    @endif
                                     <h4 class="card-title mt-2">Progres Downgrade</h4>
+                                    @if ($getDowngrade->status === 'On Progress' || $getDowngrade->status === 'Completed')
+                                    <a href="{{ route('hd_downgrade_add_progress', $getDowngrade->id) }}" class="btn btn-info mb-3">
+                                        Add Progress</a>
 
+                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">

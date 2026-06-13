@@ -400,14 +400,31 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
 
     Route::get('helpdesk/instalasi', [HelpdeskController::class, 'instalasi'])->name('hd.instalasi');
     Route::get('helpdesk/instalasi/{id}', [HelpdeskController::class, 'showinstalasi'])->name('hd.instalasi.show');
+    Route::patch('helpdesk/configure-barang/{id}', [HelpdeskController::class, 'configureBarang'])
+        ->name('hd.configure-barang');
+    Route::get('helpdesk/install/{id}/add-progress-instalasi', [HelpdeskController::class, 'addProgressInstalasi'])->name('hd_install_add_progress');
+    Route::post('helpdesk/install/{id}/add-progress-instalasi', [HelpdeskController::class, 'storeProgressInstalasi'])->name('hd_install_store_progress');
+
     Route::get('helpdesk/upgrade', [HelpdeskController::class, 'upgrade'])->name('hd.upgrade');
     Route::get('helpdesk/upgrade/show/{id}', [HelpdeskController::class, 'upgradeShow'])->name('hd.upgrade_show');
+    Route::post('helpdesk/upgrade/{id}/approve', [HelpdeskController::class, 'approveupgrade'])->name('hd.upgrade.approve');
+    Route::get('helpdesk/upgrade/{id}/add-progress-upgrade', [HelpdeskController::class, 'addProgressUpgrade'])->name('hd_upgrade_add_progress');
+    Route::post('helpdesk/upgrade/{id}/add-progress-upgrade', [HelpdeskController::class, 'storeProgressUpgrade'])->name('hd_upgrade_store_progress');
+
     Route::get('helpdesk/downgrade', [HelpdeskController::class, 'downgrade'])->name('hd.downgrade');
     Route::get('helpdesk/downgrade/show/{id}', [HelpdeskController::class, 'downgradeShow'])->name('hd.downgrade_show');
+    Route::post('helpdesk/downgrade/{id}/approve', [HelpdeskController::class, 'approvedowngrade'])->name('hd.downgrade.approve');
+    Route::get('helpdesk/downgrade/{id}/add-progress-downgrade', [HelpdeskController::class, 'addProgressDowngrade'])->name('hd_downgrade_add_progress');
+    Route::post('helpdesk/downgrade/{id}/add-progress-downgrade', [HelpdeskController::class, 'storeProgressDowngrade'])->name('hd_downgrade_store_progress');
+
     Route::get('helpdesk/relokasi', [HelpdeskController::class, 'relokasi'])->name('hd.relokasi');
     Route::get('helpdesk/relokasi/{id}', [HelpdeskController::class, 'showrelokasi'])->name('hd.relokasi.show');
+    Route::get('helpdesk/relokasi/{id}/add-progress-relokasi', [HelpdeskController::class, 'addProgressRelokasi'])->name('hd_relokasi_add_progress');
+    Route::post('helpdesk/relokasi/{id}/add-progress-relokasi', [HelpdeskController::class, 'storeProgressRelokasi'])->name('hd_relokasi_store_progress');
+
     Route::get('helpdesk/dismantle', [HelpdeskController::class, 'dismantle'])->name('hd.dismantle');
     Route::get('helpdesk/dismantle/show/{id}', [HelpdeskController::class, 'dismantleShow'])->name('hd.dismantle_show');
+    Route::post('helpdesk/dismantle/progress/{id}/disable', [HelpdeskController::class, 'storeDisable'])->name('hd.dismantle.progress.disable');
 
     Route::get('helpdesk/maintenance', [HelpdeskController::class, 'maintenance'])->name('hd.maintenance');
     Route::get('helpdesk/maintenance/create/{id}', [HelpdeskController::class, 'maintenanceCreate'])->name('hd.maintenance_create');
@@ -418,12 +435,23 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
     Route::delete('helpdesk/maintenance/{id}', [HelpdeskController::class, 'maintenanceDestroy'])->name('hd.maintenance_destroy');
     Route::patch('/helpdesk/maintenance/{id}/cancel', [HelpdeskController::class, 'maintenanceCancel'])->name('hd.maintenance_cancel');
 
+    Route::post('helpdesk/maintenance/{id}/approve', [HelpdeskController::class, 'approvemaintenance'])->name('hd.maintenance.approve');
+    Route::post('helpdesk/maintenance/{id}/reject', [HelpdeskController::class, 'rejectmaintenance'])->name('hd.maintenance.reject');
+    Route::get('helpdesk/maintenance/{id}/add-progress-maintenance', [HelpdeskController::class, 'addProgressMaintenance'])->name('hd_maintenance_add_progress');
+    Route::post('helpdesk/maintenance/{id}/add-progress-maintenance', [HelpdeskController::class, 'storeProgressMaintenance'])->name('hd_maintenance_store_progress');
+
+
+
     Route::get('helpdesk/gantivendor', [HelpdeskController::class, 'gantivendor'])->name('hd.gantivendor');
     Route::get('helpdesk/gantivendor/create/{id}', [HelpdeskController::class, 'gantivendorCreate'])->name('hd.gantivendor_create');
     Route::post('helpdesk/gantivendor', [HelpdeskController::class, 'gantivendorStore'])->name('hd.gantivendor_store');
     Route::get('helpdesk/gantivendor/{id}', [HelpdeskController::class, 'gantivendorShow'])->name('hd.gantivendor.show');
     Route::get('helpdesk/gantivendor/edit/{id}', [HelpdeskController::class, 'gantivendorEdit'])->name('hd.gantivendor.edit');
     Route::put('helpdesk/gantivendor/{id}', [HelpdeskController::class, 'gantivendorUpdate'])->name('hd.gantivendor_update');
+    Route::get('helpdesk/gantivendor/{id}/add-progress-gantivendor', [HelpdeskController::class, 'addProgressGantivendor'])->name('hd_gantivendor_add_progress');
+    Route::post('helpdesk/gantivendor/{id}/add-progress-gantivendor', [HelpdeskController::class, 'storeProgressGantivendor'])->name('hd_gantivendor_store_progress');
+    Route::get('helpdesk/gantivendor/{id}/sidbaru', [HelpdeskController::class, 'inputsidbaru'])->name('hd.gantivendor.inputsidbaru');
+    Route::post('helpdesk/gantivendor/{id}/sidbaru', [HelpdeskController::class, 'storeinputsidbaru'])->name('hd.gantivendor.storesidbaru');
 
     Route::get('helpdesk/OB', [HelpdeskController::class, 'OB'])->name('hd.OB');
     Route::get('helpdesk/OB/{id}', [HelpdeskController::class, 'showOB'])->name('hd.OB_show');
@@ -432,10 +460,17 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
     Route::get('helpdesk/Online-Billing/export', [HelpdeskController::class, 'exportOB'])->name('work-OB.export');
 
     Route::get('helpdesk/jasa', [HelpdeskController::class, 'jasa'])->name('hd.jasa');
-    Route::get('helpdesk/jasa/{id}', [HelpdeskController::class, 'showjasa'])->name('hd.wo_jasa_show');
+    Route::get('helpdesk/jasa/{id}', [HelpdeskController::class, 'showjasa'])->name('hd.jasa_show');
+    Route::post('helpdesk/jasa/{id}/approve', [HelpdeskController::class, 'approvejasa'])->name('hd.jasa.approve');
+    Route::get('helpdesk/jasa/{id}/add-progress-jasa', [HelpdeskController::class, 'addProgressjasa'])->name('hd_jasa_add_progress');
+    Route::post('helpdesk/jasa/{id}/add-progress-jasa', [HelpdeskController::class, 'storeProgressjasa'])->name('hd_jasa_store_progress');
 
     Route::get('helpdesk/poc', [HelpdeskController::class, 'poc'])->name('hd.poc');
-    Route::get('helpdesk/poc/{id}', [HelpdeskController::class, 'showpoc'])->name('hd.wo_poc_show');
+    Route::get('helpdesk/poc/{id}', [HelpdeskController::class, 'showpoc'])->name('hd.poc_show');
+    Route::post('helpdesk/poc/{id}/approve', [HelpdeskController::class, 'approvepoc'])->name('hd.poc.approve');
+
+    Route::get('helpdesk/poc/{id}/add-progress-poc', [HelpdeskController::class, 'addProgresspoc'])->name('hd_poc_add_progress');
+    Route::post('helpdesk/poc/{id}/add-progress-poc', [HelpdeskController::class, 'storeProgresspoc'])->name('hd_poc_store_progress');
 
     Route::get('helpdesk/chat', Index::class)->name('helpdesk.chat.index');
     Route::get('helpdesk/chat/{query}', Chat::class)->name('helpdesk.chat');

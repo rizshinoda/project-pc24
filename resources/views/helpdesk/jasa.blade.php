@@ -244,7 +244,7 @@
 
 
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    <a href="{{ route('hd.wo_jasa_show', $install->id) }}" class="btn btn-success btn-sm " style="display:inline-block; padding: 8px 11px;"><i class="fa fa-eye"></i></a>
+                                                    <a href="{{ route('hd.jasa_show', $install->id) }}" class="btn btn-success btn-sm " style="display:inline-block; padding: 8px 11px;"><i class="fa fa-eye"></i></a>
 
 
 
