@@ -123,7 +123,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th>Admin</th>
+                                                    <th>User</th>
                                                     <th>Proses</th>
                                                     <th>Status</th>
                                                     <th>Tanggal Dibuat</th>

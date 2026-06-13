@@ -98,7 +98,6 @@
             <!-- partial -->
 
             <!-- Main Panel -->
-            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -116,6 +115,9 @@
                         </div>
                         @endif
                     </div>
+
+
+
 
                     <!-- Menampilkan detail survey -->
                     <div class="row row-cols-1 row-cols-md-3 g-3">
@@ -190,6 +192,37 @@
                                     <p><strong>Keterangan:</strong> {{ $getRelokasi->keterangan }}</p>
                                     <p><strong>Barang non stock:</strong> {{ $getRelokasi->non_stock }}</p>
 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">
+                                        <i class="mdi mdi-paperclip"></i> Lampiran Work Order
+                                    </h4>
+
+                                    @if (!empty($getRelokasi->attachments))
+                                    <div class="list-group">
+                                        @foreach ($getRelokasi->attachments as $file)
+                                        <a href="{{ asset('storage/'.$file) }}"
+                                            target="_blank"
+                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                                            <span>
+                                                <i class="mdi mdi-file"></i>
+                                                {{ basename($file) }}
+                                            </span>
+
+                                            <span class="badge badge-info">Download</span>
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                    @else
+                                    <p class="text-muted mb-0">Tidak ada file terlampir.</p>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -294,6 +327,8 @@
                                                     <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Status Konfigurasi</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Aksi</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -314,7 +349,17 @@
                                                         <span class="badge badge-pill bg-warning">Belum Dikonfigurasi</span>
                                                         @endif
                                                     </td>
-
+                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                        @if(!$barangKeluar->is_configured)
+                                                        <form action="{{ route('hd.configure-barang', $barangKeluar->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="btn btn-info btn-sm">Konfigurasikan</button>
+                                                        </form>
+                                                        @else
+                                                        <button class="btn btn-secondary btn-sm" disabled>Sudah Dikonfigurasi</button>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                                 @empty
                                                 <tr>
@@ -336,28 +381,32 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Progres Relokasi</h4>
+                                    @if ($getRelokasi->status === 'On Progress' || $getRelokasi->status === 'Completed' || $getRelokasi->status === 'Shipped')
+                                    <a href="{{ route('hd_relokasi_add_progress', $getRelokasi->id) }}" class="btn btn-info mb-3">
+                                        Add Progress</a>
 
+                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th style=" text-align: center; vertical-align: middle;">No</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Tanggal</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">User</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Status</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Foto</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Keterangan</th>
+                                                    <th>No</th>
+                                                    <th>Tanggal</th>
+                                                    <th>User</th>
+                                                    <th>Status</th>
+                                                    <th>Foto</th>
+                                                    <th>Keterangan</th>
 
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @forelse ($progressList as $progress)
                                                 <tr>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $loop->iteration }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $progress->created_at->translatedFormat('d F Y, H:i') }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $progress->user->name }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">@if($progress->status=='Pending')
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $progress->created_at->translatedFormat('d F Y, H:i') }}</td>
+                                                    <td>{{ $progress->user->name }}</td>
+                                                    <td>@if($progress->status=='Pending')
                                                         <span class="badge badge-pill badge-danger">Pending</span>
                                                         @elseif($progress->status=='On Progress')
                                                         <span class="badge badge-pill badge-info">On Progress</span>
@@ -369,7 +418,7 @@
                                                         <span class="badge badge-pill badge-primary">Shipped</span>
                                                         @endif
                                                     </td>
-                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                    <td>
                                                         @php
                                                         $photos = $progress->photos;
                                                         @endphp

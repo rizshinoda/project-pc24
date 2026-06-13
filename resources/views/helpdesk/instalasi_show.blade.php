@@ -97,7 +97,6 @@
             </nav>
             <!-- partial -->
 
-            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -196,6 +195,38 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">
+                                        <i class="mdi mdi-paperclip"></i> Lampiran Work Order
+                                    </h4>
+
+                                    @if (!empty($getInstall->attachments))
+                                    <div class="list-group">
+                                        @foreach ($getInstall->attachments as $file)
+                                        <a href="{{ asset('storage/'.$file) }}"
+                                            target="_blank"
+                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                                            <span>
+                                                <i class="mdi mdi-file"></i>
+                                                {{ basename($file) }}
+                                            </span>
+
+                                            <span class="badge badge-info">Download</span>
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                    @else
+                                    <p class="text-muted mb-0">Tidak ada file terlampir.</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="container mt-4">
                         @php
                         // Tahapan normal
@@ -295,6 +326,7 @@
                                                     <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Status Konfigurasi</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -315,28 +347,28 @@
                                                         <span class="badge badge-pill bg-warning">Belum Dikonfigurasi</span>
                                                         @endif
                                                     </td>
+                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                        @if(!$barangKeluar->is_configured)
+                                                        <form action="{{ route('hd.configure-barang', $barangKeluar->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="btn btn-info btn-sm">Konfigurasikan</button>
+                                                        </form>
+                                                        @else
+                                                        <button class="btn btn-secondary btn-sm" disabled>Sudah Dikonfigurasi</button>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                                 @empty
                                                 <tr>
-                                                    <td colspan="9" class="text-center">Belum ada barang yang diinput</td>
+                                                    <td colspan="10" class="text-center">Belum ada barang yang diinput</td>
                                                 </tr>
                                                 @endforelse
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="form-group">
-                                        @if ($getInstall->status === 'approved' || $getInstall->status === 'shipped')
-                                        <!-- Tombol Selesai -->
-                                        <button type="button" class="btn btn-success" onclick="confirmCompletion('{{ route('ga.update_status', ['getInstallId' => $getInstall->id, 'status' => 'completed']) }}')">
-                                            <i class="fa fa-check"></i> Selesai
-                                        </button>
 
-                                        <!-- Tombol Kirim -->
-                                        <button type="button" class="btn btn-primary" onclick="confirmShipment('{{ route('ga.update_status', ['getInstallId' => $getInstall->id, 'status' => 'shipped']) }}')">
-                                            <i class="fa fa-truck"></i> Kirim
-                                        </button>
-                                        @endif
-                                    </div>
+
 
                                 </div>
                             </div>
@@ -347,8 +379,10 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Progres Instalasi</h4>
-
-
+                                    @if ($getInstall->status === 'On Progress' || $getInstall->status === 'Shipped' || $getInstall->status === 'Completed')
+                                    <a href="{{ route('hd_install_add_progress', $getInstall->id) }}" class="btn btn-info mb-3">
+                                        Add Progress</a>
+                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">

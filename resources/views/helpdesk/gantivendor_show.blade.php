@@ -114,7 +114,22 @@
                             </button>
                         </div>
                         @endif
+
+                        @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @foreach ($errors->all() as $error)
+                            {{ $error }}
+                            @endforeach
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        @endif
+
                     </div>
+
+
+
 
                     <!-- Menampilkan detail survey -->
                     <div class="row row-cols-1 row-cols-md-3 g-3">
@@ -241,8 +256,8 @@
                         <div class="stepper">
                             @foreach($steps as $index => $step)
                             <div class="step 
-                      {{ $index < $currentStep ? 'completed' : '' }} 
-                      {{ $index == $currentStep ? 'active' : '' }}">
+                    {{ $index < $currentStep ? 'completed' : '' }} 
+                    {{ $index == $currentStep ? 'active' : '' }}">
                                 <div class="step-circle">
                                     @if($index < $currentStep)
                                         <i class="bi bi-check-lg"></i>
@@ -262,7 +277,10 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Vendor Baru</h4>
-
+                                    @if ($getGantivendor->status === 'On Progress')
+                                    <a href="{{ route('hd.gantivendor.inputsidbaru', $getGantivendor->id) }}" class="btn btn-info mb-3">
+                                        Input SID Baru</a>
+                                    @endif
                                     <div class="table-responsive">
                                         <table class="table table-hover">
                                             <thead>
@@ -297,7 +315,11 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Progres Ganti Vendor</h4>
+                                    @if ($getGantivendor->status === 'On Progress' || $getGantivendor->status === 'Completed')
+                                    <a href="{{ route('hd_gantivendor_add_progress', $getGantivendor->id) }}" class="btn btn-info mb-3">
+                                        Add Progress</a>
 
+                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">
