@@ -434,7 +434,7 @@
         }
     });
 </script>
-<script>
+<!-- <script>
     document.addEventListener("DOMContentLoaded", function() {
         let monthlyStats = @json($monthlyStats ?? ['instalasi' => [], 'maintenance' => [], 'dismantle' => []]);
 
@@ -519,7 +519,7 @@
         let chart = new ApexCharts(document.querySelector("#traffic-chart"), options);
         chart.render();
     });
-</script>
+</script> -->
 
 <script>
     function confirmRedirect(url) {
@@ -557,4 +557,92 @@
             }, 5000);
         }
     });
+
+    const categories = Object.keys(woChart);
+
+    const pending = categories.map(
+        item => woChart[item]['Pending'] || 0
+    );
+
+    const progress = categories.map(
+        item => woChart[item]['On Progress'] || 0
+    );
+
+    const completed = categories.map(
+        item => woChart[item]['Completed'] || 0
+    );
+
+    const overdue = categories.map(
+        item => woChart[item]['Overdue'] || 0
+    );
+
+    var options = {
+        series: [{
+                name: 'Pending',
+                data: pending
+            },
+            {
+                name: 'On Progress',
+                data: progress
+            },
+            {
+                name: 'Completed',
+                data: completed
+            },
+            {
+                name: 'Overdue',
+                data: overdue
+            }
+        ],
+        chart: {
+            type: 'bar',
+            height: 400,
+            stacked: true
+        },
+        colors: [
+            '#ffc107', // Pending = Kuning
+            '#006af5', // On Progress = Biru muda
+            '#01cc6d', // Completed = Hijau
+            '#dc3545' // Overdue = Merah
+        ],
+        plotOptions: {
+            bar: {
+                horizontal: true
+            }
+        },
+        xaxis: {
+            categories: categories
+        },
+        legend: {
+            position: 'top'
+        }
+    };
+
+    new ApexCharts(
+        document.querySelector("#chart"),
+        options
+    ).render();
+
+    var trafficOptions = {
+        series: Object.values(statusData),
+        chart: {
+            type: 'pie',
+            height: 350
+        },
+        labels: Object.keys(statusData),
+
+        colors: [
+            '#ffc107', // Pending
+            '#006af5', // On Progress
+            '#01cc6d', // Completed
+            '#dc3545' // Overdue
+        ]
+    };
+
+    var trafficChart = new ApexCharts(
+        document.querySelector("#traffic-chart"),
+        trafficOptions
+    );
+
+    trafficChart.render();
 </script>

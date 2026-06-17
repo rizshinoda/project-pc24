@@ -101,62 +101,136 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        $startOfWeek = Carbon::now()->startOfWeek();
-        $endOfWeek = Carbon::now()->endOfWeek();
-        $startOfYear = Carbon::now()->startOfYear();
-        $endOfYear = Carbon::now()->endOfYear();
+        $models = [
+            'Survey' => WorkOrderSurvey::class,
+            'Instalasi' => WorkOrderInstall::class,
+            'Upgrade' => WorkOrderUpgrade::class,
+            'Downgrade' => WorkOrderDowngrade::class,
+            'Dismantle' => WorkOrderDismantle::class,
+            'Relokasi' => WorkOrderRelokasi::class,
+            'Ganti Vendor' => WorkOrderGantiVendor::class,
+            'Maintenance' => WorkOrderMaintenance::class,
+        ];
 
-        // Statistik Mingguan
-        $instalasiCount = $this->getCompletedWorkOrdersByWeek(WorkOrderInstall::class, $startOfWeek, $endOfWeek);
-        $maintenanceCount = $this->getCompletedWorkOrdersByWeek(WorkOrderMaintenance::class, $startOfWeek, $endOfWeek);
-        $dismantleCount = $this->getCompletedWorkOrdersByWeek(WorkOrderDismantle::class, $startOfWeek, $endOfWeek);
+        $rfsModels = [
+            WorkOrderSurvey::class,
+            WorkOrderInstall::class,
+        ];
 
-        // Statistik Bulanan
-        $monthlyStats = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $monthlyStats['instalasi'][] = WorkOrderInstall::whereMonth('updated_at', $i)
-                ->whereYear('updated_at', Carbon::now()->year)
-                ->where('status', 'completed')
-                ->count();
+        $statuses = [
+            'Pending',
+            'On Progress',
+            'Completed',
+        ];
 
-            $monthlyStats['maintenance'][] = WorkOrderMaintenance::whereMonth('updated_at', $i)
-                ->whereYear('updated_at', Carbon::now()->year)
-                ->where('status', 'completed')
-                ->count();
+        $totalWO = 0;
+        $overdueTotal = 0;
+        $escalationWO = collect();
+        $statusDistribution = array_fill_keys($statuses, 0);
+        $woChart = [];
 
-            $monthlyStats['dismantle'][] = WorkOrderDismantle::whereMonth('updated_at', $i)
-                ->whereYear('updated_at', Carbon::now()->year)
-                ->where('status', 'completed')
-                ->count();
+        foreach ($models as $type => $model) {
+
+            $count = $model::count();
+            $totalWO += $count;
+
+            // Statistik Status
+            foreach ($statuses as $status) {
+
+                $jumlah = $model::where('status', $status)->count();
+
+                $woChart[$type][$status] = $jumlah;
+
+                $statusDistribution[$status] += $jumlah;
+            }
+
+            // Statistik Overdue
+            $overdueCount = 0;
+
+            if (in_array($model, $rfsModels)) {
+
+                $overdueCount = $model::whereDate('tanggal_rfs', '<', Carbon::today())
+                    ->where('status', '!=', 'Completed')
+                    ->count();
+            }
+
+            $woChart[$type]['Overdue'] = $overdueCount;
+            $overdueTotal += $overdueCount;
+
+
+            if (in_array($model, $rfsModels)) {
+
+                $dataWO = $model::with('pelanggan')
+                    ->whereDate('tanggal_rfs', '<', Carbon::today())
+                    ->whereNotIn('status', [
+                        'Completed',
+                        'Rejected',
+                        'Canceled'
+                    ])
+                    ->get()
+                    ->map(function ($item) use ($type) {
+
+                        $item->jenis = $type;
+
+                        $item->nama_pelanggan =
+                            optional($item->pelanggan)->nama_pelanggan;
+
+                        $item->hari_overdue =
+                            Carbon::parse($item->tanggal_rfs)
+                            ->diffInDays(Carbon::today());
+
+                        switch ($type) {
+
+                            case 'Survey':
+                                $item->detail_url = route(
+                                    'admin.wo_survey_show',
+                                    $item->id
+                                );
+                                break;
+
+                            case 'Instalasi':
+                                $item->detail_url = route(
+                                    'admin.wo_instalasi_show',
+                                    $item->id
+                                );
+                                break;
+                        }
+
+                        return $item;
+                    });
+
+                $escalationWO = $escalationWO->merge($dataWO);
+            }
         }
 
-        // Statistik Total (Keseluruhan) dengan nilai default
-        $totalInstalasi = WorkOrderInstall::where('status', 'completed')->count() ?? 0;
-        $totalMaintenance = WorkOrderMaintenance::where('status', 'completed')->count() ?? 0;
-        $totalDismantle = WorkOrderDismantle::where('status', 'completed')->count() ?? 0;
+        // Tambah overdue ke donut chart
+        $statusDistribution['Overdue'] = $overdueTotal;
 
-        // Ambil notifikasi yang belum dibaca
+        $escalationWO = $escalationWO
+            ->sortByDesc('hari_overdue')
+            ->take(10);
+
         $notifications = Notification::where('user_id', Auth::id())
             ->where('is_read', false)
             ->get();
 
-        // Gabungkan semua data
         $data = array_merge(
             $this->ambilDataRole(),
-            compact(
-                'notifications',
-                'instalasiCount',
-                'maintenanceCount',
-                'dismantleCount',
-                'monthlyStats',
-                'totalInstalasi',
-                'totalMaintenance',
-                'totalDismantle'
-            )
+            [
+                'totalWO' => $totalWO,
+                'onProgress' => $statusDistribution['On Progress'],
+                'completed' => $statusDistribution['Completed'],
+                'overdue' => $overdueTotal,
+                'statusDistribution' => $statusDistribution,
+                'woChart' => $woChart,
+                'escalationWO' => $escalationWO,
+                'notifications' => $notifications,
+            ]
         );
 
         return $this->renderView('dashboard', $data);
     }
+
 
 
 
