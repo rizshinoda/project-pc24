@@ -2,59 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use id;
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Jenis;
-use App\Models\Status;
-use App\Models\Vendor;
-use setasign\Fpdi\Fpdi;
-use App\Models\Instansi;
-use App\Models\Provinsi;
-use App\Models\Pelanggan;
-use App\Models\BeritaAcara;
-use App\Models\StockBarang;
-use App\Helpers\LogActivity;
-use App\Models\Notification;
-use Illuminate\Http\Request;
-use App\Models\OnlineBilling;
-use App\Models\RequestBarang;
-use App\Models\SurveyProgress;
-use App\Models\DismantleDetail;
-use App\Models\InstallProgress;
-use App\Models\UpgradeProgress;
-use App\Models\WorkOrderSurvey;
-use App\Models\RelokasiProgress;
-use App\Models\WorkOrderInstall;
-use App\Models\WorkOrderUpgrade;
-use App\Models\DismantleProgress;
-use App\Models\DowngradeProgress;
-use App\Models\ReqBarangProgress;
-use App\Models\WorkOrderRelokasi;
-use App\Models\WorkOrderDismantle;
-use App\Models\WorkOrderDowngrade;
-use Illuminate\Support\Facades\DB;
-use App\Models\GantiVendorProgress;
-use App\Imports\OnlineBillingImport;
-use App\Models\RequestBarangDetails;
-use App\Models\WorkOrderGantiVendor;
-use App\Models\WorkOrderMaintenance;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use Maatwebsite\Excel\Facades\Excel;
-use Intervention\Image\Facades\Image;
-use App\Exports\WorkOrderSurveyExport;
-use App\Models\WorkOrderInstallDetail;
-use App\Models\WorkOrderUpgradeDetail;
-use App\Exports\WorkOrderInstallExport;
-use App\Exports\WorkOrderUpgradeExport;
-use App\Models\WorkOrderRelokasiDetail;
-use Illuminate\Support\Facades\Storage;
-use App\Exports\WorkOrderRelokasiExport;
-use App\Models\GantiVendorProgressPhoto;
 use App\Exports\WorkOrderDismantleExport;
 use App\Exports\WorkOrderDowngradeExport;
 use App\Exports\WorkOrderGantiVendorExport;
+use App\Exports\WorkOrderInstallExport;
+use App\Exports\WorkOrderRelokasiExport;
+use App\Exports\WorkOrderSurveyExport;
+use App\Exports\WorkOrderUpgradeExport;
+use App\Helpers\LogActivity;
+use App\Imports\OnlineBillingImport;
+use App\Models\BeritaAcara;
+use App\Models\DismantleDetail;
+use App\Models\DismantleProgress;
+use App\Models\DowngradeProgress;
+use App\Models\GantiVendorProgress;
+use App\Models\GantiVendorProgressPhoto;
+use App\Models\InstallProgress;
+use App\Models\Instansi;
+use App\Models\Jenis;
+use App\Models\MaintenanceProgress;
+use App\Models\Notification;
+use App\Models\OnlineBilling;
+use App\Models\Pelanggan;
+use App\Models\Provinsi;
+use App\Models\RelokasiProgress;
+use App\Models\ReqBarangProgress;
+use App\Models\RequestBarang;
+use App\Models\RequestBarangDetails;
+use App\Models\Status;
+use App\Models\StockBarang;
+use App\Models\SurveyProgress;
+use App\Models\UpgradeProgress;
+use App\Models\User;
+use App\Models\Vendor;
+use App\Models\WorkOrderDismantle;
+use App\Models\WorkOrderDowngrade;
+use App\Models\WorkOrderGantiVendor;
+use App\Models\WorkOrderInstall;
+use App\Models\WorkOrderInstallDetail;
+use App\Models\WorkOrderMaintenance;
+use App\Models\WorkOrderRelokasi;
+use App\Models\WorkOrderRelokasiDetail;
+use App\Models\WorkOrderSurvey;
+use App\Models\WorkOrderUpgrade;
+use App\Models\WorkOrderUpgradeDetail;
+use Carbon\Carbon;
+use id;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
+use Maatwebsite\Excel\Facades\Excel;
+use setasign\Fpdi\Fpdi;
 
 class AdminController extends Controller
 {
@@ -4344,5 +4345,85 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('error', 'Request Barang sudah selesai dan tidak bisa dihapus.');
+    }
+
+    public function maintenance(Request $request)
+    {
+        // Ambil parameter dari request
+        $status = $request->get('status', 'all');
+        $search = $request->get('search');
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Query untuk mendapatkan data survey dengan eager loading
+        $query = WorkOrderMaintenance::with([
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        ])->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan status
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        // Pencarian di semua kolom yang relevan
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spk', 'like', '%' . $search . '%')
+                    ->orWhereHas('onlineBilling', function ($q) use ($search) {
+                        $q->where('nama_site', 'like', '%' . $search . '%')
+                            ->orWhereHas('pelanggan', function ($q) use ($search) {
+                                $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+                            })
+                            ->orWhereHas('instansi', function ($q) use ($search) {
+                                $q->where('nama_instansi', 'like', '%' . $search . '%');
+                            });
+                    });
+            });
+        }
+
+        // Filter berdasarkan bulan dan tahun
+        if (!empty($month) && !empty($year)) {
+            $query->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        } elseif (!empty($year)) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Dapatkan data survey dengan pagination
+        $getMaintenance = $query->paginate(10)->appends([
+            'status' => $status,
+            'search' => $search,
+            'month' => $month,
+            'year' => $year,
+        ]);
+
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('getMaintenance', 'status', 'search', 'month', 'year', 'notifications'));
+
+
+        return $this->renderView('maintenance', $data);
+    }
+    public function maintenanceShow($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        $progressList = MaintenanceProgress::where('work_order_maintenance_id', $id)->get();
+
+        // Menampilkan detail work order
+        $getMaintenance = WorkOrderMaintenance::with('WorkOrderMaintenanceDetail.stockBarang')->findOrFail($id);
+
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getMaintenance', 'notifications'));
+
+        // Render view berdasarkan role
+        return $this->renderView('maintenance_show', $data);
     }
 }
