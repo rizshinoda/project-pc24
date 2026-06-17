@@ -346,8 +346,8 @@ Route::group(['middleware' => ['ga', SessionTimeout::class]], function () {
     Route::get('ga/upgrade/{id}/createshipped', [GaController::class, 'upgradecreateShipped'])->name('ga.upgrade.create.shipped');
     Route::post('ga/upgrade/{id}/storeshipped', [GaController::class, 'upgradestoreShipped'])->name('ga.upgrade.store.shipped');
 
-    Route::get('ga/OB', [GaController::class, 'OB'])->name('ga.OB');
-    Route::get('ga/OB/{id}', [GaController::class, 'showOB'])->name('ga.OB_show');
+    // Route::get('ga/OB', [GaController::class, 'OB'])->name('ga.OB');
+    // Route::get('ga/OB/{id}', [GaController::class, 'showOB'])->name('ga.OB_show');
 
     Route::get('ga/sitedismantle', [GaController::class, 'sitedismantle'])->name('ga.sitedismantle');
     Route::get('ga/sitedismantle{id}', [GaController::class, 'showsitedismantle'])->name('ga.showsitedismantle');
@@ -675,8 +675,8 @@ Route::group(['middleware' => ['psb', SessionTimeout::class]], function () {
     Route::get('/psb/dismantle/{id}/add-progress-dismantle', [PsbController::class, 'addProgressDismantle'])->name('psb_dismantle_add_progress');
     Route::post('/psb/dismantle/{id}/add-progress-dismantle', [PsbController::class, 'storeProgressDismantle'])->name('psb_dismantle_store_progress');
 
-    Route::get('psb/OB', [PsbController::class, 'OB'])->name('psb.OB');
-    Route::get('psb/OB/{id}', [PsbController::class, 'showOB'])->name('psb.OB_show');
+    // Route::get('psb/OB', [PsbController::class, 'OB'])->name('psb.OB');
+    // Route::get('psb/OB/{id}', [PsbController::class, 'showOB'])->name('psb.OB_show');
     Route::get('psb/sitedismantle', [PsbController::class, 'sitedismantle'])->name('psb.sitedismantle');
     Route::get('psb/sitedismantle{id}', [PsbController::class, 'showsitedismantle'])->name('psb.showsitedismantle');
 

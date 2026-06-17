@@ -174,6 +174,8 @@
                                     <p><strong>PIC:</strong> {{ $onlinebilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $onlinebilling->no_pic }}</p>
                                     <p><strong>Vendor:</strong> {{ $onlinebilling->vendor?->nama_vendor }} ({{ $onlinebilling->sid_vendor }})</p>
+                                    <p><strong>Harga Sewa:</strong> Rp {{ number_format($onlinebilling->harga_sewa, 0, ',', '.') }}</p>
+
                                     <p><strong>Status:</strong> @if($onlinebilling->status=='active')
                                         <span class="badge badge-pill badge-success">Aktif</span>
                                         @else($onlinebilling->status=='dismantle')
