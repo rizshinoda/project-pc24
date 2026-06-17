@@ -197,6 +197,38 @@
                         </div>
                     </div>
 
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">
+                                        <i class="mdi mdi-paperclip"></i> Lampiran Work Order
+                                    </h4>
+
+                                    @if (!empty($getInstall->attachments))
+                                    <div class="list-group">
+                                        @foreach ($getInstall->attachments as $file)
+                                        <a href="{{ asset('storage/'.$file) }}"
+                                            target="_blank"
+                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                                            <span>
+                                                <i class="mdi mdi-file"></i>
+                                                {{ basename($file) }}
+                                            </span>
+
+                                            <span class="badge badge-info">Download</span>
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                    @else
+                                    <p class="text-muted mb-0">Tidak ada file terlampir.</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="container mt-4">
                         @php
@@ -298,6 +330,8 @@
                                                     <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Status Konfigurasi</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Aksi</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -316,6 +350,17 @@
                                                         <span class="badge badge-pill bg-success">Sudah Dikonfigurasi</span>
                                                         @else
                                                         <span class="badge badge-pill bg-warning">Belum Dikonfigurasi</span>
+                                                        @endif
+                                                    </td>
+                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                        @if(!$barangKeluar->is_configured)
+                                                        <form action="{{ route('hd.configure-barang', $barangKeluar->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="btn btn-info btn-sm">Konfigurasikan</button>
+                                                        </form>
+                                                        @else
+                                                        <button class="btn btn-secondary btn-sm" disabled>Sudah Dikonfigurasi</button>
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -338,8 +383,24 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title">Progres Jasa</h4>
+                                    @if($getInstall->status == 'Pending')
+                                    <!-- Tombol Approve dan Reject -->
+                                    <!-- Tombol Approve -->
+                                    <form action="{{ route('hd.jasa.approve', $getInstall->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        <button type="button" class="btn btn-success" onclick="confirmApproval('{{ route('hd.jasa.approve', $getInstall->id) }}')">
+                                            <i class="fa fa-check"></i> Approve
+                                        </button>
+                                    </form>
 
+
+                                    @endif
+                                    <h4 class="card-title mt-2">Progres Jasa</h4>
+                                    @if ($getInstall->status === 'On Progress' || $getInstall->status === 'Completed' || $getInstall->status === 'Shipped')
+                                    <a href="{{ route('hd_jasa_add_progress', $getInstall->id) }}" class="btn btn-info mb-3">
+                                        Add Progress</a>
+
+                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">

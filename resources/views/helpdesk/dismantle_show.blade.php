@@ -99,6 +99,7 @@
 
             <!-- Main Panel -->
             <!-- Main Panel -->
+            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -116,6 +117,8 @@
                         </div>
                         @endif
                     </div>
+
+
 
 
                     <!-- Menampilkan detail survey -->
@@ -262,8 +265,17 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
+                                    @if ($getDismantle->status === 'On Progress')
+                                    <!-- Tombol Shipped -->
+                                    <form action="{{ route('hd.dismantle.progress.disable', $getDismantle->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            Disable Client
+                                        </button>
+                                    </form>
+                                    @endif
 
-                                    <h4 class="card-title mt-2">Progres Dismantle</h4>
+                                    <h4 class="card-title mt-3">Progres Dismantle</h4>
 
                                     <div class=" table-responsive">
 
@@ -352,7 +364,8 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <!-- Tombol Kembali -->
+
+
                                 </div>
                             </div>
                         </div>
