@@ -229,6 +229,8 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/requestbarang/{id}/update', [AdminController::class, 'updateRequest'])->name('admin.request_barang.update');
     Route::delete('admin/requestbarang/{id}', [AdminController::class, 'requestDestroy'])->name('admin.request_destroy');
 
+    Route::get('admin/maintenance', [AdminController::class, 'maintenance'])->name('admin.maintenance');
+    Route::get('admin/maintenance/show/{id}', [AdminController::class, 'maintenanceShow'])->name('admin.maintenance_show');
 
     Route::get('admin/chat', Index::class)->name('admin.chat.index');
     Route::get('admin/chat/{query}', Chat::class)->name('admin.chat');

@@ -85,9 +85,6 @@
                                     <a class="nav-link" href="{{route('admin.gantivendor')}}">Ganti Vendor</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('admin.maintenance')}}">Maintenance</a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link" href="{{route('admin.request_barang')}}">Request Barang</a>
                                 </li>
 
@@ -129,7 +126,7 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-danger text-white me-2">
                                 <i class="mdi mdi-home"></i>
-                            </span> Request Barang
+                            </span> Maintenance
                         </h3>
                         {{-- Alert untuk menampilkan pesan sukses --}}
                         @if (session('success'))
@@ -148,14 +145,14 @@
                             </button>
                         </div>
                         @endif
+
                     </div>
                     <div class="col-lg-12 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <h4>Daftar Request Barang</h4>
-
+                                <h4>Daftar WO Maintenance</h4>
                                 <!-- Form Pencarian dan Filter -->
-                                <form method="GET" action="{{ route('admin.request_barang') }}" class="mb-4">
+                                <form method="GET" action="{{ route('admin.maintenance') }}" class="mb-4">
                                     <div class="row">
                                         <!-- Kolom Pencarian -->
                                         <div class="col-md-6 mb-3">
@@ -189,7 +186,6 @@
                                         <!-- Tombol Filter -->
                                         <div class="">
                                             <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
-                                            <a href="{{route('admin.request_barang.create')}}" class="btn btn-info btn-sm mb-4 ">Buat Request</a>
 
                                         </div>
                                     </div>
@@ -197,79 +193,75 @@
                                 <!-- Tab Status -->
                                 <ul class="nav nav-tabs justify-content-center mb-4" id="surveyTab" role="tablist">
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" href="{{ route('admin.request_barang', ['status' => 'all', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}">Semua</a>
+                                        <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" id="all-tab" href="{{ route('admin.maintenance', ['status' => 'all', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Semua</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'pending' ? 'active' : '' }}" href="{{ route('admin.request_barang', ['status' => 'pending', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}">Pending</a>
+                                        <a class="nav-link {{ $status == 'Pending' ? 'active' : '' }}" id="pending-tab" href="{{ route('admin.maintenance', ['status' => 'Pending', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Pending</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'approved' ? 'active' : '' }}" href="{{ route('admin.request_barang', ['status' => 'approved', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}">Approved</a>
+                                        <a class="nav-link {{ $status == 'On Progress' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('admin.maintenance', ['status' => 'On Progress', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">On Progress</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'rejected' ? 'active' : '' }}" href="{{ route('admin.request_barang', ['status' => 'rejected', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}">Rejected</a>
+                                        <a class="nav-link {{ $status == 'Shipped' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('admin.maintenance', ['status' => 'Shipped', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Shipped</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'shipped' ? 'active' : '' }}" href="{{ route('admin.request_barang', ['status' => 'shipped', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}">Shipped</a>
+                                        <a class="nav-link {{ $status == 'Rejected' ? 'active' : '' }}" id="on-progress-tab" href="{{ route('admin.maintenance', ['status' => 'Rejected', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Rejected</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link {{ $status == 'completed' ? 'active' : '' }}" href="{{ route('admin.request_barang', ['status' => 'completed', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}">Completed</a>
+                                        <a class="nav-link {{ $status == 'Completed' ? 'active' : '' }}" id="completed-tab" href="{{ route('admin.maintenance', ['status' => 'Completed', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Completed</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ $status == 'Canceled' ? 'active' : '' }}" id="canceled-tab" href="{{ route('admin.maintenance', ['status' => 'Canceled', 'search' => request('search'), 'month' => request('month'), 'year' => request('year')]) }}" role="tab">Cancelled</a>
                                     </li>
                                 </ul>
-                                <div class=" table-responsive">
-                                    <!-- Tabel Request Barang -->
-                                    <table class="table table-bordered" style="table-layout: fixed; width: 160%;">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered wrap">
                                         <thead>
                                             <tr>
-                                                <th style="width: 80px; text-align: center; vertical-align: middle;">No</th>
-                                                <th style="width: 120px; text-align: center; vertical-align: middle;">Tanggal</th>
-                                                <th style="width: 250px; text-align: center; vertical-align: middle;">Nama Penerima</th>
-                                                <th style="width: 300px; text-align: center; vertical-align: middle;">Alamat</th>
-                                                <th style="width: 150px; text-align: center; vertical-align: middle;">Nomer Telepon</th>
-                                                <th style="width: 350px; text-align: center; vertical-align: middle;">Keterangan</th>
-                                                <th style="width: 120px; text-align: center; vertical-align: middle;">Status</th>
-                                                <th style="width: 120px; text-align: center; vertical-align: middle;">Aksi</th>
+                                                <th style="text-align: center; vertical-align: middle;">No</th>
+                                                <th style="text-align: center; vertical-align: middle;">Nomor Work <br> Order</th>
+                                                <th style="text-align: center; vertical-align: middle;">Tanggal <br> Dibuat</th>
+                                                <th style="text-align: center; vertical-align: middle;">Nama <br> Pelanggan</th>
+                                                <th style="text-align: center; vertical-align: middle;">Perusahaan</th>
+                                                <th style="text-align: center; vertical-align: middle;">Nama <br> Site</th>
+                                                <th style="text-align: center; vertical-align: middle;">Alamat <br> Pemasangan</th>
+                                                <th style="text-align: center; vertical-align: middle;">Bandwidth</th>
+                                                <th style="text-align: center; vertical-align: middle;">Status</th>
+                                                <th style="text-align: center; vertical-align: middle;">Aksi</th>
                                             </tr>
                                         </thead>
-
                                         <tbody>
-                                            @foreach($requestBarangs as $key => $requestBarang)
+                                            @foreach ($getMaintenance as $key => $maintenance)
                                             <tr>
-                                                <td style=" text-align: center; vertical-align: middle;">{{$requestBarangs->firstItem()+ $key}} </td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $requestBarang->created_at->format('d M Y') }}</td>
-                                                <td style="text-align: center; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">{{ $requestBarang->nama_penerima }}</td>
-                                                <td style="text-align: center; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">{{ $requestBarang->alamat_penerima }}</td>
-                                                <td style="text-align: center; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">{{ $requestBarang->no_penerima }}</td>
-                                                <td style="text-align: justify; vertical-align: middle; word-wrap: break-word; white-space: normal; padding: 8px; line-height: 1.5;">
-                                                    {{ $requestBarang->keterangan }}
+                                                <td style="text-align: center; vertical-align: middle;">{{ $getMaintenance->firstItem() + $key }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $maintenance->no_spk }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $maintenance->created_at->format('d M Y') }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $maintenance->onlineBilling->pelanggan->nama_pelanggan }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $maintenance->onlineBilling->instansi?->nama_instansi}}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $maintenance->onlineBilling->nama_site ?? 'Tidak Ada Nama Site' }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">
+                                                    {{ \Illuminate\Support\Str::limit($maintenance->onlineBilling->alamat_pemasangan, 60, '...') }}
                                                 </td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $maintenance->onlineBilling->bandwidth }} {{ $maintenance->onlineBilling->satuan }}</td>
 
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    @if($requestBarang->status=='pending')
+                                                    @if($maintenance->status == 'Pending')
                                                     <span class="badge badge-pill badge-danger">Pending</span>
-                                                    @elseif($requestBarang->status=='approved')
-                                                    <span class="badge badge-pill badge-info">Approved</span>
-                                                    @elseif($requestBarang->status=='rejected')
-                                                    <span class="badge badge-pill badge-warning">Rejected</span>
-                                                    @elseif($requestBarang->status=='completed')
-                                                    <span class="badge badge-pill badge-success">Completed</span>
-                                                    @elseif($requestBarang->status=='shipped')
+                                                    @elseif($maintenance->status == 'On Progress')
+                                                    <span class="badge badge-pill badge-info">On Progress</span>
+                                                    @elseif($maintenance->status=='Shipped')
                                                     <span class="badge badge-pill badge-primary">Shipped</span>
+                                                    @elseif($maintenance->status=='Rejected')
+                                                    <span class="badge badge-pill badge-dark">Rejected</span>
+                                                    @elseif($maintenance->status == 'Canceled')
+                                                    <span class="badge badge-pill badge-warning">Cancelled</span>
+                                                    @elseif($maintenance->status == 'Completed')
+                                                    <span class="badge badge-pill badge-success">Completed</span>
                                                     @endif
                                                 </td>
+
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    <a href="{{ route('admin.request_barang.show', $requestBarang->id) }}" class="btn btn-success btn-sm">
-                                                        <i class="fa fa-eye"></i>
-                                                    </a>
-                                                    <a href="{{ route('admin.request_barang.edit', $requestBarang->id) }}" class="btn btn-info btn-sm">
-                                                        <i class="fa fa-edit"></i>
-                                                    </a>
-                                                    <form id="delete-form-{{ $requestBarang->id }}" action="{{ route('admin.request_destroy', $requestBarang->id) }}" method="POST" style="display:inline-block;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $requestBarang->id }})">
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                    <a href="{{ route('admin.maintenance_show', $maintenance->id) }}" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></a>
 
                                                 </td>
                                             </tr>
@@ -279,17 +271,18 @@
                                 </div>
                                 <div class="mt-3">
                                     Showing
-                                    {{$requestBarangs->firstItem()}}
+                                    {{$getMaintenance->firstItem()}}
                                     to
-                                    {{$requestBarangs->lastItem()}}
+                                    {{$getMaintenance->lastItem()}}
                                     of
-                                    {{$requestBarangs->total()}}
+                                    {{$getMaintenance->total()}}
                                     entries
 
                                 </div>
                                 <div class="pull-right">
-                                    {{ $requestBarangs->links() }}
+                                    {{ $getMaintenance->links() }}
                                 </div>
+
                             </div>
                         </div>
                     </div>
