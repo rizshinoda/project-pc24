@@ -84,27 +84,27 @@
 
         </div>
 
-        <!-- Active WO -->
+        <!-- WO Escalation + Billing Chart -->
         <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
+
+            <!-- Table Escalation -->
+            <div class="col-md-8 grid-margin">
                 <div class="card">
                     <div class="card-body">
 
-                        <h4 class="card-title">WO Escalation</h4>
+                        <h4 class="card-title">WO Escalation (TOP 10)</h4>
 
-                        <div class="table-responsive">
-                            <table class="table">
+                        <div class="table-responsive" style="max-height: 500px; overflow-y:auto;">
+                            <table class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th>No</th>
                                         <th>No SPK</th>
                                         <th>Jenis WO</th>
-
                                         <th>Nama Pelanggan</th>
                                         <th>Nama Site</th>
                                         <th>Status</th>
                                         <th>Tanggal RFS</th>
-
                                         <th>Terlambat</th>
                                     </tr>
                                 </thead>
@@ -114,9 +114,11 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
 
-                                        <td> <a href="{{ $wo->detail_url }}">
+                                        <td>
+                                            <a href="{{ $wo->detail_url }}">
                                                 {{ $wo->no_spk }}
-                                            </a></td>
+                                            </a>
+                                        </td>
 
                                         <td>
                                             <span class="badge badge-info">
@@ -144,7 +146,7 @@
                                         </td>
 
                                         <td>
-                                            {{ \Carbon\Carbon::parse($wo->tanggal_rfs)->translatedFormat('d M Y') }}
+                                            {{ \Carbon\Carbon::parse($wo->tanggal_rfs)->format('d-m-Y') }}
                                         </td>
 
                                         <td>
@@ -161,8 +163,35 @@
                     </div>
                 </div>
             </div>
-        </div>
 
+            <!-- Billing Chart -->
+            <div class="col-md-4 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+
+                        <h4 class="card-title">Online Billing Status</h4>
+
+                        <div id="billing-chart"></div>
+
+                        <div class="mt-4 text-center">
+                            <div>
+                                <span class="badge badge-success">
+                                    Active: {{ $billingChart['Active'] }}
+                                </span>
+                            </div>
+
+                            <div class="mt-2">
+                                <span class="badge badge-danger">
+                                    Dismantle: {{ $billingChart['Dismantle'] }}
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <footer class="footer">
@@ -177,4 +206,5 @@
 <script>
     const woChart = @json($woChart);
     const statusData = @json($statusDistribution);
+    const billingData = @json($billingChart);
 </script>

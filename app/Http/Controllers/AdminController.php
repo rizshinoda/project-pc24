@@ -172,7 +172,10 @@ class AdminController extends Controller
         $escalationWO = collect();
         $statusDistribution = array_fill_keys($statuses, 0);
         $woChart = [];
-
+        $billingChart = [
+            'Active' => OnlineBilling::where('status', 'active')->count(),
+            'Dismantle' => OnlineBilling::where('status', 'dismantle')->count(),
+        ];
         foreach ($models as $type => $config) {
 
             $model = $config['model'];
@@ -292,6 +295,8 @@ class AdminController extends Controller
                 'woChart' => $woChart,
                 'escalationWO' => $escalationWO,
                 'notifications' => $notifications,
+                'billingChart' => $billingChart,
+
             ]
         );
 
