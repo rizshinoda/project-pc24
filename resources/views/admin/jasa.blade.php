@@ -85,6 +85,9 @@
                                     <a class="nav-link" href="{{route('admin.gantivendor')}}">Ganti Vendor</a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link" href="{{route('admin.maintenance')}}">Maintenance</a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link" href="{{route('admin.request_barang')}}">Request Barang</a>
                                 </li>
 
@@ -300,7 +303,7 @@
 
                                 </div>
                                 <div class="pull-right">
-                                    {{ $getInstall->links() }}
+                                    {{ $getInstall->appends(request()->query())->links() }}
                                 </div>
 
                             </div>
