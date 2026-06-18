@@ -562,4 +562,49 @@
     );
 
     trafficChart.render();
+
+
+    var billingOptions = {
+        series: [{
+            name: 'Total',
+            data: [
+                billingData.Active,
+                billingData.Dismantle
+            ]
+        }],
+
+        chart: {
+            type: 'bar',
+            height: 320
+        },
+
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                borderRadius: 4,
+                distributed: true
+            }
+        },
+
+        colors: [
+            '#23e088', // Active
+            '#dc3545' // Dismantle
+        ],
+
+        dataLabels: {
+            enabled: true
+        },
+
+        xaxis: {
+            categories: [
+                'Active',
+                'Dismantle'
+            ]
+        }
+    };
+
+    new ApexCharts(
+        document.querySelector("#billing-chart"),
+        billingOptions
+    ).render();
 </script>
