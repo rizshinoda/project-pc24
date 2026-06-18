@@ -298,7 +298,7 @@
 
                                 </div>
                                 <div class="pull-right">
-                                    {{ $getSurvey->links() }}
+                                    {{ $getSurvey->appends(request()->query())->links() }}
                                 </div>
 
                             </div>

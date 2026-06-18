@@ -14,6 +14,7 @@
 <!-- Custom js for this page -->
 <script src="{{asset('/dist/assets/js/dashboard.js')}}"></script>
 <!-- End custom js for this page -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script src="{{asset('jquery.min.js')}}"></script>
@@ -263,7 +264,7 @@
         }
     });
 </script>
-<script>
+<!-- <script>
     document.addEventListener("DOMContentLoaded", function() {
         let monthlyStats = @json($monthlyStats ?? ['instalasi' => [], 'maintenance' => [], 'dismantle' => []]);
 
@@ -348,7 +349,7 @@
         let chart = new ApexCharts(document.querySelector("#traffic-chart"), options);
         chart.render();
     });
-</script>
+</script> -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
@@ -544,4 +545,223 @@
             }, 5000);
         }
     });
+</script>
+<script>
+    // CHART
+    const categories = Object.keys(woChart);
+
+    const pending =
+        categories.map(
+            item => woChart[item]['Pending'] || 0
+        );
+
+    const progress =
+        categories.map(
+            item => woChart[item]['On Progress'] || 0
+        );
+
+    const shipped =
+        categories.map(
+            item => woChart[item]['Shipped'] || 0
+        );
+
+    const completed =
+        categories.map(
+            item => woChart[item]['Completed'] || 0
+        );
+
+    const overdue =
+        categories.map(
+            item => woChart[item]['Overdue'] || 0
+        );
+
+
+    // TAMBAHKAN DI SINI
+    const routeMap = {
+
+
+        'Instalasi': '{{ route("hd.instalasi") }}',
+
+        'POC': '{{ route("hd.poc") }}',
+
+        'Jasa': '{{ route("hd.jasa") }}',
+
+        'Maintenance': '{{ route("hd.maintenance") }}',
+
+        'Dismantle': '{{ route("hd.dismantle") }}',
+
+        'Upgrade': '{{ route("hd.upgrade") }}',
+
+        'Downgrade': '{{ route("hd.downgrade") }}',
+
+        'Relokasi': '{{ route("hd.relokasi") }}',
+
+        'Ganti Vendor': '{{ route("hd.gantivendor") }}',
+
+    };
+
+
+    const overdueAllowed = ['Survey', 'Instalasi', 'POC',
+        'Jasa'
+    ];
+
+
+    // BARU OPTIONS
+    var options = {
+
+        series: [
+
+            {
+                name: 'Pending',
+                data: pending
+            },
+
+            {
+                name: 'On Progress',
+                data: progress
+            },
+
+            {
+                name: 'Shipped',
+                data: shipped
+            },
+
+            {
+                name: 'Completed',
+                data: completed
+            },
+
+            {
+                name: 'Overdue',
+                data: overdue
+            }
+
+        ],
+
+        chart: {
+
+            type: 'bar',
+
+            height: 400,
+
+            stacked: true,
+
+            events: {
+
+                dataPointSelection: function(
+                    event,
+                    chartContext,
+                    config
+                ) {
+
+                    const status =
+                        config.w.config.series[
+                            config.seriesIndex
+                        ].name;
+
+
+                    // ambil kategori
+                    const wo =
+                        config.w.globals.labels[
+                            config.dataPointIndex
+                        ];
+
+
+                    // ambil route
+                    const route =
+                        routeMap[wo];
+
+                    if (!route) {
+                        return;
+                    }
+
+
+                    // // redirect
+                    // window.location.href =
+                    //     `${route}?status=${encodeURIComponent(status)}`;
+
+                    if (status === 'Overdue') {
+
+                        if (!overdueAllowed.includes(wo)) {
+                            return;
+                        }
+
+                        window.location.href =
+                            `${route}?filter=overdue`;
+
+                    } else {
+
+                        window.location.href =
+                            `${route}?status=${encodeURIComponent(status)}`;
+                    }
+                }
+
+            }
+
+        },
+
+        colors: ["#fab300", "#038bf3", "#f24cf8", "#23e088", "#fd6060"], // Warna dasar
+        fill: {
+            type: "gradient",
+            gradient: {
+                shade: "light",
+                type: "vertical", // Bisa 'horizontal' atau 'diagonal1', 'diagonal2'
+                shadeIntensity: 0.5,
+                gradientToColors: ["#f9c10c", "#03a9f3", "#eb2ff1", "#00ff88", "#ee4874"], // Warna gradasi tujuan
+                inverseColors: false,
+                opacityFrom: 0.9,
+                opacityTo: 0.7,
+                stops: [0, 100]
+            }
+        },
+        plotOptions: {
+            bar: {
+                horizontal: true
+            }
+        },
+
+        xaxis: {
+            categories: categories
+        }
+
+    };
+
+
+    // RENDER
+    new ApexCharts(
+        document.querySelector("#chart"),
+        options
+    ).render();
+
+
+    var trafficOptions = {
+        series: Object.values(statusData),
+        chart: {
+            type: 'pie',
+            height: 350
+        },
+        labels: Object.keys(statusData),
+
+        colors: ["#fab300", "#038bf3", "#f24cf8", "#23e088", "#fd6060"], // Warna dasar
+        fill: {
+            type: "gradient",
+            gradient: {
+                shade: "light",
+                type: "vertical", // Bisa 'horizontal' atau 'diagonal1', 'diagonal2'
+                shadeIntensity: 0.5,
+                gradientToColors: ["#f9c10c", "#03a9f3", "#eb2ff1", "#00ff88", "#ee4874"], // Warna gradasi tujuan
+                inverseColors: false,
+                opacityFrom: 0.9,
+                opacityTo: 0.7,
+                stops: [0, 100]
+            }
+        },
+    };
+
+    var trafficChart = new ApexCharts(
+        document.querySelector("#traffic-chart"),
+        trafficOptions
+    );
+
+    trafficChart.render();
 </script>

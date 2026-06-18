@@ -16,6 +16,8 @@
             <div class="col-md-3 stretch-card grid-margin">
                 <div class="card bg-gradient-primary card-img-holder text-white">
                     <div class="card-body">
+                        <img src="{{ asset('/dist/assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+
                         <h4>Total WO</h4>
                         <h2>{{ $totalWO }}</h2>
                     </div>
@@ -25,6 +27,8 @@
             <div class="col-md-3 stretch-card grid-margin">
                 <div class="card bg-gradient-info card-img-holder text-white">
                     <div class="card-body">
+                        <img src="{{ asset('/dist/assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+
                         <h4>On Progress</h4>
                         <h2>{{ $onProgress }}</h2>
                     </div>
@@ -34,6 +38,8 @@
             <div class="col-md-3 stretch-card grid-margin">
                 <div class="card bg-gradient-success card-img-holder text-white">
                     <div class="card-body">
+                        <img src="{{ asset('/dist/assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+
                         <h4>Completed</h4>
                         <h2>{{ $completed }}</h2>
                     </div>
@@ -43,6 +49,8 @@
             <div class="col-md-3 stretch-card grid-margin">
                 <div class="card bg-gradient-danger card-img-holder text-white">
                     <div class="card-body">
+                        <img src="{{ asset('/dist/assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+
                         <h4>Overdue</h4>
                         <h2>{{ $overdue }}</h2>
                     </div>
@@ -136,7 +144,7 @@
                                         </td>
 
                                         <td>
-                                            {{ \Carbon\Carbon::parse($wo->tanggal_rfs)->format('d-m-Y') }}
+                                            {{ \Carbon\Carbon::parse($wo->tanggal_rfs)->translatedFormat('d M Y') }}
                                         </td>
 
                                         <td>

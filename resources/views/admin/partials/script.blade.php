@@ -558,70 +558,193 @@
         }
     });
 
+    // DATA CHART
     const categories = Object.keys(woChart);
 
-    const pending = categories.map(
-        item => woChart[item]['Pending'] || 0
-    );
+    const pending =
+        categories.map(
+            item => woChart[item]['Pending'] || 0
+        );
 
-    const progress = categories.map(
-        item => woChart[item]['On Progress'] || 0
-    );
+    const progress =
+        categories.map(
+            item => woChart[item]['On Progress'] || 0
+        );
 
-    const completed = categories.map(
-        item => woChart[item]['Completed'] || 0
-    );
+    const shipped =
+        categories.map(
+            item => woChart[item]['Shipped'] || 0
+        );
 
-    const overdue = categories.map(
-        item => woChart[item]['Overdue'] || 0
-    );
+    const completed =
+        categories.map(
+            item => woChart[item]['Completed'] || 0
+        );
 
+    const overdue =
+        categories.map(
+            item => woChart[item]['Overdue'] || 0
+        );
+
+
+    // TAMBAHKAN DI SINI
+    const routeMap = {
+
+        'Survey': '{{ route("admin.survey") }}',
+
+        'Instalasi': '{{ route("admin.instalasi") }}',
+
+        'POC': '{{ route("admin.poc") }}',
+
+        'Jasa': '{{ route("admin.jasa") }}',
+
+        'Maintenance': '{{ route("admin.maintenance") }}',
+
+        'Dismantle': '{{ route("admin.dismantle") }}',
+
+        'Upgrade': '{{ route("admin.upgrade") }}',
+
+        'Downgrade': '{{ route("admin.downgrade") }}',
+
+        'Relokasi': '{{ route("admin.relokasi") }}',
+
+        'Ganti Vendor': '{{ route("admin.gantivendor") }}',
+
+    };
+
+
+    const overdueAllowed = ['Survey', 'Instalasi', 'POC',
+        'Jasa'
+    ];
+
+
+    // BARU OPTIONS
     var options = {
-        series: [{
+
+        series: [
+
+            {
                 name: 'Pending',
                 data: pending
             },
+
             {
                 name: 'On Progress',
                 data: progress
             },
+
+            {
+                name: 'Shipped',
+                data: shipped
+            },
+
             {
                 name: 'Completed',
                 data: completed
             },
+
             {
                 name: 'Overdue',
                 data: overdue
             }
+
         ],
+
         chart: {
+
             type: 'bar',
+
             height: 400,
-            stacked: true
+
+            stacked: true,
+
+            events: {
+
+                dataPointSelection: function(
+                    event,
+                    chartContext,
+                    config
+                ) {
+
+                    const status =
+                        config.w.config.series[
+                            config.seriesIndex
+                        ].name;
+
+
+                    // ambil kategori
+                    const wo =
+                        config.w.globals.labels[
+                            config.dataPointIndex
+                        ];
+
+
+                    // ambil route
+                    const route =
+                        routeMap[wo];
+
+                    if (!route) {
+                        return;
+                    }
+
+
+                    // // redirect
+                    // window.location.href =
+                    //     `${route}?status=${encodeURIComponent(status)}`;
+
+                    if (status === 'Overdue') {
+
+                        if (!overdueAllowed.includes(wo)) {
+                            return;
+                        }
+
+                        window.location.href =
+                            `${route}?filter=overdue`;
+
+                    } else {
+
+                        window.location.href =
+                            `${route}?status=${encodeURIComponent(status)}`;
+                    }
+                }
+
+            }
+
         },
-        colors: [
-            '#ffc107', // Pending = Kuning
-            '#006af5', // On Progress = Biru muda
-            '#01cc6d', // Completed = Hijau
-            '#dc3545' // Overdue = Merah
-        ],
+
+        colors: ["#fab300", "#038bf3", "#f24cf8", "#23e088", "#fd6060"], // Warna dasar
+        fill: {
+            type: "gradient",
+            gradient: {
+                shade: "light",
+                type: "vertical", // Bisa 'horizontal' atau 'diagonal1', 'diagonal2'
+                shadeIntensity: 0.5,
+                gradientToColors: ["#f9c10c", "#03a9f3", "#eb2ff1", "#00ff88", "#ee4874"], // Warna gradasi tujuan
+                inverseColors: false,
+                opacityFrom: 0.9,
+                opacityTo: 0.7,
+                stops: [0, 100]
+            }
+        },
         plotOptions: {
             bar: {
                 horizontal: true
             }
         },
+
         xaxis: {
             categories: categories
-        },
-        legend: {
-            position: 'top'
         }
+
     };
 
+
+    // RENDER
     new ApexCharts(
         document.querySelector("#chart"),
         options
     ).render();
+
 
     var trafficOptions = {
         series: Object.values(statusData),
@@ -631,12 +754,20 @@
         },
         labels: Object.keys(statusData),
 
-        colors: [
-            '#ffc107', // Pending
-            '#006af5', // On Progress
-            '#01cc6d', // Completed
-            '#dc3545' // Overdue
-        ]
+        colors: ["#fab300", "#038bf3", "#f24cf8", "#23e088", "#fd6060"], // Warna dasar
+        fill: {
+            type: "gradient",
+            gradient: {
+                shade: "light",
+                type: "vertical", // Bisa 'horizontal' atau 'diagonal1', 'diagonal2'
+                shadeIntensity: 0.5,
+                gradientToColors: ["#f9c10c", "#03a9f3", "#eb2ff1", "#00ff88", "#ee4874"], // Warna gradasi tujuan
+                inverseColors: false,
+                opacityFrom: 0.9,
+                opacityTo: 0.7,
+                stops: [0, 100]
+            }
+        },
     };
 
     var trafficChart = new ApexCharts(

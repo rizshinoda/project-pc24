@@ -2,45 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-
-use App\Models\Tipe;
-use App\Models\User;
-use App\Models\Jenis;
-use App\Models\Merek;
-use App\Models\Status;
-use setasign\Fpdi\Fpdi;
-use App\Models\StockBarang;
-use App\Models\BarangKeluar;
-use App\Models\Notification;
-use Illuminate\Http\Request;
-use App\Models\OnlineBilling;
-use App\Models\RequestBarang;
-use App\Models\DismantleDetail;
-use App\Models\InstallProgress;
-use App\Models\UpgradeProgress;
-use App\Models\RelokasiProgress;
-use App\Models\WorkOrderInstall;
-use App\Models\WorkOrderUpgrade;
-use App\Models\DismantleProgress;
-use App\Models\ReqBarangProgress;
-use App\Models\WorkOrderRelokasi;
-use App\Models\WorkOrderDismantle;
-use App\Models\MaintenanceProgress;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\InstallProgressPhoto;
-use App\Models\RequestBarangDetails;
-use App\Models\UpgradeProgressPhoto;
-use App\Models\WorkOrderMaintenance;
-use Illuminate\Support\Facades\Auth;
-use App\Models\RelokasiProgressPhoto;
-use App\Models\RequestBarangProgress;
+use App\Models\BarangKeluar;
+use App\Models\DismantleDetail;
+use App\Models\DismantleProgress;
 use App\Models\DismantleProgressPhoto;
-use App\Models\ReqBarangProgressPhoto;
+use App\Models\InstallProgress;
+use App\Models\InstallProgressPhoto;
+use App\Models\Jenis;
+use App\Models\MaintenanceProgress;
 use App\Models\MaintenanceProgressPhoto;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Merek;
+use App\Models\Notification;
+use App\Models\OnlineBilling;
+use App\Models\RelokasiProgress;
+use App\Models\RelokasiProgressPhoto;
+use App\Models\ReqBarangProgress;
+use App\Models\ReqBarangProgressPhoto;
+use App\Models\RequestBarang;
+use App\Models\RequestBarangDetails;
+use App\Models\RequestBarangProgress;
 use App\Models\RequestBarangProgressPhoto;
+use App\Models\Status;
+use App\Models\StockBarang;
+use App\Models\Tipe;
+use App\Models\UpgradeProgress;
+use App\Models\UpgradeProgressPhoto;
+use App\Models\User;
+use App\Models\WorkOrderDismantle;
+use App\Models\WorkOrderDowngrade;
+use App\Models\WorkOrderGantiVendor;
+use App\Models\WorkOrderInstall;
+use App\Models\WorkOrderMaintenance;
+use App\Models\WorkOrderRelokasi;
+use App\Models\WorkOrderSurvey;
+use App\Models\WorkOrderUpgrade;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use setasign\Fpdi\Fpdi;
 
 class GaController extends Controller
 {
@@ -87,64 +89,195 @@ class GaController extends Controller
     // Fungsi untuk setiap view
     public function dashboard()
     {
-        $startOfWeek = Carbon::now()->startOfWeek();
-        $endOfWeek = Carbon::now()->endOfWeek();
-        $startOfYear = Carbon::now()->startOfYear();
-        $endOfYear = Carbon::now()->endOfYear();
+        $models = [
+            'Survey' => [
+                'model' => WorkOrderSurvey::class
+            ],
 
-        // Statistik Mingguan
-        $instalasiCount = $this->getCompletedWorkOrdersByWeek(WorkOrderInstall::class, $startOfWeek, $endOfWeek);
-        $maintenanceCount = $this->getCompletedWorkOrdersByWeek(WorkOrderMaintenance::class, $startOfWeek, $endOfWeek);
-        $dismantleCount = $this->getCompletedWorkOrdersByWeek(WorkOrderDismantle::class, $startOfWeek, $endOfWeek);
+            'Instalasi' => [
+                'model' => WorkOrderInstall::class,
+                'jenis_pekerjaan' => 'Instalasi'
+            ],
 
-        // Statistik Bulanan
-        $monthlyStats = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $monthlyStats['instalasi'][] = WorkOrderInstall::whereMonth('updated_at', $i)
-                ->whereYear('updated_at', Carbon::now()->year)
-                ->where('status', 'completed')
-                ->count();
+            'POC' => [
+                'model' => WorkOrderInstall::class,
+                'jenis_pekerjaan' => 'POC'
+            ],
 
-            $monthlyStats['maintenance'][] = WorkOrderMaintenance::whereMonth('updated_at', $i)
-                ->whereYear('updated_at', Carbon::now()->year)
-                ->where('status', 'completed')
-                ->count();
+            'Jasa' => [
+                'model' => WorkOrderInstall::class,
+                'jenis_pekerjaan' => 'Jasa'
+            ],
 
-            $monthlyStats['dismantle'][] = WorkOrderDismantle::whereMonth('updated_at', $i)
-                ->whereYear('updated_at', Carbon::now()->year)
-                ->where('status', 'completed')
-                ->count();
+            'Upgrade' => [
+                'model' => WorkOrderUpgrade::class
+            ],
+
+            'Downgrade' => [
+                'model' => WorkOrderDowngrade::class
+            ],
+
+            'Dismantle' => [
+                'model' => WorkOrderDismantle::class
+            ],
+
+            'Relokasi' => [
+                'model' => WorkOrderRelokasi::class
+            ],
+
+            'Ganti Vendor' => [
+                'model' => WorkOrderGantiVendor::class
+            ],
+
+            'Maintenance' => [
+                'model' => WorkOrderMaintenance::class
+            ],
+        ];
+
+        $statuses = [
+            'Pending',
+            'On Progress',
+            'Shipped',
+            'Completed',
+        ];
+
+        $closedStatuses = [
+            'Completed',
+            'Rejected',
+            'Canceled'
+        ];
+
+        $rfsTypes = [
+            'Survey',
+            'Instalasi',
+            'POC',
+            'Jasa'
+        ];
+
+        $totalWO = 0;
+        $overdueTotal = 0;
+        $escalationWO = collect();
+        $statusDistribution = array_fill_keys($statuses, 0);
+        $woChart = [];
+
+        foreach ($models as $type => $config) {
+
+            $model = $config['model'];
+
+            $query = $model::query();
+
+            // Filter jenis pekerjaan untuk instalasi
+            if (isset($config['jenis_pekerjaan'])) {
+                $query->where(
+                    'jenis_pekerjaan',
+                    $config['jenis_pekerjaan']
+                );
+            }
+
+            $count = (clone $query)->count();
+            $totalWO += $count;
+
+            // Statistik status
+            foreach ($statuses as $status) {
+
+                $jumlah = (clone $query)
+                    ->where('status', $status)
+                    ->count();
+
+                $woChart[$type][$status] = $jumlah;
+
+                $statusDistribution[$status] += $jumlah;
+            }
+
+            // Statistik overdue
+            $overdueCount = 0;
+
+            if (in_array($type, $rfsTypes)) {
+
+                $overdueCount = (clone $query)
+                    ->whereDate('tanggal_rfs', '<', Carbon::today())
+                    ->whereNotIn('status', $closedStatuses)
+                    ->count();
+
+                // Data escalation
+                $dataWO = (clone $query)
+                    ->with('pelanggan')
+                    ->whereDate('tanggal_rfs', '<', Carbon::today())
+                    ->whereNotIn('status', $closedStatuses)
+                    ->get()
+                    ->map(function ($item) use ($type) {
+
+                        $item->jenis = $type;
+
+                        $item->nama_pelanggan =
+                            optional($item->pelanggan)->nama_pelanggan;
+
+                        $item->hari_overdue =
+                            Carbon::parse($item->tanggal_rfs)
+                            ->diffInDays(Carbon::today());
+
+                        switch ($type) {
+
+                            case 'Instalasi':
+                                $item->detail_url = route(
+                                    'ga.instalasi.show',
+                                    $item->id
+                                );
+                                break;
+
+                            case 'POC':
+                                $item->detail_url = route(
+                                    'ga.poc_show',
+                                    $item->id
+                                );
+                                break;
+
+                            case 'Jasa':
+                                $item->detail_url = route(
+                                    'ga.jasa_show',
+                                    $item->id
+                                );
+                                break;
+                        }
+
+                        return $item;
+                    });
+
+                $escalationWO = $escalationWO->merge($dataWO);
+            }
+
+            $woChart[$type]['Overdue'] = $overdueCount;
+            $overdueTotal += $overdueCount;
         }
 
+        $statusDistribution['Overdue'] = $overdueTotal;
 
-        // Statistik Total (Keseluruhan) dengan nilai default
-        $totalInstalasi = WorkOrderInstall::where('status', 'completed')->count() ?? 0;
-        $totalMaintenance = WorkOrderMaintenance::where('status', 'completed')->count() ?? 0;
-        $totalDismantle = WorkOrderDismantle::where('status', 'completed')->count() ?? 0;
+        $escalationWO = $escalationWO
+            ->sortByDesc('hari_overdue')
+            ->take(10);
 
-        // Ambil notifikasi yang belum dibaca
         $notifications = Notification::where('user_id', Auth::id())
             ->where('is_read', false)
             ->get();
 
-        // Gabungkan semua data
         $data = array_merge(
             $this->ambilDataRole(),
-            compact(
-                'notifications',
-                'instalasiCount',
-                'maintenanceCount',
-                'dismantleCount',
-                'monthlyStats',
-                'totalInstalasi',
-                'totalMaintenance',
-                'totalDismantle'
-            )
+            [
+                'totalWO' => $totalWO,
+                'onProgress' => ($statusDistribution['On Progress'] ?? 0)
+                    +
+                    ($statusDistribution['Shipped'] ?? 0),
+                'completed' => $statusDistribution['Completed'] ?? 0,
+                'overdue' => $overdueTotal,
+                'statusDistribution' => $statusDistribution,
+                'woChart' => $woChart,
+                'escalationWO' => $escalationWO,
+                'notifications' => $notifications,
+            ]
         );
 
         return $this->renderView('dashboard', $data);
     }
-
 
 
     /**
@@ -172,7 +305,15 @@ class GaController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -2434,7 +2575,15 @@ class GaController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -2510,7 +2659,15 @@ class GaController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {

@@ -99,28 +99,72 @@ class AdminController extends Controller
         return view(strtolower($this->roles[$role]) . '.' . $namaView, $data);
     }
 
+
     public function dashboard()
     {
         $models = [
-            'Survey' => WorkOrderSurvey::class,
-            'Instalasi' => WorkOrderInstall::class,
-            'Upgrade' => WorkOrderUpgrade::class,
-            'Downgrade' => WorkOrderDowngrade::class,
-            'Dismantle' => WorkOrderDismantle::class,
-            'Relokasi' => WorkOrderRelokasi::class,
-            'Ganti Vendor' => WorkOrderGantiVendor::class,
-            'Maintenance' => WorkOrderMaintenance::class,
-        ];
+            'Survey' => [
+                'model' => WorkOrderSurvey::class
+            ],
 
-        $rfsModels = [
-            WorkOrderSurvey::class,
-            WorkOrderInstall::class,
+            'Instalasi' => [
+                'model' => WorkOrderInstall::class,
+                'jenis_pekerjaan' => 'Instalasi'
+            ],
+
+            'POC' => [
+                'model' => WorkOrderInstall::class,
+                'jenis_pekerjaan' => 'POC'
+            ],
+
+            'Jasa' => [
+                'model' => WorkOrderInstall::class,
+                'jenis_pekerjaan' => 'Jasa'
+            ],
+
+            'Upgrade' => [
+                'model' => WorkOrderUpgrade::class
+            ],
+
+            'Downgrade' => [
+                'model' => WorkOrderDowngrade::class
+            ],
+
+            'Dismantle' => [
+                'model' => WorkOrderDismantle::class
+            ],
+
+            'Relokasi' => [
+                'model' => WorkOrderRelokasi::class
+            ],
+
+            'Ganti Vendor' => [
+                'model' => WorkOrderGantiVendor::class
+            ],
+
+            'Maintenance' => [
+                'model' => WorkOrderMaintenance::class
+            ],
         ];
 
         $statuses = [
             'Pending',
             'On Progress',
+            'Shipped',
             'Completed',
+        ];
+
+        $closedStatuses = [
+            'Completed',
+            'Rejected',
+            'Canceled'
+        ];
+
+        $rfsTypes = [
+            'Survey',
+            'Instalasi',
+            'POC',
+            'Jasa'
         ];
 
         $totalWO = 0;
@@ -129,44 +173,50 @@ class AdminController extends Controller
         $statusDistribution = array_fill_keys($statuses, 0);
         $woChart = [];
 
-        foreach ($models as $type => $model) {
+        foreach ($models as $type => $config) {
 
-            $count = $model::count();
+            $model = $config['model'];
+
+            $query = $model::query();
+
+            // Filter jenis pekerjaan untuk instalasi
+            if (isset($config['jenis_pekerjaan'])) {
+                $query->where(
+                    'jenis_pekerjaan',
+                    $config['jenis_pekerjaan']
+                );
+            }
+
+            $count = (clone $query)->count();
             $totalWO += $count;
 
-            // Statistik Status
+            // Statistik status
             foreach ($statuses as $status) {
 
-                $jumlah = $model::where('status', $status)->count();
+                $jumlah = (clone $query)
+                    ->where('status', $status)
+                    ->count();
 
                 $woChart[$type][$status] = $jumlah;
 
                 $statusDistribution[$status] += $jumlah;
             }
 
-            // Statistik Overdue
+            // Statistik overdue
             $overdueCount = 0;
 
-            if (in_array($model, $rfsModels)) {
+            if (in_array($type, $rfsTypes)) {
 
-                $overdueCount = $model::whereDate('tanggal_rfs', '<', Carbon::today())
-                    ->where('status', '!=', 'Completed')
-                    ->count();
-            }
-
-            $woChart[$type]['Overdue'] = $overdueCount;
-            $overdueTotal += $overdueCount;
-
-
-            if (in_array($model, $rfsModels)) {
-
-                $dataWO = $model::with('pelanggan')
+                $overdueCount = (clone $query)
                     ->whereDate('tanggal_rfs', '<', Carbon::today())
-                    ->whereNotIn('status', [
-                        'Completed',
-                        'Rejected',
-                        'Canceled'
-                    ])
+                    ->whereNotIn('status', $closedStatuses)
+                    ->count();
+
+                // Data escalation
+                $dataWO = (clone $query)
+                    ->with('pelanggan')
+                    ->whereDate('tanggal_rfs', '<', Carbon::today())
+                    ->whereNotIn('status', $closedStatuses)
                     ->get()
                     ->map(function ($item) use ($type) {
 
@@ -180,7 +230,6 @@ class AdminController extends Controller
                             ->diffInDays(Carbon::today());
 
                         switch ($type) {
-
                             case 'Survey':
                                 $item->detail_url = route(
                                     'admin.wo_survey_show',
@@ -194,6 +243,20 @@ class AdminController extends Controller
                                     $item->id
                                 );
                                 break;
+
+                            case 'POC':
+                                $item->detail_url = route(
+                                    'admin.wo_poc_show',
+                                    $item->id
+                                );
+                                break;
+
+                            case 'Jasa':
+                                $item->detail_url = route(
+                                    'admin.wo_jasa_show',
+                                    $item->id
+                                );
+                                break;
                         }
 
                         return $item;
@@ -201,9 +264,11 @@ class AdminController extends Controller
 
                 $escalationWO = $escalationWO->merge($dataWO);
             }
+
+            $woChart[$type]['Overdue'] = $overdueCount;
+            $overdueTotal += $overdueCount;
         }
 
-        // Tambah overdue ke donut chart
         $statusDistribution['Overdue'] = $overdueTotal;
 
         $escalationWO = $escalationWO
@@ -218,8 +283,10 @@ class AdminController extends Controller
             $this->ambilDataRole(),
             [
                 'totalWO' => $totalWO,
-                'onProgress' => $statusDistribution['On Progress'],
-                'completed' => $statusDistribution['Completed'],
+                'onProgress' => ($statusDistribution['On Progress'] ?? 0)
+                    +
+                    ($statusDistribution['Shipped'] ?? 0),
+                'completed' => $statusDistribution['Completed'] ?? 0,
                 'overdue' => $overdueTotal,
                 'statusDistribution' => $statusDistribution,
                 'woChart' => $woChart,
@@ -263,7 +330,15 @@ class AdminController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -1252,7 +1327,15 @@ class AdminController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -4263,7 +4346,15 @@ class AdminController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -4342,7 +4433,15 @@ class AdminController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
