@@ -165,7 +165,7 @@
             </div>
 
             <!-- Billing Chart -->
-            <div class="col-md-4 grid-margin stretch-card">
+            <div class="col-md-4 grid-margin">
                 <div class="card">
                     <div class="card-body">
 
