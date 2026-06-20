@@ -180,7 +180,7 @@
 
                                 </div>
                                 <div class="pull-right">
-                                    {{ $getInstall->links() }}
+                                    {{ $getInstall->appends(request()->query())->links() }}
                                 </div>
 
                             </div>

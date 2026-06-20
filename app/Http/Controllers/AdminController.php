@@ -977,18 +977,31 @@ class AdminController extends Controller
         }
     }
 
-    public function pelanggan()
+    public function pelanggan(Request $request)
     {
+        $search = $request->get('search');
 
-        // Mengambil 5 item per halaman dan urutkan berdasarkan created_at secara descending
-        $pelanggans = Pelanggan::orderBy('created_at', 'desc')->paginate(5);
+        $query = Pelanggan::query();
 
+        if (!empty($search)) {
+            $query->where('nama_pelanggan', 'like', '%' . $search . '%');
+        }
 
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        $getPelanggan = $query
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->appends([
+                'search' => $search,
+            ]);
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('notifications', 'pelanggans'));
+        $notifications = Notification::where('user_id', Auth::user()->id)
+            ->where('is_read', false)
+            ->get();
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('getPelanggan', 'search', 'notifications')
+        );
 
         return $this->renderView('pelanggan', $data);
     }
@@ -1125,16 +1138,31 @@ class AdminController extends Controller
         // Redirect ke halaman pelanggan dengan pesan sukses
         return redirect()->route('admin.pelanggan')->with('success', 'Data pelanggan berhasil dihapus.');
     }
-    public function namavendor()
+    public function namavendor(Request $request)
     {
-        // Mengambil 5 item per halaman dan urutkan berdasarkan created_at secara descending
-        $vendors = Vendor::orderBy('created_at', 'desc')->paginate(5);
+        $search = $request->get('search');
 
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        $query = Vendor::query();
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('notifications', 'vendors'));
+        if (!empty($search)) {
+            $query->where('nama_vendor', 'like', '%' . $search . '%');
+        }
+
+        $getVendor = $query
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->appends([
+                'search' => $search,
+            ]);
+
+        $notifications = Notification::where('user_id', Auth::user()->id)
+            ->where('is_read', false)
+            ->get();
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('getVendor', 'search', 'notifications')
+        );
 
         return $this->renderView('namavendor', $data);
     }
@@ -1220,16 +1248,31 @@ class AdminController extends Controller
         return redirect()->route('admin.namavendor')->with('success', 'Data Vendor berhasil dihapus.');
     }
 
-    public function instansi()
+    public function instansi(Request $request)
     {
-        // Mengambil 5 item per halaman dan urutkan berdasarkan created_at secara descending
-        $instansis = Instansi::orderBy('created_at', 'desc')->paginate(5);
+        $search = $request->get('search');
 
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        $query = Instansi::query();
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('notifications', 'instansis'));
+        if (!empty($search)) {
+            $query->where('nama_instansi', 'like', '%' . $search . '%');
+        }
+
+        $getInstansi = $query
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->appends([
+                'search' => $search,
+            ]);
+
+        $notifications = Notification::where('user_id', Auth::user()->id)
+            ->where('is_read', false)
+            ->get();
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact('getInstansi', 'search', 'notifications')
+        );
 
         return $this->renderView('instansi', $data);
     }
