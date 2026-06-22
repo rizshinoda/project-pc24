@@ -153,7 +153,23 @@
                         <div class="card">
 
                             <div class="card-body">
-                                <a href="{{route('instansi.create')}}" class="btn btn-info btn-sm mb-4 ">Tambah Data</a>
+                                <form method="GET" action="{{ route('admin.instansi') }}" class="mb-4">
+                                    <div class="row">
+                                        <!-- Kolom Pencarian -->
+                                        <div class="col-md-6 mb-3">
+                                            <input type="text" name="search" class="form-control contoh1" placeholder="Cari Data" value="{{ request('search') }}">
+                                        </div>
+
+
+                                        <!-- Tombol Filter -->
+                                        <div class="">
+                                            <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
+                                            <a href="{{route('instansi.create')}}" class="btn btn-info btn-sm mb-4 ">Tambah Data</a>
+                                            <!-- <a href="{{ route('work-order-install.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a> -->
+
+                                        </div>
+                                    </div>
+                                </form>
                                 <div class=" table-responsive">
 
                                     <table class="table table-hover wrap">
@@ -166,9 +182,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($instansis as $key => $instansi)
+                                            @foreach ($getInstansi as $key => $instansi)
                                             <tr>
-                                                <td style=" text-align: center; vertical-align: middle;">{{$instansis->firstItem()+ $key}} </td>
+                                                <td style=" text-align: center; vertical-align: middle;">{{$getInstansi->firstItem()+ $key}} </td>
                                                 <td style="text-align: center; vertical-align: middle;">{{$instansi->nama_instansi}}</td>
 
 
@@ -185,16 +201,16 @@
                                 </div>
                                 <div class="mt-3">
                                     Showing
-                                    {{$instansis->firstItem()}}
+                                    {{$getInstansi->firstItem()}}
                                     to
-                                    {{$instansis->lastItem()}}
+                                    {{$getInstansi->lastItem()}}
                                     of
-                                    {{$instansis->total()}}
+                                    {{$getInstansi->total()}}
                                     entries
 
                                 </div>
                                 <div class="d-flex justify-content-end">
-                                    {{ $instansis->links() }}
+                                    {{ $getInstansi->links() }}
                                 </div>
                             </div>
                         </div>

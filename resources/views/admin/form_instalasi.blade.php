@@ -175,8 +175,10 @@
                                                 <div class="col-sm-8">
                                                     <select class="form-control" id="pelanggan_id" name="pelanggan_id" required>
                                                         <option value="">Pilih Pelanggan</option>
+
                                                         @foreach ($pelanggans as $pelanggan)
                                                         <option value="{{ $pelanggan->id }}"
+                                                            data-id="{{ $pelanggan->id }}"
                                                             data-nama-gedung="{{ $pelanggan->nama_gedung }}"
                                                             data-alamat="{{ $pelanggan->alamat }}"
                                                             data-no-pelanggan="{{ $pelanggan->no_pelanggan }}"
@@ -185,8 +187,8 @@
                                                             {{ $pelanggan->nama_pelanggan }}
                                                         </option>
                                                         @endforeach
-                                                    </select>
 
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row">
@@ -429,6 +431,13 @@
 
                                         <div class="col-md-6">
                                             <!-- Kolom kedua -->
+
+                                            <div class="form-group row">
+                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">No Jaringan</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control" id="no_jaringan" name="no_jaringan" readonly>
+                                                </div>
+                                            </div>
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Jenis Pekerjaan</label>
                                                 <div class="col-sm-8">
@@ -545,12 +554,7 @@
                                                     <input type="text" class="form-control" id="vlan" name="vlan">
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">No Jaringan</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="no_jaringan" name="no_jaringan">
-                                                </div>
-                                            </div>
+
                                             <div class="form-group row">
                                                 <label for="no_pelanggan" class="col-sm-4 col-form-label">Tanggal RFS</label>
                                                 <div class="col-sm-8">

@@ -550,25 +550,22 @@
     // TAMBAHKAN DI SINI
     const routeMap = {
 
-        'Survey': '{{ route("admin.survey") }}',
 
-        'Instalasi': '{{ route("admin.instalasi") }}',
+        'Instalasi': '{{ route("ga.instalasi") }}',
 
-        'POC': '{{ route("admin.poc") }}',
+        'POC': '{{ route("ga.poc") }}',
 
-        'Jasa': '{{ route("admin.jasa") }}',
+        'Jasa': '{{ route("ga.jasa") }}',
 
-        'Maintenance': '{{ route("admin.maintenance") }}',
+        'Maintenance': '{{ route("ga.maintenance") }}',
 
-        'Dismantle': '{{ route("admin.dismantle") }}',
+        'Dismantle': '{{ route("ga.dismantle") }}',
 
-        'Upgrade': '{{ route("admin.upgrade") }}',
+        'Upgrade': '{{ route("ga.upgrade") }}',
 
-        'Downgrade': '{{ route("admin.downgrade") }}',
 
-        'Relokasi': '{{ route("admin.relokasi") }}',
+        'Relokasi': '{{ route("ga.relokasi") }}',
 
-        'Ganti Vendor': '{{ route("admin.gantivendor") }}',
 
     };
 
