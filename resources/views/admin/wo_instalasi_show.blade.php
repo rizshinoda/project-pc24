@@ -489,96 +489,195 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Status Berita Acara</h4>
+                    <div class="row mt-4 justify-content-center">
+                        <div class="col-md-5">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body p-4">
 
+                                    <h4 class="card-title mb-4 text-center">Berita Acara</h4>
 
+                                    {{-- Jika belum ada BA --}}
+                                    @if (!$beritaAcara)
 
-                                    <div class="form-group">
-                                        <!-- Tombol Kirim Berita Acara hanya muncul jika status instalasi 'Completed' dan status BA 'pending' -->
-                                        @if ($getInstall->status === 'Completed' && !$beritaAcaras->contains('status', 'sent') && !$beritaAcaras->contains('status', 'received'))
-                                        <form action="{{ route('berita_acara.send', $getInstall->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-paper-plane"></i> Kirim Berita Acara
-                                            </button>
-                                        </form>
+                                    @if ($getInstall->status === 'Completed')
+
+                                    <div class="alert alert-info">
+                                        Upload dokumen berita acara awal untuk memulai proses.
+                                    </div>
+
+                                    <form action="{{ route('berita_acara.store') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+
+                                        <input type="hidden" name="work_order_id" value="{{ $getInstall->id }}">
+                                        <input type="hidden" name="work_order_type" value="install">
+
+                                        <div class="form-group">
+                                            <label>Upload BA Awal</label>
+                                            <input type="file" name="attachment" class="form-control" required>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            <i class="fa fa-upload"></i> Upload Berita Acara
+                                        </button>
+                                    </form>
+
+                                    @else
+                                    <div class="alert alert-warning mb-0">
+                                        Work Order belum selesai. Berita acara belum dapat dibuat.
+                                    </div>
+                                    @endif
+
+                                    @else
+
+                                    {{-- STATUS --}}
+                                    <div class="text-center mb-4">
+                                        <h5 class="mb-2">Status Berita Acara</h5>
+
+                                        @if ($beritaAcara->status == 'draft')
+                                        <span class="badge badge-warning px-3 py-2">Draft</span>
+                                        <br><small class="text-muted">Step 1 of 3</small>
+
+                                        @elseif ($beritaAcara->status == 'sent')
+                                        <span class="badge badge-info px-3 py-2">Sent</span>
+                                        <br><small class="text-muted">Step 2 of 3</small>
+
+                                        @elseif ($beritaAcara->status == 'received')
+                                        <span class="badge badge-success px-3 py-2">Received</span>
+                                        <br><small class="text-muted">Step 3 of 3</small>
                                         @endif
                                     </div>
-                                    <div class=" table-responsive">
 
-                                        <!-- Tabel Berita Acara -->
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th style=" text-align: center; vertical-align: middle;">No</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Admin</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Tanggal Kirim</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Tanggal Terima</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Status</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse ($beritaAcaras as $key => $ba)
-                                                <tr>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $key + 1 }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $ba->user->name ?? 'N/A' }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $ba->tanggal_kirim ? $ba->tanggal_kirim->translatedFormat('d F Y, H:i') : '-' }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">{{ $ba->tanggal_terima ? $ba->tanggal_terima->translatedFormat('d F Y, H:i') : '-' }}</td>
-                                                    <td style=" text-align: center; vertical-align: middle;">
-                                                        @if($ba->status=='sent')
-                                                        <span class="badge badge-pill badge-info">Sent</span>
-                                                        @elseif($ba->status=='received')
-                                                        <span class="badge badge-pill badge-success">Received</span>
-                                                        @else
-                                                        <span class="badge badge-pill badge-warning">Pending</span>
-                                                        @endif
-                                                    </td>
-                                                    <td style=" text-align: center; vertical-align: middle;">
-                                                        @if ($ba->status === 'pending')
-                                                        <form action="{{ route('berita_acara.send', $getInstall->id) }}" method="POST">
-                                                            @csrf
-                                                            <button class="btn btn-primary btn-sm">Kirim</button>
-                                                        </form>
-                                                        @elseif ($ba->status === 'sent')
-                                                        <form action="{{ route('berita_acara.received', $ba->id) }}" method="POST">
-                                                            @csrf
-                                                            <button class="btn btn-success btn-sm">Sudah Diterima</button>
-                                                        </form>
-                                                        @elseif ($ba->status === 'received')
-                                                        <div>
-                                                            @if (!$billingExists)
-                                                            <button
-                                                                class="btn btn-info btn-sm"
-                                                                onclick="confirmRedirect('{{ route('sid.form', $getInstall->id) }}')">
-                                                                <i class="fa fa-file-invoice"></i> Input Online Billing
-                                                            </button>
-                                                            @else
-                                                            <span class="text-muted">Sudah diinput ke Online Billing</span>
-                                                            @endif
-                                                        </div>
+                                    {{-- BA Dikirim --}}
+                                    <div class="border rounded p-3 mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <strong>📄 BA Dikirim</strong>
 
-
-                                                        @endif
-                                                    </td>
-
-                                                </tr>
-                                                @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center">Belum ada berita acara</td>
-                                                </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
+                                            @if ($beritaAcara->file_path)
+                                            <a href="{{ Storage::url($beritaAcara->file_path) }}"
+                                                target="_blank"
+                                                class="btn btn-outline-primary btn-sm">
+                                                Lihat
+                                            </a>
+                                            @endif
+                                        </div>
                                     </div>
-                                    <!-- Tombol Kembali -->
-                                    <a href="{{ route('admin.instalasi') }}" class="btn btn-info mt-3">
-                                        <i class="fa fa-arrow-left"></i> Kembali
-                                    </a>
+
+                                    {{-- BA Diterima --}}
+                                    <div class="border rounded p-3 mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <strong>✍ BA Diterima</strong>
+
+                                            @if ($beritaAcara->received_file_path)
+                                            <a href="{{ Storage::url($beritaAcara->received_file_path) }}"
+                                                target="_blank"
+                                                class="btn btn-outline-success btn-sm">
+                                                Lihat
+                                            </a>
+                                            @else
+                                            <small class="text-muted">Belum ada file</small>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    {{-- Metadata --}}
+                                    <div class="mb-4">
+                                        <small class="text-muted d-block mb-1">
+                                            <strong>Dikirim:</strong>
+                                            {{ $beritaAcara->tanggal_kirim ? $beritaAcara->tanggal_kirim->translatedFormat('d F Y H:i') : '-' }}
+                                        </small>
+
+                                        <small class="text-muted d-block">
+                                            <strong>Diterima:</strong>
+                                            {{ $beritaAcara->tanggal_terima ? $beritaAcara->tanggal_terima->translatedFormat('d F Y H:i') : '-' }}
+                                        </small>
+                                    </div>
+
+                                    {{-- Action --}}
+                                    <div class="mt-4">
+
+                                        {{-- Draft --}}
+                                        @if ($beritaAcara->status == 'draft')
+
+                                        <div class="d-flex justify-content-center flex-wrap" style="gap: 12px;">
+
+                                            <form action="{{ route('berita_acara.send', $getInstall->id) }}" method="POST" class="mb-2">
+                                                @csrf
+                                                <button class="btn btn-primary" style="min-width:180px;">
+                                                    <i class="fa fa-paper-plane"></i> Kirim BA
+                                                </button>
+                                            </form>
+
+                                            <a href="{{ route('admin.instalasi') }}"
+                                                class="btn btn-secondary mb-2"
+                                                style="min-width:180px;">
+                                                <i class="fa fa-arrow-left"></i> Kembali
+                                            </a>
+
+                                        </div>
+
+                                        {{-- Sent --}}
+                                        @elseif ($beritaAcara->status == 'sent')
+
+                                        <form action="{{ route('berita_acara.received', $beritaAcara->id) }}"
+                                            method="POST"
+                                            enctype="multipart/form-data">
+
+                                            @csrf
+
+                                            <div class="form-group">
+                                                <label>Upload BA Bertandatangan</label>
+                                                <input type="file" name="attachment" class="form-control" required>
+                                            </div>
+
+                                            <div class="d-flex justify-content-center flex-wrap mt-3" style="gap: 12px;">
+
+                                                <button class="btn btn-success mb-2" style="min-width:180px;">
+                                                    <i class="fa fa-check"></i> Tandai Diterima
+                                                </button>
+
+                                                <a href="{{ route('admin.instalasi') }}"
+                                                    class="btn btn-secondary mb-2"
+                                                    style="min-width:180px;">
+                                                    <i class="fa fa-arrow-left"></i> Kembali
+                                                </a>
+
+                                            </div>
+
+                                        </form>
+
+                                        {{-- Received --}}
+                                        @elseif ($beritaAcara->status == 'received')
+
+                                        <div class="d-flex justify-content-center flex-wrap" style="gap: 12px;">
+
+                                            @if (!$billingExists)
+                                            <button
+                                                class="btn btn-info mb-2"
+                                                style="min-width:180px;"
+                                                onclick="confirmRedirect('{{ route('sid.form', $getInstall->id) }}')">
+                                                <i class="fa fa-file-invoice"></i> Billing
+                                            </button>
+                                            @else
+                                            <button class="btn btn-success mb-2" style="min-width:180px;" disabled>
+                                                Sudah Billing
+                                            </button>
+                                            @endif
+
+                                            <a href="{{ route('admin.instalasi') }}"
+                                                class="btn btn-secondary mb-2"
+                                                style="min-width:180px;">
+                                                <i class="fa fa-arrow-left"></i> Kembali
+                                            </a>
+
+                                        </div>
+
+                                        @endif
+
+                                    </div>
+
+                                    @endif
 
                                 </div>
                             </div>

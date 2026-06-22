@@ -110,8 +110,14 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/instalasi/{id}', [AdminController::class, 'updateinstalasi'])->name('admin.wo_instalasi_update');
     Route::delete('admin/instalasi/{id}', [AdminController::class, 'destroyinstalasi'])->name('wo_instalasi.destroy');
     Route::patch('/admin/instalasi/{id}/cancel', [AdminController::class, 'cancelInstalasi'])->name('admin.cancel_instalasi');
-    Route::post('admin/instalasi/sendBA/{id}', [AdminController::class, 'sendBA'])->name('berita_acara.send');
-    Route::post('admin/instalasi/ReceiveBA/{id}', [AdminController::class, 'ReceiveBA'])->name('berita_acara.received');
+    Route::post('admin/berita-acara/store', [AdminController::class, 'storeBA'])
+        ->name('berita_acara.store');
+
+    Route::post('admin/instalasi/sendBA/{id}', [AdminController::class, 'sendBA'])
+        ->name('berita_acara.send');
+
+    Route::post('admin/instalasi/ReceiveBA/{id}', [AdminController::class, 'ReceiveBA'])
+        ->name('berita_acara.received');
     Route::get('admin/instalasi/billing/sid/{id}', [AdminController::class, 'sidform'])->name('sid.form');
     Route::post('admin/instalasi/billing/sid/{id}', [AdminController::class, 'storebilling'])->name('online_billing.store');
 

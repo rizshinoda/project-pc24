@@ -696,9 +696,8 @@ class AdminController extends Controller
         // Cek apakah sudah ada di tabel online_billing
         $billingExists = OnlineBilling::where('work_order_install_id', $getInstall->id)->exists();
         // Mendapatkan berita acara yang terkait dengan work order ini
-        $beritaAcaras = BeritaAcara::where('work_order_install_id', $id)->get();
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('billingExists', 'beritaAcaras', 'progressList', 'getInstall', 'notifications'));
+        $beritaAcara = $getInstall->beritaAcara;        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('billingExists', 'beritaAcara', 'progressList', 'getInstall', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('wo_instalasi_show', $data);
@@ -906,23 +905,52 @@ class AdminController extends Controller
         // Jika sudah Completed, tidak bisa dibatalkan
         return redirect()->back()->with('error', 'Instalasi sudah selesai dan tidak bisa dibatalkan.');
     }
-
-    public function sendBA(Request $request, $id)
+    public function storeBA(Request $request)
     {
-        // Validasi Work Order Instalasi
+        $request->validate([
+            'work_order_id' => 'required',
+            'work_order_type' => 'required',
+            'attachment' => 'required|mimes:pdf,jpg,jpeg,png|max:10240'
+        ]);
+
+        // cek supaya 1 WO hanya punya 1 BA
+        $exists = BeritaAcara::where('work_order_id', $request->work_order_id)
+            ->where('work_order_type', $request->work_order_type)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'Berita acara sudah ada.');
+        }
+
+        $filePath = $request->file('attachment')
+            ->store('berita_acaras', 'public');
+
+        BeritaAcara::create([
+            'work_order_id' => $request->work_order_id,
+            'work_order_type' => $request->work_order_type,
+            'file_path' => $filePath,
+            'user_id' => Auth::id(),
+            'status' => 'draft'
+        ]);
+
+        return back()->with('success', 'Berita acara berhasil diupload.');
+    }
+    public function sendBA($id)
+    {
         $workOrder = WorkOrderInstall::findOrFail($id);
 
-        // Buat berita acara baru
-        BeritaAcara::create([
-            'work_order_install_id' => $workOrder->id,
-            'user_id' => Auth::id(),
+        $beritaAcara = $workOrder->beritaAcara;
+
+        if (!$beritaAcara) {
+            return back()->with('error', 'Upload berita acara terlebih dahulu.');
+        }
+
+        $beritaAcara->update([
             'tanggal_kirim' => now(),
             'status' => 'sent',
         ]);
 
-        // Redirect ke halaman detail dengan pesan sukses
-        return redirect()->route('admin.wo_instalasi_show', $id)
-            ->with('success', 'Berita acara berhasil dikirim.');
+        return back()->with('success', 'Berita acara berhasil dikirim.');
     }
 
     /**
@@ -932,16 +960,21 @@ class AdminController extends Controller
     {
         $beritaAcara = BeritaAcara::findOrFail($id);
 
-        // Update tanggal terima dan status
+        $request->validate([
+            'attachment' => 'required|mimes:pdf,jpg,jpeg,png|max:10240'
+        ]);
+
+        $receivedFile = $request->file('attachment')
+            ->store('berita_acaras/received', 'public');
+
         $beritaAcara->update([
+            'received_file_path' => $receivedFile,
             'user_id' => Auth::id(),
             'tanggal_terima' => now(),
             'status' => 'received',
         ]);
 
-        // Redirect ke halaman detail dengan pesan sukses
-        return redirect()->route('admin.wo_instalasi_show', $beritaAcara->work_order_install_id)
-            ->with('success', 'Berita acara berhasil diperbarui sebagai diterima.');
+        return back()->with('success', 'Berita acara berhasil diterima.');
     }
 
     public function sidform($id)

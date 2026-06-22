@@ -10,10 +10,14 @@ class BeritaAcara extends Model
     use HasFactory;
     protected $fillable = [
         'work_order_install_id',
+        'work_order_id',
+        'work_order_type',
+        'file_path',
+        'received_file_path',
         'user_id',
         'tanggal_kirim',
         'tanggal_terima',
-        'status',
+        'status'
     ];
     // Pastikan atribut tanggal dikonversi ke objek Carbon
     protected $casts = [
@@ -30,5 +34,9 @@ class BeritaAcara extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    public function workOrder()
+    {
+        return $this->morphTo();
     }
 }
