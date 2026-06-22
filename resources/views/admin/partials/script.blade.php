@@ -122,62 +122,66 @@
         const alamatInput = document.getElementById('alamat');
         const noPelangganInput = document.getElementById('no_pelanggan');
         const fotoPelangganImg = document.getElementById('foto');
-        const noSpkInput = document.getElementById('no_spk'); // Menambahkan referensi ke input no_spk
+        const noSpkInput = document.getElementById('no_spk');
+        const noJaringanInput = document.getElementById('no_jaringan');
 
         pelangganSelect.addEventListener('change', function() {
-            const selectedOption = pelangganSelect.options[pelangganSelect.selectedIndex];
+            const selectedOption = this.options[this.selectedIndex];
 
-            // Ambil data atribut dari option yang dipilih
+            // Pakai value langsung (lebih aman)
+            const pelangganId = this.value;
             const namaGedung = selectedOption.getAttribute('data-nama-gedung');
             const alamat = selectedOption.getAttribute('data-alamat');
             const noPelanggan = selectedOption.getAttribute('data-no-pelanggan');
             const fotoUrl = selectedOption.getAttribute('data-foto');
 
-            // Set nilai input berdasarkan data yang diambil
-            namaGedungInput.value = namaGedung ? namaGedung : '';
-            alamatInput.value = alamat ? alamat : '';
-            noPelangganInput.value = noPelanggan ? noPelanggan : '';
+            // Isi data pelanggan
+            namaGedungInput.value = namaGedung || '';
+            alamatInput.value = alamat || '';
+            noPelangganInput.value = noPelanggan || '';
 
-            // Tampilkan foto jika ada
+            // Generate preview no_jaringan mengikuti serial no_spk
+            if (pelangganId) {
+                const kodePelanggan = 'C' + String(pelangganId).padStart(2, '0');
+
+                const now = new Date();
+                const periode = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+                const noSpk = noSpkInput.value;
+
+                // Ambil serial dari bagian terakhir no_spk
+                const serial = noSpk.split('/').pop();
+
+                noJaringanInput.value = `${kodePelanggan}-${periode}${serial}`;
+            } else {
+                noJaringanInput.value = '';
+            }
+
+            // Tampilkan foto
             if (fotoUrl) {
                 fotoPelangganImg.src = fotoUrl;
                 fotoPelangganImg.style.display = 'block';
             } else {
                 fotoPelangganImg.src = '';
-                fotoPelangganImg.style.display = 'none'; // Sembunyikan jika tidak ada foto
+                fotoPelangganImg.style.display = 'none';
             }
 
-            // Menambahkan kelas 'input-filled' jika input memiliki nilai
-            toggleInputClass(namaGedungInput, namaGedung);
-            toggleInputClass(alamatInput, alamat);
-            toggleInputClass(noPelangganInput, noPelanggan);
+            toggleInputClass(namaGedungInput);
+            toggleInputClass(alamatInput);
+            toggleInputClass(noPelangganInput);
+            toggleInputClass(noJaringanInput);
         });
 
-        // Menambahkan pengecekan untuk input no_spk
-        toggleInputClass(noSpkInput, noSpkInput.value); // Pastikan no_spk diberi warna hijau jika sudah terisi
+        toggleInputClass(noSpkInput);
 
-        // Fungsi untuk menambahkan atau menghapus kelas 'input-filled'
-        function toggleInputClass(inputElement, value) {
-            if (value) {
-                inputElement.classList.add('input-filled');
-            } else {
-                inputElement.classList.remove('input-filled');
-            }
-        }
-    });
-
-
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Cek apakah URL memiliki hash #no_spk
         if (window.location.hash === '#no_spk') {
-            const noSpkElement = document.getElementById('no_spk');
-            if (noSpkElement) {
-                // Scroll ke elemen No SPK
-                noSpkElement.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
+            noSpkInput?.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function toggleInputClass(inputElement) {
+            inputElement.classList.toggle('input-filled', !!inputElement.value);
         }
     });
 

@@ -1373,6 +1373,8 @@ class HelpdeskController extends Controller
                         $q->where('nama_instansi', 'like', '%' . $search . '%');
                     })
                     ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhere('no_jaringan', 'like', '%' . $search . '%')
+
                     ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
                         $q->where('name', 'like', '%' . $search . '%');
                     });
@@ -1529,6 +1531,8 @@ class HelpdeskController extends Controller
                         $q->where('nama_instansi', 'like', '%' . $search . '%');
                     })
                     ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhere('no_jaringan', 'like', '%' . $search . '%')
+
                     ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
                         $q->where('name', 'like', '%' . $search . '%');
                     });

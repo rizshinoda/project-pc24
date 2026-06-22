@@ -354,7 +354,9 @@ class AdminController extends Controller
                     ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
                         $q->where('nama_instansi', 'like', '%' . $search . '%');
                     })
-                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhere('nama_site', 'like', '%' . $search . '%')
+                    ->orWhere('no_jaringan', 'like', '%' . $search . '%')
+                    // Pencarian di kolom nama_site
                     ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
                         $q->where('name', 'like', '%' . $search . '%');
                     });
@@ -408,21 +410,42 @@ class AdminController extends Controller
             ->where('is_read', false)
             ->get();
 
-        // Ambil nomor instalasi terakhir (TANPA reset harian)
+        /*
+    |--------------------------------------------------------------------------
+    | Generate No SPK
+    |--------------------------------------------------------------------------
+    */
         $lastInstall = WorkOrderInstall::orderBy('id', 'desc')->first();
 
         if ($lastInstall && preg_match('/\/(\d+)$/', $lastInstall->no_spk, $matches)) {
-            $lastNumber = (int) $matches[1];
-            $nextNumber = $lastNumber + 1;
+            $nextNumber = (int) $matches[1] + 1;
         } else {
             $nextNumber = 1;
         }
 
-        // Pad minimal 4 digit (kalau lebih, tampil apa adanya)
-        $numberFormatted = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        // Format nomor urut SPK (4 digit)
+        $serial = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // Generate nomor INSTALASI
-        $no_spk = 'PC24Telin/PSB-INSTALLASI/' . now()->format('Y-m-d') . '/' . $numberFormatted;
+        // Generate No SPK
+        $no_spk = 'PC24Telin/PSB-INSTALLASI/' . now()->format('Y-m-d') . '/' . $serial;
+
+        /*
+    |--------------------------------------------------------------------------
+    | Preview No Jaringan
+    |--------------------------------------------------------------------------
+    | Nomor urut mengikuti No SPK
+    */
+        $no_jaringan = null;
+
+        if ($pelanggans->count() > 0) {
+            $firstPelanggan = $pelanggans->first();
+
+            $kodePelanggan = 'C' . str_pad($firstPelanggan->id, 2, '0', STR_PAD_LEFT);
+            $periode = now()->format('Y-m');
+
+            // Pakai serial yang sama dengan SPK
+            $no_jaringan = $kodePelanggan . '-' . $periode . $serial;
+        }
 
         // Gabungkan data role
         $data = array_merge(
@@ -432,6 +455,7 @@ class AdminController extends Controller
                 'jenisList',
                 'notifications',
                 'no_spk',
+                'no_jaringan',
                 'pelanggans',
                 'instansis',
                 'vendors'
@@ -474,6 +498,18 @@ class AdminController extends Controller
             'cart' => 'nullable|array', // Keranjang tidak wajib
             // tambahkan validasi lain sesuai kebutuhan
         ]);
+
+        // TAMBAHKAN DI SINI
+        $pelanggan = Pelanggan::findOrFail($validatedData['pelanggan_id']);
+
+        $kodePelanggan = 'C' . str_pad($pelanggan->id, 2, '0', STR_PAD_LEFT);
+        $periode = now()->format('Ym');
+
+        // Ambil serial dari no_spk (bagian terakhir setelah slash)
+        $serial = last(explode('/', $validatedData['no_spk']));
+
+        // Final no_jaringan
+        $noJaringan = $kodePelanggan . '-' . $periode . $serial;
         // Inisialisasi variabel $filename sebagai null terlebih dahulu
         $filename = null;
 
@@ -510,7 +546,7 @@ class AdminController extends Controller
             'nni' => $validatedData['nni'],
             'provinsi' => $validatedData['provinsi'],
             'vlan' => $validatedData['vlan'],
-            'no_jaringan' => $validatedData['no_jaringan'],
+            'no_jaringan' => $noJaringan,
             'tanggal_rfs' => $validatedData['tanggal_rfs'],
             'durasi' => $validatedData['durasi'],
             'nama_durasi' => $validatedData['nama_durasi'],
@@ -1329,8 +1365,6 @@ class AdminController extends Controller
         // Validasi input dari form
         $request->validate([
             'nama_instansi' => 'required|string|max:255',
-
-
 
         ]);
 
@@ -3583,6 +3617,8 @@ class AdminController extends Controller
                         $q->where('nama_instansi', 'like', '%' . $search . '%');
                     })
                     ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
+                    ->orWhere('no_jaringan', 'like', '%' . $search . '%')
+
                     ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
                         $q->where('name', 'like', '%' . $search . '%');
                     });
