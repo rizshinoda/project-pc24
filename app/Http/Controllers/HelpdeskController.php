@@ -2328,7 +2328,7 @@ class HelpdeskController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -2344,23 +2344,21 @@ class HelpdeskController extends Controller
             $progress->status = 'Completed'; // Ubah status progress jadi Completed
 
             // Ubah status upgrade menjadi Completed
-            $getUpgrade->status = 'Completed';
-            $getUpgrade->save();
 
             // Perbarui status di tabel statuses
-            $status = Status::where('work_orderable_id', $getUpgrade->id)
-                ->where('process', 'Upgrade')
-                ->first();
-            if ($status) {
-                $status->status = 'Completed';
-                $status->save();
-            }
+            // $status = Status::where('work_orderable_id', $getUpgrade->id)
+            //     ->where('process', 'Upgrade')
+            //     ->first();
+            // if ($status) {
+            //     $status->status = 'Completed';
+            //     $status->save();
+            // }
 
             // Update bandwidth lama dengan bandwidth baru di tabel online_billings
-            $onlineBilling = $getUpgrade->onlineBilling; // Ambil data online billing terkait
-            $onlineBilling->bandwidth = $getUpgrade->bandwidth_baru; // Set bandwidth baru
-            $onlineBilling->satuan = $getUpgrade->satuan; // Update satuan jika perlu
-            $onlineBilling->save(); // Simpan perubahan
+            // $onlineBilling = $getUpgrade->onlineBilling; // Ambil data online billing terkait
+            // $onlineBilling->bandwidth = $getUpgrade->bandwidth_baru; // Set bandwidth baru
+            // $onlineBilling->satuan = $getUpgrade->satuan; // Update satuan jika perlu
+            // $onlineBilling->save(); // Simpan perubahan
             $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
 
             // Buat notifikasi "Survey Completed" untuk setiap admin
@@ -2465,7 +2463,7 @@ class HelpdeskController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -2481,23 +2479,22 @@ class HelpdeskController extends Controller
             $progress->status = 'Completed'; // Ubah status progress jadi Completed
 
             // Ubah status upgrade menjadi Completed
-            $getDowngrade->status = 'Completed';
-            $getDowngrade->save();
+
 
             // Perbarui status di tabel statuses
-            $status = Status::where('work_orderable_id', $getDowngrade->id)
-                ->where('process', 'Downgrade')
-                ->first();
-            if ($status) {
-                $status->status = 'Completed';
-                $status->save();
-            }
+            // $status = Status::where('work_orderable_id', $getDowngrade->id)
+            //     ->where('process', 'Downgrade')
+            //     ->first();
+            // if ($status) {
+            //     $status->status = 'Completed';
+            //     $status->save();
+            // }
 
-            // Update bandwidth lama dengan bandwidth baru di tabel online_billings
-            $onlineBilling = $getDowngrade->onlineBilling; // Ambil data online billing terkait
-            $onlineBilling->bandwidth = $getDowngrade->bandwidth_baru; // Set bandwidth baru
-            $onlineBilling->satuan = $getDowngrade->satuan; // Update satuan jika perlu
-            $onlineBilling->save(); // Simpan perubahan
+            // // Update bandwidth lama dengan bandwidth baru di tabel online_billings
+            // $onlineBilling = $getDowngrade->onlineBilling; // Ambil data online billing terkait
+            // $onlineBilling->bandwidth = $getDowngrade->bandwidth_baru; // Set bandwidth baru
+            // $onlineBilling->satuan = $getDowngrade->satuan; // Update satuan jika perlu
+            // $onlineBilling->save(); // Simpan perubahan
             // Dapatkan semua admin (atau role yang sesuai)
             // Dapatkan semua admin (atau role yang sesuai)
             $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin

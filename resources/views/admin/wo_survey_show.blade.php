@@ -419,9 +419,9 @@
 
                                     </div>
 
-                                    <a href="{{ route('admin.survey') }}" class="btn btn-info mt-4 "><i class="fa fa-arrow-left"></i> Kembali</a>
+                                    <a href="{{ route('admin.survey') }}" class="btn btn-sm btn-info mt-2 "><i class="fa fa-arrow-left"></i> Kembali</a>
                                     @if ($getSurvey->status == 'Completed')
-                                    <a href="{{ route('admin.survey.progresinstall', $getSurvey->id) }}" class="btn btn-info mt-4 pull-right">Progress Instalasi</a>
+                                    <a href="{{ route('admin.survey.progresinstall', $getSurvey->id) }}" class="btn btn-sm btn-info mt-2 pull-right">Progress Instalasi</a>
                                     @endif
                                 </div>
 

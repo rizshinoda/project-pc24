@@ -179,6 +179,9 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/upgrade/{id}', [AdminController::class, 'upgradeUpdate'])->name('admin.upgrade_update');
     Route::delete('admin/upgrade/{id}', [AdminController::class, 'upgradeDestroy'])->name('admin.upgrade_destroy');
     Route::patch('/admin/upgrade/{id}/cancel', [AdminController::class, 'upgradeCancel'])->name('admin.upgrade_cancel');
+    Route::get('/admin/upgrade/{id}/add-progress-upgrade', [AdminController::class, 'addProgressUpgrade'])->name('admin_upgrade_add_progress');
+    Route::post('/admin/upgrade/{id}/add-progress-upgrade', [AdminController::class, 'storeProgressUpgrade'])->name('admin_upgrade_store_progress');
+
 
     Route::get('admin/downgrade', [AdminController::class, 'downgrade'])->name('admin.downgrade');
     Route::get('admin/downgrade/create/{id}', [AdminController::class, 'downgradeCreate'])->name('admin.downgrade_create');
@@ -188,6 +191,9 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/downgrade/{id}', [AdminController::class, 'downgradeUpdate'])->name('admin.downgrade_update');
     Route::delete('admin/downgrade/{id}', [AdminController::class, 'downgradeDestroy'])->name('admin.downgrade_destroy');
     Route::patch('/admin/downgrade/{id}/cancel', [AdminController::class, 'downgradeCancel'])->name('admin.downgrade_cancel');
+    Route::get('/admin/downgrade/{id}/add-progress-downgrade', [AdminController::class, 'addProgressDowngrade'])->name('admin_downgrade_add_progress');
+    Route::post('/admin/downgrade/{id}/add-progress-downgrade', [AdminController::class, 'storeProgressDowngrade'])->name('admin_downgrade_store_progress');
+
 
     Route::get('admin/dismantle', [AdminController::class, 'dismantle'])->name('admin.dismantle');
     Route::get('admin/dismantle/create/{id}', [AdminController::class, 'dismantleCreate'])->name('admin.dismantle_create');

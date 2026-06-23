@@ -142,11 +142,11 @@
                         <div class="col-md-6"> <!-- Lebar form setengah halaman -->
                             <div class="card">
                                 <div class="card-body">
-                                    <a href="{{ route('admin.wo_survey_show', $getSurvey->id) }}" class="btn btn-sm btn-info"> <i class="fa fa-arrow-left"></i></a>
+                                    <a href="{{ route('admin.upgrade_show', $getUpgrade->id) }}" class="btn btn-sm btn-info"> <i class="fa fa-arrow-left"></i></a>
 
                                     <h4 class="mb-5 text-center">Update Progress Instalasi</h4>
                                     {{-- Form untuk mengupload multiple foto --}}
-                                    <form action="{{ route('admin_survey_add_progress', $getSurvey->id) }}" method="POST" enctype="multipart/form-data">
+                                    <form action="{{ route('admin_upgrade_add_progress', $getUpgrade->id) }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="form-group">
                                             <label for="keterangan">Keterangan Progress</label>
@@ -168,10 +168,10 @@
 
                                             <button type="button"
                                                 class="btn btn-success btn-complete"
-                                                data-title="Selesaikan Survey?"
-                                                data-text="Progress Survey akan ditandai sebagai Completed dan tidak bisa diubah kembali."
+                                                data-title="Selesaikan Upgrade?"
+                                                data-text="Progress Upgrade akan ditandai sebagai Completed dan tidak bisa diubah kembali."
                                                 data-action="complete">
-                                                Selesaikan Proses Survey
+                                                Selesaikan Proses Upgrade
                                             </button>
                                         </div>
                                     </form>

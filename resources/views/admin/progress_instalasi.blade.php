@@ -560,7 +560,11 @@
                                             <div class="form-group row">
                                                 <label for="no_pelanggan" class="col-sm-4 col-form-label">No Jaringan</label>
                                                 <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="no_jaringan" name="no_jaringan" value="{{ old('no_jaringan', $getSurvey->no_jaringan) }}">
+                                                    <input type="text"
+                                                        class="form-control"
+                                                        id="no_jaringan"
+                                                        name="no_jaringan"
+                                                        value="{{ old('no_jaringan', $getSurvey->no_jaringan ?? $no_jaringan) }}">
                                                 </div>
                                             </div>
                                             <div class="form-group row">
