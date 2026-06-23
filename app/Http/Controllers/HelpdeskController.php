@@ -2123,7 +2123,7 @@ class HelpdeskController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru

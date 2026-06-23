@@ -413,7 +413,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -429,10 +429,10 @@ class PsbController extends Controller
             $progress->status = 'Completed'; // Ubah status progress jadi Completed
 
             // Ubah status survey menjadi Completed
-            $getInstall->status = 'Completed';
-            $getInstall->save();
+            // $getInstall->status = 'Completed';
+            // $getInstall->save();
 
-            // Dapatkan semua admin (atau role yang sesuai)
+            // // Dapatkan semua admin (atau role yang sesuai)
             $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
 
             // Buat notifikasi "Survey Completed" untuk setiap admin
@@ -480,7 +480,7 @@ class PsbController extends Controller
 
         // Redirect ke view survey atau detail survey berdasarkan aksi
         if ($request->action === 'complete') {
-            return redirect()->route('psb.instalasi', $id)->with('success', 'Instalasi berhasil diselesaikan.');
+            return redirect()->route('psb.instalasi.show', $id)->with('success', 'Instalasi berhasil diselesaikan.');
         }
 
         return redirect()->route('psb.instalasi.show', $id)->with('success', 'Progress berhasil ditambahkan.');
@@ -607,7 +607,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -622,9 +622,9 @@ class PsbController extends Controller
         if ($request->has('action') && $request->action === 'complete') {
             $progress->status = 'Completed'; // Ubah status progress jadi Completed
 
-            // Ubah status survey menjadi Completed
-            $survey->status = 'Completed';
-            $survey->save();
+            // // Ubah status survey menjadi Completed
+            // $survey->status = 'Completed';
+            // $survey->save();
 
             // Dapatkan semua admin (atau role yang sesuai)
             $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
@@ -669,7 +669,7 @@ class PsbController extends Controller
 
         // Redirect ke view survey atau detail survey berdasarkan aksi
         if ($request->action === 'complete') {
-            return redirect()->route('psb.survey', $id)->with('success', 'Survey berhasil diselesaikan.');
+            return redirect()->route('psb.survey_show', $id)->with('success', 'Survey berhasil diselesaikan.');
         }
 
         return redirect()->route('psb.survey_show', $id)->with('success', 'Progress berhasil ditambahkan.');

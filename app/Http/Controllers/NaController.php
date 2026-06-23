@@ -401,7 +401,7 @@ class NaController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -440,7 +440,7 @@ class NaController extends Controller
 
         // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
         if ($request->action === 'complete') {
-            return redirect()->route('na.instalasi', $id)->with('success', 'Progress berhasil diselesaikan.');
+            return redirect()->route('na.instalasi.show', $id)->with('success', 'Progress berhasil diselesaikan.');
         }
 
         return redirect()->route('na.instalasi.show', $id)->with('success', 'Progress berhasil ditambahkan.');

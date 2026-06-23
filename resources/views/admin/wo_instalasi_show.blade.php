@@ -395,7 +395,14 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Progres Instalasi</h4>
+                                    @if ($getInstall->status === 'On Progress' || $getInstall->status === 'Shipped' || $getInstall->status === 'Completed')
+                                    <a href="{{ route('admin_install_add_progress', $getInstall->id) }}"
+                                        class="btn btn-info btn-sm mb-2">
+                                        <i class="fa fa-plus"></i> Add Progress
+                                    </a>
 
+
+                                    @endif
                                     <div class=" table-responsive">
 
                                         <table class="table table-hover">
@@ -405,7 +412,7 @@
                                                     <th style=" text-align: center; vertical-align: middle;">Tanggal</th>
                                                     <th style=" text-align: center; vertical-align: middle;">User</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Status</th>
-                                                    <th style=" text-align: center; vertical-align: middle;">Foto</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Lampiran</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Keterangan</th>
 
                                                 </tr>
@@ -428,61 +435,106 @@
                                                         <span class="badge badge-pill badge-primary">Shipped</span>
                                                         @endif
                                                     </td>
-                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                    <!-- Lampiran -->
+                                                    <td class="text-center">
                                                         @php
                                                         $photos = $progress->photos;
                                                         @endphp
+
                                                         @if ($photos->isNotEmpty())
-                                                        <!-- Tombol untuk membuka modal -->
-                                                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#photoModal{{ $progress->id }}">
-                                                            Lihat Foto
+                                                        <button type="button"
+                                                            class="btn btn-outline-info btn-sm"
+                                                            data-toggle="modal"
+                                                            data-target="#photoModal{{ $progress->id }}">
+                                                            <i class="fa fa-paperclip"></i>
+                                                            {{ $photos->count() }} Lampiran
                                                         </button>
 
-                                                        <!-- Modal untuk menampilkan foto -->
-                                                        <div class="modal fade" id="photoModal{{ $progress->id }}" tabindex="-1" role="dialog" aria-labelledby="photoModalLabel{{ $progress->id }}" aria-hidden="true">
-                                                            <div class="modal-dialog modal-lg" role="document">
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="photoModal{{ $progress->id }}" tabindex="-1">
+                                                            <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title" id="photoModalLabel{{ $progress->id }}">Foto</h5>
-                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                            <span aria-hidden="true">&times;</span>
+
+                                                                    <div class="modal-header bg-info text-white">
+                                                                        <h5 class="modal-title">
+                                                                            Lampiran Progress
+                                                                        </h5>
+                                                                        <button type="button" class="close text-white" data-dismiss="modal">
+                                                                            <span>&times;</span>
                                                                         </button>
                                                                     </div>
-                                                                    <div class="modal-body d-flex flex-row flex-wrap justify-content-center">
-                                                                        @foreach ($photos as $photo)
-                                                                        <div class="m-2 d-flex flex-column align-items-center">
-                                                                            <img src="{{ asset('uploads/' . $photo->file_path) }}"
-                                                                                alt="Logo"
-                                                                                style="width: 150px; height: 150px; object-fit: contain; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
 
-                                                                            <a href="{{ asset('uploads/' . $photo->file_path) }}" download class="btn btn-info mt-2">Download Foto</a>
+                                                                    <div class="modal-body">
+                                                                        <div class="row">
+                                                                            @foreach ($photos as $photo)
+                                                                            @php
+                                                                            $ext = strtolower(pathinfo($photo->file_path, PATHINFO_EXTENSION));
+                                                                            @endphp
+
+                                                                            <div class="col-md-4 mb-4">
+                                                                                <div class="card shadow-sm border-0 text-center h-100">
+
+                                                                                    <div class="card-body">
+                                                                                        @if(in_array($ext, ['jpg','jpeg','png','gif','webp']))
+                                                                                        <img src="{{ asset('uploads/' . $photo->file_path) }}"
+                                                                                            class="img-fluid rounded"
+                                                                                            style="height:200px; width:200px">
+                                                                                        @elseif($ext == 'pdf')
+                                                                                        <i class="fa fa-file-pdf-o text-danger"
+                                                                                            style="font-size:200px;"></i>
+                                                                                        @endif
+                                                                                    </div>
+
+                                                                                    <div class="card-footer bg-white border-0">
+                                                                                        <a href="{{ asset('uploads/' . $photo->file_path) }}"
+                                                                                            target="_blank"
+                                                                                            class="btn btn-sm btn-primary">
+                                                                                            <i class="fa fa-eye"></i> Lihat
+                                                                                        </a>
+
+                                                                                        <a href="{{ asset('uploads/' . $photo->file_path) }}"
+                                                                                            download
+                                                                                            class="btn btn-sm btn-success">
+                                                                                            <i class="fa fa-download"></i> Download
+                                                                                        </a>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            @endforeach
                                                                         </div>
-                                                                        @endforeach
                                                                     </div>
-
 
                                                                     <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                                                        <button type="button"
+                                                                            class="btn btn-secondary"
+                                                                            data-dismiss="modal">
+                                                                            Tutup
+                                                                        </button>
                                                                     </div>
+
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         @else
-                                                        Tidak ada foto
+                                                        <span class="text-muted">Tidak ada</span>
                                                         @endif
                                                     </td>
+
                                                     <td style="text-align: center justify; vertical-align: middle; padding: 8px; line-height: 1.3;" class="keterangan-cell">
                                                         {{ $progress->keterangan }}
                                                     </td>
                                                 </tr>
                                                 @empty
                                                 <tr>
-                                                    <td colspan="6" class="text-center">Tidak ada progress yang tersedia.</td>
+                                                    <td colspan="6" class="text-center text-muted py-4">
+                                                        Tidak ada progress yang tersedia.
+                                                    </td>
                                                 </tr>
                                                 @endforelse
                                             </tbody>
                                         </table>
                                     </div>
+                                    <a href="{{ route('admin.instalasi') }}" class="btn btn-sm btn-info mt-2"><i class="fa fa-arrow-left"></i> Kembali</a>
 
 
                                 </div>
@@ -490,7 +542,7 @@
                         </div>
                     </div>
                     <div class="row mt-4 justify-content-center">
-                        <div class="col-md-5">
+                        <div class="col-md-8">
                             <div class="card shadow-sm border-0">
                                 <div class="card-body p-4">
 
@@ -516,7 +568,7 @@
                                             <input type="file" name="attachment" class="form-control" required>
                                         </div>
 
-                                        <button type="submit" class="btn btn-primary btn-block">
+                                        <button type="button" class="btn btn-primary btn-block btn-upload-ba">
                                             <i class="fa fa-upload"></i> Upload Berita Acara
                                         </button>
                                     </form>
@@ -531,7 +583,7 @@
 
                                     {{-- STATUS --}}
                                     <div class="text-center mb-4">
-                                        <h5 class="mb-2">Status Berita Acara</h5>
+                                        <h5 class="mb-2">Status </h5>
 
                                         @if ($beritaAcara->status == 'draft')
                                         <span class="badge badge-warning px-3 py-2">Draft</span>
@@ -584,6 +636,10 @@
                                     {{-- Metadata --}}
                                     <div class="mb-4">
                                         <small class="text-muted d-block mb-1">
+                                            <strong>Upload by:</strong>
+                                            {{ $beritaAcara->user->name}}
+                                        </small>
+                                        <small class="text-muted d-block mb-1">
                                             <strong>Dikirim:</strong>
                                             {{ $beritaAcara->tanggal_kirim ? $beritaAcara->tanggal_kirim->translatedFormat('d F Y H:i') : '-' }}
                                         </small>
@@ -592,6 +648,8 @@
                                             <strong>Diterima:</strong>
                                             {{ $beritaAcara->tanggal_terima ? $beritaAcara->tanggal_terima->translatedFormat('d F Y H:i') : '-' }}
                                         </small>
+
+
                                     </div>
 
                                     {{-- Action --}}
@@ -604,16 +662,12 @@
 
                                             <form action="{{ route('berita_acara.send', $getInstall->id) }}" method="POST" class="mb-2">
                                                 @csrf
-                                                <button class="btn btn-primary" style="min-width:180px;">
+                                                <button class="btn btn-primary btn-send-ba " style="min-width:180px;">
                                                     <i class="fa fa-paper-plane"></i> Kirim BA
                                                 </button>
                                             </form>
 
-                                            <a href="{{ route('admin.instalasi') }}"
-                                                class="btn btn-secondary mb-2"
-                                                style="min-width:180px;">
-                                                <i class="fa fa-arrow-left"></i> Kembali
-                                            </a>
+
 
                                         </div>
 
@@ -633,15 +687,11 @@
 
                                             <div class="d-flex justify-content-center flex-wrap mt-3" style="gap: 12px;">
 
-                                                <button class="btn btn-success mb-2" style="min-width:180px;">
+                                                <button class="btn btn-success btn-upload-ba mb-2 " style="min-width:180px;">
                                                     <i class="fa fa-check"></i> Tandai Diterima
                                                 </button>
 
-                                                <a href="{{ route('admin.instalasi') }}"
-                                                    class="btn btn-secondary mb-2"
-                                                    style="min-width:180px;">
-                                                    <i class="fa fa-arrow-left"></i> Kembali
-                                                </a>
+
 
                                             </div>
 
@@ -657,19 +707,15 @@
                                                 class="btn btn-info mb-2"
                                                 style="min-width:180px;"
                                                 onclick="confirmRedirect('{{ route('sid.form', $getInstall->id) }}')">
-                                                <i class="fa fa-file-invoice"></i> Billing
+                                                <i class="fa fa-file-invoice"></i> Input Online Billing
                                             </button>
                                             @else
                                             <button class="btn btn-success mb-2" style="min-width:180px;" disabled>
-                                                Sudah Billing
+                                                Sudah diinput ke Online Billing
                                             </button>
                                             @endif
 
-                                            <a href="{{ route('admin.instalasi') }}"
-                                                class="btn btn-secondary mb-2"
-                                                style="min-width:180px;">
-                                                <i class="fa fa-arrow-left"></i> Kembali
-                                            </a>
+
 
                                         </div>
 
