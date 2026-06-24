@@ -135,7 +135,7 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="foto">Upload Foto Progress</label>
+                                            <label for="foto">Upload Lampiran Progress</label>
                                             <input type="file" name="foto[]" id="foto" class="form-control" multiple>
                                         </div>
 

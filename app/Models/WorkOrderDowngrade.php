@@ -36,4 +36,13 @@ class WorkOrderDowngrade extends Model
     {
         return $this->morphMany(Status::class, 'workOrderable');
     }
+    public function beritaAcara()
+    {
+        return $this->morphOne(
+            BeritaAcara::class,
+            'workOrder',
+            'work_order_type',
+            'work_order_id'
+        );
+    }
 }

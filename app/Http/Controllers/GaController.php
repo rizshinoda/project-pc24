@@ -1496,7 +1496,7 @@ class GaController extends Controller
         $year = $request->get('year');
 
         // Query untuk mendapatkan data survey
-        $query = OnlineBilling::orderBy('created_at', 'desc');
+        $query = OnlineBilling::orderBy('updated_at', 'desc');
 
         // Filter berdasarkan status
         if ($status != 'all') {

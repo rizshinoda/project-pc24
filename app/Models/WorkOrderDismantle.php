@@ -45,4 +45,13 @@ class WorkOrderDismantle extends Model
     {
         return $this->hasMany(DismantleDetail::class, 'dismantle_id');
     }
+    public function beritaAcara()
+    {
+        return $this->morphOne(
+            BeritaAcara::class,
+            'workOrder',
+            'work_order_type',
+            'work_order_id'
+        );
+    }
 }

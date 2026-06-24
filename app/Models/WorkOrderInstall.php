@@ -79,6 +79,11 @@ class WorkOrderInstall extends Model
 
     public function beritaAcara()
     {
-        return $this->hasOne(BeritaAcara::class, 'work_order_install_id');
+        return $this->morphOne(
+            BeritaAcara::class,
+            'workOrder',
+            'work_order_type',
+            'work_order_id'
+        );
     }
 }

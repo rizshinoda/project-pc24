@@ -110,17 +110,29 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/instalasi/{id}', [AdminController::class, 'updateinstalasi'])->name('admin.wo_instalasi_update');
     Route::delete('admin/instalasi/{id}', [AdminController::class, 'destroyinstalasi'])->name('wo_instalasi.destroy');
     Route::patch('/admin/instalasi/{id}/cancel', [AdminController::class, 'cancelInstalasi'])->name('admin.cancel_instalasi');
-    Route::post('admin/instalasi/sendBA/{id}', [AdminController::class, 'sendBA'])->name('berita_acara.send');
-    Route::post('admin/instalasi/ReceiveBA/{id}', [AdminController::class, 'ReceiveBA'])->name('berita_acara.received');
+    Route::post('admin/berita-acara/store', [AdminController::class, 'storeBA'])
+        ->name('berita_acara.store');
+
+    Route::post('admin/berita-acara/send/{id}', [AdminController::class, 'sendBA'])
+        ->name('berita_acara.send');
+
+    Route::post('admin/instalasi/ReceiveBA/{id}', [AdminController::class, 'ReceiveBA'])
+        ->name('berita_acara.received');
     Route::get('admin/instalasi/billing/sid/{id}', [AdminController::class, 'sidform'])->name('sid.form');
     Route::post('admin/instalasi/billing/sid/{id}', [AdminController::class, 'storebilling'])->name('online_billing.store');
 
+    Route::get('/admin/install/{id}/add-progress-instalasi', [AdminController::class, 'addProgressInstalasi'])->name('admin_install_add_progress');
+    Route::post('/admin/install/{id}/add-progress-instalasi', [AdminController::class, 'storeProgressInstalasi'])->name('admin_install_store_progress');
 
     Route::get('admin/jasa', [AdminController::class, 'jasa'])->name('admin.jasa');
     Route::get('admin/jasa/{id}', [AdminController::class, 'showjasa'])->name('admin.wo_jasa_show');
+    Route::get('/admin/jasa/{id}/add-progress-jasa', [AdminController::class, 'addProgressJasa'])->name('admin_jasa_add_progress');
+    Route::post('/admin/jasa/{id}/add-progress-jasa', [AdminController::class, 'storeProgressJasa'])->name('admin_jasa_store_progress');
 
     Route::get('admin/poc', [AdminController::class, 'poc'])->name('admin.poc');
     Route::get('admin/poc/{id}', [AdminController::class, 'showpoc'])->name('admin.wo_poc_show');
+    Route::get('/admin/poc/{id}/add-progress-poc', [AdminController::class, 'addProgressPoc'])->name('admin_poc_add_progress');
+    Route::post('/admin/poc/{id}/add-progress-poc', [AdminController::class, 'storeProgressPoc'])->name('admin_poc_store_progress');
 
 
     // Routes untuk Pelanggan
@@ -160,7 +172,8 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::patch('notifications/{id}/mark-as-read/admin', [AdminController::class, 'markAsReadAdmin'])->name('notifications.markAsReadAdmin');
     Route::get('admin/survey/{id}/progressinstall', [AdminController::class, 'progressinstall'])->name('admin.survey.progresinstall');
     Route::post('admin/survey/{id}/progressinstall', [AdminController::class, 'storeprogressinstall'])->name('admin.survey.storeprogresinstall');
-
+    Route::get('/admin/survey/{id}/add-progress-survey', [AdminController::class, 'addProgressSurvey'])->name('admin_survey_add_progress');
+    Route::post('/admin/survey/{id}/add-progress-survey', [AdminController::class, 'storeProgressSurvey'])->name('admin_survey_store_progress');
 
     Route::get('admin/upgrade', [AdminController::class, 'upgrade'])->name('admin.upgrade');
     Route::get('admin/upgrade/create/{id}', [AdminController::class, 'upgradeCreate'])->name('admin.upgrade_create');
@@ -170,6 +183,9 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/upgrade/{id}', [AdminController::class, 'upgradeUpdate'])->name('admin.upgrade_update');
     Route::delete('admin/upgrade/{id}', [AdminController::class, 'upgradeDestroy'])->name('admin.upgrade_destroy');
     Route::patch('/admin/upgrade/{id}/cancel', [AdminController::class, 'upgradeCancel'])->name('admin.upgrade_cancel');
+    Route::get('/admin/upgrade/{id}/add-progress-upgrade', [AdminController::class, 'addProgressUpgrade'])->name('admin_upgrade_add_progress');
+    Route::post('/admin/upgrade/{id}/add-progress-upgrade', [AdminController::class, 'storeProgressUpgrade'])->name('admin_upgrade_store_progress');
+
 
     Route::get('admin/downgrade', [AdminController::class, 'downgrade'])->name('admin.downgrade');
     Route::get('admin/downgrade/create/{id}', [AdminController::class, 'downgradeCreate'])->name('admin.downgrade_create');
@@ -179,6 +195,9 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/downgrade/{id}', [AdminController::class, 'downgradeUpdate'])->name('admin.downgrade_update');
     Route::delete('admin/downgrade/{id}', [AdminController::class, 'downgradeDestroy'])->name('admin.downgrade_destroy');
     Route::patch('/admin/downgrade/{id}/cancel', [AdminController::class, 'downgradeCancel'])->name('admin.downgrade_cancel');
+    Route::get('/admin/downgrade/{id}/add-progress-downgrade', [AdminController::class, 'addProgressDowngrade'])->name('admin_downgrade_add_progress');
+    Route::post('/admin/downgrade/{id}/add-progress-downgrade', [AdminController::class, 'storeProgressDowngrade'])->name('admin_downgrade_store_progress');
+
 
     Route::get('admin/dismantle', [AdminController::class, 'dismantle'])->name('admin.dismantle');
     Route::get('admin/dismantle/create/{id}', [AdminController::class, 'dismantleCreate'])->name('admin.dismantle_create');
@@ -188,6 +207,9 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/dismantle/{id}', [AdminController::class, 'dismantleUpdate'])->name('admin.dismantle_update');
     Route::delete('admin/dismantle/{id}', [AdminController::class, 'dismantleDestroy'])->name('admin.dismantle_destroy');
     Route::patch('/admin/dismantle/{id}/cancel', [AdminController::class, 'dismantleCancel'])->name('admin.dismantle_cancel');
+    Route::get('/admin/dismantle/{id}/add-progress-dismantle', [AdminController::class, 'addProgressDismantle'])->name('admin_dismantle_add_progress');
+    Route::post('/admin/dismantle/{id}/add-progress-dismantle', [AdminController::class, 'storeProgressDismantle'])->name('admin_dismantle_store_progress');
+
 
     Route::get('admin/relokasi', [AdminController::class, 'relokasi'])->name('admin.relokasi');
     Route::get('admin/relokasi/create/{id}', [AdminController::class, 'relokasiCreate'])->name('admin.relokasi_create');
@@ -197,6 +219,8 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/relokasi/{id}', [AdminController::class, 'relokasiUpdate'])->name('admin.relokasi_update');
     Route::delete('admin/relokasi/{id}', [AdminController::class, 'relokasiDestroy'])->name('admin.relokasi_destroy');
     Route::patch('/admin/relokasi/{id}/cancel', [AdminController::class, 'relokasiCancel'])->name('admin.relokasi_cancel');
+    Route::get('/admin/relokasi/{id}/add-progress-relokasi', [AdminController::class, 'addProgressRelokasi'])->name('admin_relokasi_add_progress');
+    Route::post('/admin/relokasi/{id}/add-progress-relokasi', [AdminController::class, 'storeProgressRelokasi'])->name('admin_relokasi_store_progress');
 
 
     Route::get('admin/gantivendor', [AdminController::class, 'gantivendor'])->name('admin.gantivendor');

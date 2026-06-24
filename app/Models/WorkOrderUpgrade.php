@@ -47,4 +47,13 @@ class WorkOrderUpgrade extends Model
     {
         return $this->hasMany(BarangKeluar::class, 'work_order_upgrade_id');
     }
+    public function beritaAcara()
+    {
+        return $this->morphOne(
+            BeritaAcara::class,
+            'workOrder',
+            'work_order_type',
+            'work_order_id'
+        );
+    }
 }

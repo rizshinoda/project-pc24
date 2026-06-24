@@ -347,7 +347,28 @@
         let hiddenInput = document.getElementById(input.id + '_hidden');
         hiddenInput.value = value; // Hanya angka tanpa pemisah
     }
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-complete')) {
 
+            const btn = e.target;
+
+            Swal.fire({
+                title: btn.dataset.title ?? 'Yakin?',
+                text: btn.dataset.text ?? 'Data akan diproses.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Selesaikan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('actionInput').value = btn.dataset.action;
+                    btn.closest('form').submit();
+                }
+            });
+        }
+    });
     // Fungsi konfirmasi untuk approve
     function confirmApproval(url) {
         Swal.fire({
@@ -824,4 +845,94 @@
         document.querySelector("#billing-chart"),
         billingOptions
     ).render();
+</script>
+
+<script>
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-upload-ba')) {
+            e.preventDefault();
+
+            const form = e.target.closest('form');
+            const fileInput = form.querySelector('input[type="file"]');
+
+            if (!fileInput.files.length) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File belum dipilih',
+                    text: 'Silakan upload file terlebih dahulu.'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Upload Berita Acara?',
+                text: 'Pastikan file yang diupload sudah benar.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Upload'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-upload-ba')) {
+            e.preventDefault();
+
+            const form = e.target.closest('form');
+            const fileInput = form.querySelector('input[type="file"]');
+
+            if (!fileInput.files.length) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File belum dipilih',
+                    text: 'Silakan upload file terlebih dahulu.'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Upload Berita Acara?',
+                text: 'Pastikan file yang diupload sudah benar.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Upload'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-send-ba')) {
+            e.preventDefault();
+
+            const btn = e.target;
+            const form = btn.closest('form');
+
+            Swal.fire({
+                title: 'Kirim Berita Acara?',
+                text: 'Setelah dikirim, status akan berubah menjadi Sent.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Kirim',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    });
 </script>
