@@ -2628,7 +2628,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -2765,7 +2765,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -2780,22 +2780,22 @@ class PsbController extends Controller
         if ($request->has('action') && $request->action === 'complete') {
             $progress->status = 'Completed'; // Ubah status progress jadi Completed
 
-            // Ubah status upgrade menjadi Completed
-            $getRelokasi->status = 'Completed';
-            $getRelokasi->save();
+            // // Ubah status upgrade menjadi Completed
+            // $getRelokasi->status = 'Completed';
+            // $getRelokasi->save();
 
-            // Perbarui status di tabel statuses
-            $status = Status::where('work_orderable_id', $getRelokasi->id)
-                ->where('process', 'Relokasi')
-                ->first();
-            if ($status) {
-                $status->status = 'Completed';
-                $status->save();
-            }
-            // Update bandwidth lama dengan bandwidth baru di tabel online_billings
-            $onlineBilling = $getRelokasi->onlineBilling; // Ambil data online billing terkait
-            $onlineBilling->alamat_pemasangan = $getRelokasi->alamat_pemasangan_baru; // Set bandwidth baru
-            $onlineBilling->save(); // Simpan perubahan
+            // // Perbarui status di tabel statuses
+            // $status = Status::where('work_orderable_id', $getRelokasi->id)
+            //     ->where('process', 'Relokasi')
+            //     ->first();
+            // if ($status) {
+            //     $status->status = 'Completed';
+            //     $status->save();
+            // }
+            // // Update bandwidth lama dengan bandwidth baru di tabel online_billings
+            // $onlineBilling = $getRelokasi->onlineBilling; // Ambil data online billing terkait
+            // $onlineBilling->alamat_pemasangan = $getRelokasi->alamat_pemasangan_baru; // Set bandwidth baru
+            // $onlineBilling->save(); // Simpan perubahan
 
             $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
 
@@ -2854,7 +2854,7 @@ class PsbController extends Controller
 
         // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
         if ($request->action === 'complete') {
-            return redirect()->route('psb.relokasi', $id)->with('success', 'Relokasi berhasil diselesaikan.');
+            return redirect()->route('psb.relokasi.show', $id)->with('success', 'Relokasi berhasil diselesaikan.');
         }
 
         return redirect()->route('psb.relokasi.show', $id)->with('success', 'Progress berhasil ditambahkan.');
@@ -2998,7 +2998,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -3126,7 +3126,7 @@ class PsbController extends Controller
         $year = $request->get('year');
 
         // Query untuk mendapatkan data survey
-        $query = OnlineBilling::orderBy('created_at', 'desc');
+        $query = OnlineBilling::orderBy('updated_at', 'desc');
 
         // Filter berdasarkan status
         if ($status != 'all') {
@@ -3326,7 +3326,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -3813,7 +3813,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -3827,10 +3827,6 @@ class PsbController extends Controller
         // Set status default atau complete sesuai tombol yang ditekan
         if ($request->has('action') && $request->action === 'complete') {
             $progress->status = 'Completed'; // Ubah status progress jadi Completed
-
-            // Ubah status upgrade menjadi Completed
-            $getInstall->status = 'Completed';
-            $getInstall->save();
 
 
 
@@ -3878,7 +3874,7 @@ class PsbController extends Controller
 
         // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
         if ($request->action === 'complete') {
-            return redirect()->route('psb.poc', $id)->with('success', 'POC berhasil diselesaikan.');
+            return redirect()->route('psb.poc_show', $id)->with('success', 'POC berhasil diselesaikan.');
         }
 
         return redirect()->route('psb.poc_show', $id)->with('success', 'Progress berhasil ditambahkan.');
@@ -3917,7 +3913,7 @@ class PsbController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -3932,9 +3928,6 @@ class PsbController extends Controller
         if ($request->has('action') && $request->action === 'complete') {
             $progress->status = 'Completed'; // Ubah status progress jadi Completed
 
-            // Ubah status upgrade menjadi Completed
-            $getInstall->status = 'Completed';
-            $getInstall->save();
 
 
 
@@ -3982,7 +3975,7 @@ class PsbController extends Controller
 
         // Redirect ke view upgrade atau detail upgrade berdasarkan aksi
         if ($request->action === 'complete') {
-            return redirect()->route('psb.jasa', $id)->with('success', 'Jasa berhasil diselesaikan.');
+            return redirect()->route('psb.jasa_show', $id)->with('success', 'Jasa berhasil diselesaikan.');
         }
 
         return redirect()->route('psb.jasa_show', $id)->with('success', 'Progress berhasil ditambahkan.');

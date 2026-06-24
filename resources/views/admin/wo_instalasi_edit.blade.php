@@ -473,6 +473,12 @@
 
                                         <div class="col-md-6">
                                             <div class="form-group row">
+                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">No Jaringan</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control" id="no_jaringan" name="no_jaringan" value="{{ old('no_jaringan', $getInstall->no_jaringan) }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Jenis Pekerjaan</label>
                                                 <div class="col-sm-8">
                                                     <select class="form-control" id="jenis_pekerjaan" name="jenis_pekerjaan" required>
@@ -591,12 +597,7 @@
                                                     <input type="text" class="form-control" id="vlan" name="vlan" value="{{ old('vlan', $getInstall->vlan) }}">
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">No Jaringan</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="no_jaringan" name="no_jaringan" value="{{ old('no_jaringan', $getInstall->no_jaringan) }}">
-                                                </div>
-                                            </div>
+
                                             <div class="form-group row">
                                                 <label for="no_pelanggan" class="col-sm-4 col-form-label">Tanggal RFS</label>
                                                 <div class="col-sm-8">

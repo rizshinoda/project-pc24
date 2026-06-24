@@ -660,7 +660,7 @@
 
                                         <div class="d-flex justify-content-center flex-wrap" style="gap: 12px;">
 
-                                            <form action="{{ route('berita_acara.send', $getInstall->id) }}" method="POST" class="mb-2">
+                                            <form action="{{ route('berita_acara.send', $beritaAcara->id) }}" method="POST" class="mb-2">
                                                 @csrf
                                                 <button class="btn btn-primary btn-send-ba " style="min-width:180px;">
                                                     <i class="fa fa-paper-plane"></i> Kirim BA

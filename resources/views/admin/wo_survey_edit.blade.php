@@ -347,7 +347,14 @@
                                         </div>
 
                                         <div class="col-md-6">
+
                                             <!-- Kolom kedua -->
+                                            <div class="form-group row">
+                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">No Jaringan</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control" id="no_jaringan" name="no_jaringan" value="{{ old('no_jaringan', $getSurvey->no_jaringan) }}">
+                                                </div>
+                                            </div>
                                             <div class="form-group row">
                                                 <label for="instansi_id" class="col-sm-4 col-form-label">Nama Instansi</label>
                                                 <div class="col-sm-8">
@@ -455,12 +462,7 @@
                                                     <input type="text" class="form-control" id="vlan" name="vlan" value="{{ old('vlan', $getSurvey->vlan) }}">
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">No Jaringan</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control" id="no_jaringan" name="no_jaringan" value="{{ old('no_jaringan', $getSurvey->no_jaringan) }}">
-                                                </div>
-                                            </div>
+
                                             <div class="form-group row">
                                                 <label for="no_pelanggan" class="col-sm-4 col-form-label">Tanggal RFS</label>
                                                 <div class="col-sm-8">

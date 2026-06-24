@@ -1077,7 +1077,7 @@ class NaController extends Controller
         // Validasi input
         $request->validate([
             'keterangan' => 'required',
-            'foto.*' => 'nullable|image|max:10240',
+            'foto.*' => 'nullable|file|mimetypes:image/jpeg,image/png,application/pdf|max:10240',
         ]);
 
         // Menyimpan progress baru
@@ -1441,7 +1441,7 @@ class NaController extends Controller
         $year = $request->get('year');
 
         // Query untuk mendapatkan data survey
-        $query = OnlineBilling::orderBy('created_at', 'desc');
+        $query = OnlineBilling::orderBy('updated_at', 'desc');
 
         // Filter berdasarkan status
         if ($status != 'all') {

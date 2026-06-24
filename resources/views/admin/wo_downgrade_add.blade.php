@@ -144,7 +144,7 @@
                                 <div class="card-body">
                                     <a href="{{ route('admin.downgrade_show', $getDowngrade->id) }}" class="btn btn-sm btn-info"> <i class="fa fa-arrow-left"></i></a>
 
-                                    <h4 class="mb-5 text-center">Update Progress Instalasi</h4>
+                                    <h4 class="mb-5 text-center">Update Progress Downgrade</h4>
                                     {{-- Form untuk mengupload multiple foto --}}
                                     <form action="{{ route('admin_downgrade_add_progress', $getDowngrade->id) }}" method="POST" enctype="multipart/form-data">
                                         @csrf

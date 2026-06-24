@@ -144,7 +144,7 @@
                                 <div class="card-body">
                                     <a href="{{ route('admin.wo_survey_show', $getSurvey->id) }}" class="btn btn-sm btn-info"> <i class="fa fa-arrow-left"></i></a>
 
-                                    <h4 class="mb-5 text-center">Update Progress Instalasi</h4>
+                                    <h4 class="mb-5 text-center">Update Progress Survey</h4>
                                     {{-- Form untuk mengupload multiple foto --}}
                                     <form action="{{ route('admin_survey_add_progress', $getSurvey->id) }}" method="POST" enctype="multipart/form-data">
                                         @csrf

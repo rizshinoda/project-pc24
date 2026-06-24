@@ -126,9 +126,13 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
 
     Route::get('admin/jasa', [AdminController::class, 'jasa'])->name('admin.jasa');
     Route::get('admin/jasa/{id}', [AdminController::class, 'showjasa'])->name('admin.wo_jasa_show');
+    Route::get('/admin/jasa/{id}/add-progress-jasa', [AdminController::class, 'addProgressJasa'])->name('admin_jasa_add_progress');
+    Route::post('/admin/jasa/{id}/add-progress-jasa', [AdminController::class, 'storeProgressJasa'])->name('admin_jasa_store_progress');
 
     Route::get('admin/poc', [AdminController::class, 'poc'])->name('admin.poc');
     Route::get('admin/poc/{id}', [AdminController::class, 'showpoc'])->name('admin.wo_poc_show');
+    Route::get('/admin/poc/{id}/add-progress-poc', [AdminController::class, 'addProgressPoc'])->name('admin_poc_add_progress');
+    Route::post('/admin/poc/{id}/add-progress-poc', [AdminController::class, 'storeProgressPoc'])->name('admin_poc_store_progress');
 
 
     // Routes untuk Pelanggan
@@ -203,6 +207,9 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/dismantle/{id}', [AdminController::class, 'dismantleUpdate'])->name('admin.dismantle_update');
     Route::delete('admin/dismantle/{id}', [AdminController::class, 'dismantleDestroy'])->name('admin.dismantle_destroy');
     Route::patch('/admin/dismantle/{id}/cancel', [AdminController::class, 'dismantleCancel'])->name('admin.dismantle_cancel');
+    Route::get('/admin/dismantle/{id}/add-progress-dismantle', [AdminController::class, 'addProgressDismantle'])->name('admin_dismantle_add_progress');
+    Route::post('/admin/dismantle/{id}/add-progress-dismantle', [AdminController::class, 'storeProgressDismantle'])->name('admin_dismantle_store_progress');
+
 
     Route::get('admin/relokasi', [AdminController::class, 'relokasi'])->name('admin.relokasi');
     Route::get('admin/relokasi/create/{id}', [AdminController::class, 'relokasiCreate'])->name('admin.relokasi_create');
@@ -212,6 +219,8 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('admin/relokasi/{id}', [AdminController::class, 'relokasiUpdate'])->name('admin.relokasi_update');
     Route::delete('admin/relokasi/{id}', [AdminController::class, 'relokasiDestroy'])->name('admin.relokasi_destroy');
     Route::patch('/admin/relokasi/{id}/cancel', [AdminController::class, 'relokasiCancel'])->name('admin.relokasi_cancel');
+    Route::get('/admin/relokasi/{id}/add-progress-relokasi', [AdminController::class, 'addProgressRelokasi'])->name('admin_relokasi_add_progress');
+    Route::post('/admin/relokasi/{id}/add-progress-relokasi', [AdminController::class, 'storeProgressRelokasi'])->name('admin_relokasi_store_progress');
 
 
     Route::get('admin/gantivendor', [AdminController::class, 'gantivendor'])->name('admin.gantivendor');

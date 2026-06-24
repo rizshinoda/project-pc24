@@ -144,7 +144,7 @@
                                 <div class="card-body">
                                     <a href="{{ route('admin.upgrade_show', $getUpgrade->id) }}" class="btn btn-sm btn-info"> <i class="fa fa-arrow-left"></i></a>
 
-                                    <h4 class="mb-5 text-center">Update Progress Instalasi</h4>
+                                    <h4 class="mb-5 text-center">Update Progress Upgrade</h4>
                                     {{-- Form untuk mengupload multiple foto --}}
                                     <form action="{{ route('admin_upgrade_add_progress', $getUpgrade->id) }}" method="POST" enctype="multipart/form-data">
                                         @csrf
