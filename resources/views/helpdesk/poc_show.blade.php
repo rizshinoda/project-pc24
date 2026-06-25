@@ -518,7 +518,7 @@
                                                     </td>
 
                                                     <!-- Keterangan -->
-                                                    <td style="line-height:1.6;">
+                                                    <td style="text-align: center justify; vertical-align: middle; padding: 8px; line-height: 1.3;" class="keterangan-cell">
                                                         {{ $progress->keterangan }}
                                                     </td>
                                                 </tr>
