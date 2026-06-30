@@ -208,8 +208,10 @@
                                     <p><strong>Alamat:</strong> {{ $getDowngrade->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getDowngrade->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getDowngrade->onlineBilling->no_pic }}</p>
-                                    <p><strong>Tanggal RFS:</strong> {{ \Carbon\Carbon::parse($getDowngrade->tanggal_rfs)->translatedFormat('d M Y') }}</p>
-
+                                    <p>
+                                        <strong>Tanggal RFS:</strong>
+                                        {{ $getDowngrade->tanggal_rfs?->translatedFormat('d M Y') ?? '-' }}
+                                    </p>
                                     <p><strong>Vendor:</strong> {{ $getDowngrade->onlineBilling->vendor?->nama_vendor }}</p>
                                     <p><strong>Keterengan:</strong> {{ $getDowngrade->keterangan }}</p>
 
