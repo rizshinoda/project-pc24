@@ -250,7 +250,7 @@
 
                                 </div>
                                 <div class="pull-right">
-                                    {{ $getDowngrade->links() }}
+                                    {{ $getDowngrade->appends(request()->query())->links() }}
                                 </div>
 
                             </div>

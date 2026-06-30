@@ -437,8 +437,8 @@
     };
 
 
-    const overdueAllowed = ['Survey', 'Instalasi', 'POC',
-        'Jasa'
+    const overdueAllowed = ['Instalasi', 'POC',
+        'Jasa', 'Upgrade', 'Downgrade', 'Relokasi', 'Dismantle'
     ];
 
 

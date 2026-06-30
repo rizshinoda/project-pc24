@@ -167,7 +167,10 @@
                                         <div class="form-group ">
                                             <label for="keterangan">Keterangan</label>
                                             <textarea name="keterangan" id="keterangan" class="form-control mb-4" rows="4">{{ $workOrder->keterangan }}</textarea>
-
+                                            <div class="form-group ">
+                                                <label for="no_pelanggan" class="col-sm-4 ">Tanggal RFS</label>
+                                                <input type="date" class="form-control" id="tanggal_rfs" name="tanggal_rfs" value="{{ old('tanggal_rfs', $workOrder->tanggal_rfs) }}" required>
+                                            </div>
                                             <label>Upload File <span class="text-muted small">(pdf, doc, docx, jpg, png)</span>
 
                                             </label>

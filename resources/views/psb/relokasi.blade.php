@@ -265,7 +265,7 @@
 
                 </div>
                 <div class="pull-right">
-                  {{ $getRelokasi->links() }}
+                  {{ $getRelokasi->appends(request()->query())->links() }}
                 </div>
 
               </div>

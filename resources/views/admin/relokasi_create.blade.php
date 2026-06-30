@@ -201,6 +201,12 @@
                                                     <textarea id="non_stock" name="non_stock" class="form-control" rows="4"></textarea>
                                                 </div>
                                             </div>
+                                            <div class="form-group row">
+                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Tanggal RFS</label>
+                                                <div class="col-sm-8">
+                                                    <input type="date" class="form-control" id="tanggal_rfs" name="tanggal_rfs" required>
+                                                </div>
+                                            </div>
                                             <!-- Dropdown Jenis Barang -->
                                             <div class="form-group row">
                                                 <label for="jenis_id" class="col-sm-4 col-form-label">Jenis Barang</label>

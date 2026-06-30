@@ -460,7 +460,7 @@
 
 
     const overdueAllowed = ['Survey', 'Instalasi', 'POC',
-        'Jasa'
+        'Jasa', 'Upgrade', 'Downgrade', 'Relokasi', 'Dismantle'
     ];
 
 

@@ -462,7 +462,12 @@
                                                     <input type="text" class="form-control" id="vlan" name="vlan" value="{{ old('vlan', $getSurvey->vlan) }}">
                                                 </div>
                                             </div>
-
+                                            <div class="form-group row">
+                                                <label for="keterangan" class="col-sm-4 col-form-label">Keterangan</label>
+                                                <div class="col-sm-8">
+                                                    <textarea name="keterangan" id="keterangan" class="form-control" rows="4">{{ $getSurvey->keterangan }}</textarea>
+                                                </div>
+                                            </div>
                                             <div class="form-group row">
                                                 <label for="no_pelanggan" class="col-sm-4 col-form-label">Tanggal RFS</label>
                                                 <div class="col-sm-8">

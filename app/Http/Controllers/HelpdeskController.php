@@ -165,7 +165,11 @@ class HelpdeskController extends Controller
             'Survey',
             'Instalasi',
             'POC',
-            'Jasa'
+            'Jasa',
+            'Upgrade',
+            'Downgrade',
+            'Relokasi',
+            'Dismantle'
         ];
 
         $totalWO = 0;
@@ -217,8 +221,12 @@ class HelpdeskController extends Controller
                     ->count();
 
                 // Data escalation
+                $relations = in_array($type, ['Survey', 'Instalasi', 'POC', 'Jasa'])
+                    ? ['pelanggan']
+                    : ['onlineBilling.pelanggan'];
+
                 $dataWO = (clone $query)
-                    ->with('pelanggan')
+                    ->with($relations)
                     ->whereDate('tanggal_rfs', '<', Carbon::today())
                     ->whereNotIn('status', $closedStatuses)
                     ->get()
@@ -226,9 +234,23 @@ class HelpdeskController extends Controller
 
                         $item->jenis = $type;
 
-                        $item->nama_pelanggan =
-                            optional($item->pelanggan)->nama_pelanggan;
+                        if (in_array($type, ['Survey', 'Instalasi', 'POC', 'Jasa'])) {
 
+                            $item->nama_pelanggan =
+                                optional($item->pelanggan)->nama_pelanggan;
+
+                            $item->nama_site =
+                                $item->nama_site ?? '-';
+                        } else {
+
+                            $item->nama_site =
+                                optional($item->onlineBilling)->nama_site;
+
+                            $item->nama_pelanggan =
+                                optional(
+                                    optional($item->onlineBilling)->pelanggan
+                                )->nama_pelanggan;
+                        }
                         $item->hari_overdue =
                             Carbon::parse($item->tanggal_rfs)
                             ->diffInDays(Carbon::today());
@@ -253,6 +275,30 @@ class HelpdeskController extends Controller
                             case 'Jasa':
                                 $item->detail_url = route(
                                     'hd.jasa_show',
+                                    $item->id
+                                );
+                                break;
+                            case 'Upgrade':
+                                $item->detail_url = route(
+                                    'hd.upgrade_show',
+                                    $item->id
+                                );
+                                break;
+                            case 'Downgrade':
+                                $item->detail_url = route(
+                                    'hd.downgrade_show',
+                                    $item->id
+                                );
+                                break;
+                            case 'Relokasi':
+                                $item->detail_url = route(
+                                    'hd.relokasi.show',
+                                    $item->id
+                                );
+                                break;
+                            case 'Dismantle':
+                                $item->detail_url = route(
+                                    'hd.dismantle_show',
                                     $item->id
                                 );
                                 break;
@@ -1602,7 +1648,14 @@ class HelpdeskController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -1684,7 +1737,14 @@ class HelpdeskController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -1765,7 +1825,14 @@ class HelpdeskController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -1845,7 +1912,14 @@ class HelpdeskController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {

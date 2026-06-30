@@ -439,7 +439,12 @@
                                                     <input type="text" class="form-control" id="vlan" name="vlan">
                                                 </div>
                                             </div>
-
+                                            <div class="form-group row">
+                                                <label for="no_pelanggan" class="col-sm-4 col-form-label">Keterangan</label>
+                                                <div class="col-sm-8">
+                                                    <textarea class="form-control" id="keterangan" name="keterangan" rows="4"></textarea>
+                                                </div>
+                                            </div>
                                             <div class="form-group row">
                                                 <label for="no_pelanggan" class="col-sm-4 col-form-label">Tanggal RFS</label>
                                                 <div class="col-sm-8">

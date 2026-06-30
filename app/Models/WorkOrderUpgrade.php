@@ -18,6 +18,7 @@ class WorkOrderUpgrade extends Model
         'non_stock',
         'keterangan',
         'attachments', // tambahkan ini supaya bisa diisi massal
+        'tanggal_rfs'
 
     ];
     protected $casts = [
