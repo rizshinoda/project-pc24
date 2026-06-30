@@ -163,7 +163,7 @@
                                                     <input type="text" class="form-control" id="no_spk" name="no_spk" value="{{ $workOrder->no_spk }}" readonly>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="bandwidth">Bandwidth Baru</label>
+                                                    <label for="bandwidth">Volume Baru</label>
                                                     <div class="input-group mb-4">
                                                         <input type="number" name="bandwidth_baru" id="bandwidth_baru" class="form-control" value="{{ $workOrder->bandwidth_baru }}" min="1" required>
                                                         <select class="form-control" id="satuan" name="satuan" required>
@@ -182,6 +182,10 @@
                                                     <div class="form-group ">
                                                         <label for="keterangan" class="col-sm-4 ">Keterangan</label>
                                                         <textarea name="keterangan" id="keterangan" class="form-control" rows="4">{{ $workOrder->keterangan }}</textarea>
+                                                    </div>
+                                                    <div class="form-group ">
+                                                        <label for="no_pelanggan" class="col-sm-4 ">Tanggal RFS</label>
+                                                        <input type="date" class="form-control" id="tanggal_rfs" name="tanggal_rfs" value="{{ old('tanggal_rfs', $workOrder->tanggal_rfs) }}" required>
                                                     </div>
                                                     <label>Upload File <span class="text-muted small">(pdf, doc, docx, jpg, png)</span>
                                                     </label>

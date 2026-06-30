@@ -181,6 +181,11 @@
                                                         <label for="no_pelanggan" class="col-sm-4">Keterangan</label>
                                                         <textarea class="form-control" id="keterangan" name="keterangan" rows="4"></textarea>
                                                     </div>
+                                                    <div class="form-group">
+                                                        <label for="no_pelanggan" class="col-sm-4 ">Tanggal RFS</label>
+                                                        <input type="date" class="form-control" id="tanggal_rfs" name="tanggal_rfs" required>
+                                                    </div>
+
                                                     <label>Upload File <span class="text-muted small">(pdf, doc, docx, jpg, png)</span>
                                                     </label>
                                                     <input type="file" name="attachments[]" multiple>

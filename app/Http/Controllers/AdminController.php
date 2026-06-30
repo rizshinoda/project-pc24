@@ -170,7 +170,11 @@ class AdminController extends Controller
             'Survey',
             'Instalasi',
             'POC',
-            'Jasa'
+            'Jasa',
+            'Upgrade',
+            'Downgrade',
+            'Relokasi',
+            'Dismantle'
         ];
 
         $totalWO = 0;
@@ -222,8 +226,12 @@ class AdminController extends Controller
                     ->count();
 
                 // Data escalation
+                $relations = in_array($type, ['Survey', 'Instalasi', 'POC', 'Jasa'])
+                    ? ['pelanggan']
+                    : ['onlineBilling.pelanggan'];
+
                 $dataWO = (clone $query)
-                    ->with('pelanggan')
+                    ->with($relations)
                     ->whereDate('tanggal_rfs', '<', Carbon::today())
                     ->whereNotIn('status', $closedStatuses)
                     ->get()
@@ -231,9 +239,23 @@ class AdminController extends Controller
 
                         $item->jenis = $type;
 
-                        $item->nama_pelanggan =
-                            optional($item->pelanggan)->nama_pelanggan;
+                        if (in_array($type, ['Survey', 'Instalasi', 'POC', 'Jasa'])) {
 
+                            $item->nama_pelanggan =
+                                optional($item->pelanggan)->nama_pelanggan;
+
+                            $item->nama_site =
+                                $item->nama_site ?? '-';
+                        } else {
+
+                            $item->nama_site =
+                                optional($item->onlineBilling)->nama_site;
+
+                            $item->nama_pelanggan =
+                                optional(
+                                    optional($item->onlineBilling)->pelanggan
+                                )->nama_pelanggan;
+                        }
                         $item->hari_overdue =
                             Carbon::parse($item->tanggal_rfs)
                             ->diffInDays(Carbon::today());
@@ -263,6 +285,30 @@ class AdminController extends Controller
                             case 'Jasa':
                                 $item->detail_url = route(
                                     'admin.wo_jasa_show',
+                                    $item->id
+                                );
+                                break;
+                            case 'Upgrade':
+                                $item->detail_url = route(
+                                    'admin.upgrade_show',
+                                    $item->id
+                                );
+                                break;
+                            case 'Downgrade':
+                                $item->detail_url = route(
+                                    'admin.downgrade_show',
+                                    $item->id
+                                );
+                                break;
+                            case 'Relokasi':
+                                $item->detail_url = route(
+                                    'admin.relokasi_show',
+                                    $item->id
+                                );
+                                break;
+                            case 'Dismantle':
+                                $item->detail_url = route(
+                                    'admin.dismantle_show',
                                     $item->id
                                 );
                                 break;
@@ -1943,7 +1989,15 @@ class AdminController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -2044,6 +2098,7 @@ class AdminController extends Controller
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+            'tanggal_rfs' => 'nullable|date',
 
         ]);
         // Simpan data ke tabel work_order_upgrades
@@ -2056,6 +2111,8 @@ class AdminController extends Controller
             'keterangan' => $validated['keterangan'],
             'non_stock' => $validated['non_stock'],
             'status' => 'Pending', // Default status
+            'tanggal_rfs' => $validated['tanggal_rfs'],
+
         ]);
 
         // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
@@ -2220,26 +2277,45 @@ class AdminController extends Controller
         if ($workOrder->status === 'Completed') {
             return redirect()->back()->with('error', 'Status Upgrade sudah selesai, tidak bisa diedit.');
         }
+        // Dapatkan daftar jenis barang
+        $jenisList = Jenis::all();
+
+        // Mengambil data stok dengan total jumlah berdasarkan tipe, merek, dan jenis, serta melakukan pagination
+        $stockBarangs = StockBarang::with(['merek', 'tipe', 'jenis'])
+            ->selectRaw('tipe_id, merek_id, jenis_id, kualitas, SUM(jumlah) as total_jumlah')
+            ->groupBy(
+                'tipe_id',
+                'merek_id',
+                'jenis_id',
+                'kualitas'
+            )
+            ->paginate(10); // Menggunakan pagination dengan 10 item per halaman
+
+        // Siapkan data detail barang dalam format array, kosongkan keranjang
+        $WorkOrderUpgradeDetail = []; // Kosongkan keranjang
         $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
 
         // Ambil data lain yang dibutuhkan, misalnya online billing
         $onlineBilling = $workOrder->onlineBilling;
 
-        $data = array_merge($this->ambilDataRole(), compact('workOrder', 'onlineBilling', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('WorkOrderUpgradeDetail', 'stockBarangs', 'jenisList', 'workOrder', 'onlineBilling', 'notifications'));
         // Kirim data ke view
         return view('admin.upgrade_edit', $data);
     }
     public function upgradeUpdate(Request $request, $id)
     {
         // Validasi data input
-        $request->validate([
+        $validated = $request->validate([
             'bandwidth_baru' => 'required|numeric|min:1',
             'satuan' => 'required|in:Gbps,Mbps,Kbps,RU(RACK UNIT),CORE,PAIR',
             'online_billing_id' => 'required|exists:online_billings,id',
-            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120',
+            'cart' => 'nullable|array',
+            'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+            'tanggal_rfs' => 'nullable|date',
 
         ]);
-
         // Ambil data work order berdasarkan ID
         $workOrder = WorkOrderUpgrade::findOrFail($id);
         $uploadedFiles = [];
@@ -2264,10 +2340,40 @@ class AdminController extends Controller
             'satuan' => $request->satuan,
             'online_billing_id' => $request->online_billing_id,
             'attachments' => $uploadedFiles,
+            'keterangan' => $validated['keterangan'],
+            'non_stock' => $validated['non_stock'],
+            'tanggal_rfs' => $validated['tanggal_rfs'],
 
         ]);
         LogActivity::add('Upgrade', $workOrder->onlineBilling->nama_site, 'edit');
+        // Hapus detail barang yang ada sebelumnya
+        WorkOrderUpgradeDetail::where('work_order_upgrade_id', $workOrder->id)->delete();
 
+        // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
+        // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
+        if (!empty($validated['cart'])) {
+            foreach ($validated['cart'] as $jenis => $merekArray) {
+                foreach ($merekArray as $merek => $tipeArray) {
+                    foreach ($tipeArray as $tipe => $kualitasArray) {
+                        foreach ($kualitasArray as $kualitas => $item) {
+                            $stockBarang = StockBarang::whereHas('merek', fn($query) => $query->where('nama_merek', $merek))
+                                ->whereHas('tipe', fn($query) => $query->where('nama_tipe', $tipe))
+                                ->where('kualitas', $kualitas)
+                                ->first();
+
+                            WorkOrderUpgradeDetail::create([
+                                'work_order_upgrade_id' => $workOrder->id,
+                                'stock_barang_id' => $stockBarang?->id, // Gunakan null-safe operator untuk menghindari error jika tidak ditemukan
+                                'merek' => $merek,
+                                'tipe' => $tipe,
+                                'kualitas' => $kualitas,
+                                'jumlah' => $item['total_jumlah'],
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
         // Redirect dengan pesan sukses
         return redirect()->route('admin.upgrade')->with('success', 'Work order berhasil diperbarui.');
     }
@@ -2335,7 +2441,15 @@ class AdminController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -2423,6 +2537,7 @@ class AdminController extends Controller
             'satuan' => 'required|string',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
             'keterangan' => 'nullable|string',
+            'tanggal_rfs' => 'nullable|date',
 
         ]);
 
@@ -2435,6 +2550,7 @@ class AdminController extends Controller
             'admin_id' => Auth::user()->id,
             'status' => 'Pending', // Default status
             'keterangan' => $validated['keterangan'],
+            'tanggal_rfs' => $validated['tanggal_rfs'],
 
         ]);
 
@@ -2566,6 +2682,7 @@ class AdminController extends Controller
             'online_billing_id' => 'required|exists:online_billings,id',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
             'keterangan' => 'nullable|string',
+            'tanggal_rfs' => 'nullable|date',
 
         ]);
 
@@ -2593,6 +2710,7 @@ class AdminController extends Controller
             'online_billing_id' => $request->online_billing_id,
             'attachments' => $uploadedFiles,
             'keterangan' => $request->keterangan,
+            'tanggal_rfs' => $request->tanggal_rfs,
 
         ]);
         LogActivity::add('Downgrade', $workOrder->onlineBilling->nama_site, 'edit');
@@ -2652,7 +2770,15 @@ class AdminController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -2740,6 +2866,7 @@ class AdminController extends Controller
             'online_billing_id' => 'required|exists:online_billings,id',
             'keterangan' => 'nullable|string',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+            'tanggal_rfs' => 'nullable|date',
 
         ]);
 
@@ -2750,6 +2877,8 @@ class AdminController extends Controller
             'keterangan' => $validated['keterangan'],
             'admin_id' => Auth::user()->id,
             'status' => 'Pending', // Default status
+            'tanggal_rfs' => $validated['tanggal_rfs'],
+
         ]);
 
         Status::create([
@@ -2906,6 +3035,8 @@ class AdminController extends Controller
             'keterangan' => 'nullable|string',
             'online_billing_id' => 'required|exists:online_billings,id',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // validasi file
+            'tanggal_rfs' => 'nullable|date',
+
         ]);
 
         // Ambil data work order berdasarkan ID
@@ -2934,6 +3065,8 @@ class AdminController extends Controller
             'keterangan' => $request->keterangan,
             'online_billing_id' => $request->online_billing_id,
             'attachments' => $uploadedFiles,
+            'tanggal_rfs' => $request->tanggal_rfs,
+
         ]);
 
 
@@ -2996,7 +3129,15 @@ class AdminController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-
+        // filter overdue
+        if ($request->filter == 'overdue') {
+            $query->whereDate('tanggal_rfs', '<', today())
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Rejected',
+                    'Canceled'
+                ]);
+        }
         // Pencarian di semua kolom yang relevan
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -3092,6 +3233,7 @@ class AdminController extends Controller
 
             'cart' => 'nullable|array', // Keranjang tidak wajib
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+            'tanggal_rfs' => 'nullable|date',
 
             // tambahkan validasi lain sesuai kebutuhan
         ]);
@@ -3119,6 +3261,7 @@ class AdminController extends Controller
             'status' => 'Pending', // Default status
             'keterangan' => $validated['keterangan'],
             'non_stock' => $validated['non_stock'],
+            'tanggal_rfs' => $validated['tanggal_rfs'],
 
         ]);
         // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
@@ -3310,6 +3453,7 @@ class AdminController extends Controller
             'cart' => 'nullable|array',
             'non_stock' => 'nullable|string',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // validasi file
+            'tanggal_rfs' => 'nullable|date',
 
             // tambahkan validasi lain sesuai kebutuhan
         ]);
@@ -3337,6 +3481,7 @@ class AdminController extends Controller
             'keterangan' => $validatedData['keterangan'],
             'non_stock' => $validatedData['non_stock'],
             'attachments' => $uploadedFiles,
+            'tanggal_rfs' => $validatedData['tanggal_rfs'],
 
         ]);
         LogActivity::add('Relokasi', $workOrder->onlineBilling->nama_site, 'edit');

@@ -18,6 +18,7 @@ class WorkOrderRelokasi extends Model
         'non_stock',
         'admin_id',
         'attachments', // tambahkan ini supaya bisa diisi massal
+        'tanggal_rfs'
 
     ];
     protected $casts = [

@@ -199,6 +199,8 @@
                                     <p><strong>Alamat:</strong> {{ $getSurvey->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getSurvey->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getSurvey->no_pic }}</p>
+                                    <p><strong>Tanggal RFS:</strong> {{ \Carbon\Carbon::parse($getSurvey->tanggal_rfs)->translatedFormat('d M Y') }}</p>
+
                                     <p><strong>Vendor:</strong> {{ $getSurvey->vendor->nama_vendor }}</p>
                                     <p><strong>Keterengan:</strong> {{ $getSurvey->keterangan }}</p>
 

@@ -264,7 +264,7 @@
 
                 </div>
                 <div class="pull-right">
-                  {{ $getUpgrade->links() }}
+                  {{ $getUpgrade->appends(request()->query())->links() }}
                 </div>
 
               </div>

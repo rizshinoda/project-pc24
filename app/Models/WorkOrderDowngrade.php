@@ -18,6 +18,7 @@ class WorkOrderDowngrade extends Model
 
         'admin_id',
         'attachments', // tambahkan ini supaya bisa diisi massal
+        'tanggal_rfs'
 
     ];
     protected $casts = [

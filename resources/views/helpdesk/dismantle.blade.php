@@ -250,7 +250,7 @@
 
                                 </div>
                                 <div class="pull-right">
-                                    {{ $getDismantle->links() }}
+                                    {{ $getDismantle->appends(request()->query())->links() }}
                                 </div>
 
                             </div>
