@@ -129,7 +129,7 @@
                         <h3 class="page-title">
                             <span class="page-title-icon bg-gradient-danger text-white me-2">
                                 <i class="mdi mdi-home"></i>
-                            </span> Instalasi
+                            </span> Dismantle
                         </h3>
 
                     </div>

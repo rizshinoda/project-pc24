@@ -186,6 +186,8 @@
                                     <p><strong>PIC:</strong> {{ $getDowngrade->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getDowngrade->onlineBilling->no_pic }}</p>
                                     <p><strong>Vendor:</strong> {{ $getDowngrade->onlineBilling->vendor?->nama_vendor }}</p>
+                                    <p><strong>Keterengan:</strong> {{ $getDowngrade->keterangan }}</p>
+
                                 </div>
                             </div>
                         </div>

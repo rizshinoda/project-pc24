@@ -29,6 +29,7 @@ class WorkOrderSurvey extends Model
         'vlan',
         'no_jaringan',
         'tanggal_rfs',
+        'keterangan',
 
         'attachments', // tambahkan ini supaya bisa diisi massal
 

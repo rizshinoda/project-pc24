@@ -179,7 +179,10 @@
                                                         <input type="hidden" name="online_billing_id" value="{{ $workOrder->online_billing_id }}">
 
                                                     </div>
-
+                                                    <div class="form-group ">
+                                                        <label for="keterangan" class="col-sm-4 ">Keterangan</label>
+                                                        <textarea name="keterangan" id="keterangan" class="form-control" rows="4">{{ $workOrder->keterangan }}</textarea>
+                                                    </div>
                                                     <label>Upload File <span class="text-muted small">(pdf, doc, docx, jpg, png)</span>
                                                     </label>
                                                     <input type="file" name="attachments[]" multiple>

@@ -200,6 +200,8 @@
                                     <p><strong>PIC:</strong> {{ $getSurvey->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getSurvey->no_pic }}</p>
                                     <p><strong>Vendor:</strong> {{ $getSurvey->vendor->nama_vendor }}</p>
+                                    <p><strong>Keterengan:</strong> {{ $getSurvey->keterangan }}</p>
+
                                 </div>
                             </div>
                         </div>

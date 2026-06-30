@@ -1562,6 +1562,7 @@ class AdminController extends Controller
             'vlan' => 'nullable|string',
             'no_jaringan' => 'nullable|string',
             'tanggal_rfs' => 'required|date',
+            'keterangan' => 'nullable|string',
 
 
             // tambahkan validasi lain sesuai kebutuhan
@@ -1601,6 +1602,7 @@ class AdminController extends Controller
             'vlan' => $request->vlan,
             'no_jaringan' => $request->no_jaringan,
             'tanggal_rfs' => $request->tanggal_rfs,
+            'keterangan' => $request->keterangan,
 
         ]);
         LogActivity::add(
@@ -1733,6 +1735,7 @@ class AdminController extends Controller
             'tanggal_rfs' => 'required|date',
             'foto' => 'image|nullable|max:2048', // Validasi untuk foto
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // validasi file
+            'keterangan' => 'nullable|string',
 
             // tambahkan validasi lain sesuai kebutuhan
         ]);
@@ -1787,6 +1790,7 @@ class AdminController extends Controller
             'tanggal_rfs' => $request->tanggal_rfs,
             'foto' => $filename, // Simpan nama file atau null jika tidak ada foto
             'attachments' => $uploadedFiles,
+            'keterangan' => $request->keterangan,
 
         ]);
         LogActivity::add('Survey', $getSurvey->nama_site, 'edit');
@@ -2418,6 +2422,7 @@ class AdminController extends Controller
             'bandwidth_baru' => 'required|string',
             'satuan' => 'required|string',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+            'keterangan' => 'nullable|string',
 
         ]);
 
@@ -2429,6 +2434,8 @@ class AdminController extends Controller
             'satuan' => $validated['satuan'],
             'admin_id' => Auth::user()->id,
             'status' => 'Pending', // Default status
+            'keterangan' => $validated['keterangan'],
+
         ]);
 
         Status::create([
@@ -2558,6 +2565,7 @@ class AdminController extends Controller
             'satuan' => 'required|in:Gbps,Mbps,Kbps,RU(RACK UNIT),CORE,PAIR',
             'online_billing_id' => 'required|exists:online_billings,id',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120', // Tambahkan ini
+            'keterangan' => 'nullable|string',
 
         ]);
 
@@ -2584,6 +2592,7 @@ class AdminController extends Controller
             'satuan' => $request->satuan,
             'online_billing_id' => $request->online_billing_id,
             'attachments' => $uploadedFiles,
+            'keterangan' => $request->keterangan,
 
         ]);
         LogActivity::add('Downgrade', $workOrder->onlineBilling->nama_site, 'edit');
