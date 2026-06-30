@@ -227,6 +227,10 @@
                                     <p><strong>Alamat:</strong> {{ $getUpgrade->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getUpgrade->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getUpgrade->onlineBilling->no_pic }}</p>
+                                    <p>
+                                        <strong>Tanggal RFS:</strong>
+                                        {{ $getUpgrade->tanggal_rfs?->translatedFormat('d M Y') ?? '-' }}
+                                    </p>
                                     <p><strong>Alamat Baru:</strong> {{ $getUpgrade->alamat_pemasangan_baru }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getUpgrade->keterangan }}</p>
                                     <p><strong>Barang non stock:</strong> {{ $getUpgrade->non_stock }}</p>

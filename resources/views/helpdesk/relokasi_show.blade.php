@@ -188,8 +188,10 @@
                                     <p><strong>Alamat:</strong> {{ $getRelokasi->onlineBilling->alamat_pemasangan }}</p>
                                     <p><strong>PIC:</strong> {{ $getRelokasi->onlineBilling->nama_pic }}</p>
                                     <p><strong>Nomer PIC:</strong> {{ $getRelokasi->onlineBilling->no_pic }}</p>
-                                    <p><strong>Tanggal RFS:</strong> {{ \Carbon\Carbon::parse($getRelokasi->tanggal_rfs)->translatedFormat('d M Y') }}</p>
-
+                                    <p>
+                                        <strong>Tanggal RFS:</strong>
+                                        {{ $getRelokasi->tanggal_rfs?->translatedFormat('d M Y') ?? '-' }}
+                                    </p>
                                     <p><strong>Alamat Baru:</strong> {{ $getRelokasi->alamat_pemasangan_baru }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getRelokasi->keterangan }}</p>
                                     <p><strong>Barang non stock:</strong> {{ $getRelokasi->non_stock }}</p>

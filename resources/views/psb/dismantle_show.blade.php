@@ -184,8 +184,10 @@
                                     <p><strong>PIC:</strong> {{ $getDismantle->onlineBilling->nama_pic }}</p>
 
                                     <p><strong>Nomer PIC:</strong> {{ $getDismantle->onlineBilling->no_pic }}</p>
-                                    <p><strong>Tanggal RFS:</strong> {{ \Carbon\Carbon::parse($getDismantle->tanggal_rfs)->translatedFormat('d M Y') }}</p>
-
+                                    <p>
+                                        <strong>Tanggal RFS:</strong>
+                                        {{ $getDismantle->tanggal_rfs?->translatedFormat('d M Y') ?? '-' }}
+                                    </p>
                                     <p><strong>Vendor:</strong> {{ $getDismantle->onlineBilling->vendor?->nama_vendor }}</p>
                                     <p><strong>Keterangan:</strong> {{ $getDismantle->keterangan }}</p>
 
