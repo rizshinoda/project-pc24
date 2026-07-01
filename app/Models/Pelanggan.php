@@ -24,4 +24,8 @@ class Pelanggan extends Model
     {
         return $this->hasMany(WorkOrderSurvey::class, 'pelanggan_id');
     }
+    public function onlineBillings()
+    {
+        return $this->hasMany(OnlineBilling::class, 'pelanggan_id');
+    }
 }
