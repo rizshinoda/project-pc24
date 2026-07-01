@@ -23,6 +23,8 @@ class WorkOrderRelokasi extends Model
     ];
     protected $casts = [
         'attachments' => 'array', // penting supaya JSON di DB otomatis jadi array di PHP
+        'tanggal_rfs' => 'date',
+
     ];
     /**
      * Relationship with the OnlineBilling model.
