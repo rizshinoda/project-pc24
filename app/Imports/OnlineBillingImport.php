@@ -79,7 +79,7 @@ class OnlineBillingImport implements ToModel, WithHeadingRow, WithChunkReading
             'tanggal_instalasi' => isset($row['tanggal_instalasi']) ? $this->excelDateToDate($row['tanggal_instalasi']) : null,
             'durasi'            => $row['durasi'] ?? null,
             'nama_durasi'       => $row['nama_durasi'] ?? null,
-            'harga_sewa'        => $row['bulanan'] ?? null,
+            'harga_sewa'        => $row['harga_sewa'] ?? null,
             'sid_vendor'        => $row['sid_vendor'] ?? null,
             'admin_id'          => Auth::id() ?? 1,
             'status'            => $row['status'] ?? 'active',
