@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OnlineBillingExport;
 use App\Exports\WorkOrderDismantleExport;
 use App\Exports\WorkOrderDowngradeExport;
 use App\Exports\WorkOrderGantiVendorExport;
@@ -4376,16 +4377,10 @@ class AdminController extends Controller
     */
         $no_jaringan = null;
 
-        if ($pelanggans->count() > 0) {
-            $firstPelanggan = $pelanggans->first();
+        $kodePelanggan = 'C' . str_pad($getSurvey->pelanggan_id, 2, '0', STR_PAD_LEFT);
+        $periode = now()->format('Ym');
 
-            $kodePelanggan = 'C' . str_pad($firstPelanggan->id, 2, '0', STR_PAD_LEFT);
-            $periode = now()->format('Y-m');
-
-            // Pakai serial yang sama dengan SPK
-            $no_jaringan = $kodePelanggan . '-' . $periode . $serial;
-        }
-
+        $no_jaringan = $kodePelanggan . '-' . $periode . $serial;
         // Gabungkan data role
         $data = array_merge(
             $this->ambilDataRole(),
@@ -5684,5 +5679,10 @@ class AdminController extends Controller
         }
 
         return redirect()->route('admin.wo_poc_show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    public function exportOB()
+    {
+        return Excel::download(new OnlineBillingExport, ' Laporan OnlineBilling.xlsx');
     }
 }

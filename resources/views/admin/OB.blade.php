@@ -211,6 +211,8 @@
                                         <!-- Tombol Filter -->
                                         <div class="">
                                             <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
+                                            <a href="{{ route('admin.work-OB.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a>
+
 
                                         </div>
                                     </div>
