@@ -177,14 +177,19 @@
                                                         <option value="">Pilih Pelanggan</option>
 
                                                         @foreach ($pelanggans as $pelanggan)
+                                                        @php
+                                                        $kodePelanggan = 'C' . str_pad($pelanggan->id, 2, '0', STR_PAD_LEFT);
+                                                        @endphp
+
                                                         <option value="{{ $pelanggan->id }}"
                                                             data-id="{{ $pelanggan->id }}"
+                                                            data-kode="{{ $kodePelanggan }}"
                                                             data-nama-gedung="{{ $pelanggan->nama_gedung }}"
                                                             data-alamat="{{ $pelanggan->alamat }}"
                                                             data-no-pelanggan="{{ $pelanggan->no_pelanggan }}"
                                                             data-foto="{{ asset('storage/pelanggan/' . $pelanggan->foto) }}">
 
-                                                            {{ $pelanggan->nama_pelanggan }}
+                                                            {{ $pelanggan->nama_pelanggan }} ({{ $kodePelanggan }})
                                                         </option>
                                                         @endforeach
 

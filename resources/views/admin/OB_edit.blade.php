@@ -165,6 +165,9 @@
                                                     <select class="form-control" id="pelanggan_id" name="pelanggan_id" required>
                                                         <option value="">Pilih Pelanggan</option>
                                                         @foreach ($pelanggans as $pelanggan)
+                                                        @php
+                                                        $kodePelanggan = 'C' . str_pad($pelanggan->id, 2, '0', STR_PAD_LEFT);
+                                                        @endphp
                                                         <option value="{{ $pelanggan->id }}"
                                                             data-nama-gedung="{{ $pelanggan->nama_gedung }}"
                                                             data-alamat="{{ $pelanggan->alamat }}"
@@ -172,7 +175,7 @@
                                                             data-foto="{{ asset('storage/pelanggan/' . $pelanggan->foto) }}"
 
                                                             {{ $getOB->pelanggan_id == $pelanggan->id ? 'selected' : '' }}>
-                                                            {{ $pelanggan->nama_pelanggan }}
+                                                            {{ $pelanggan->nama_pelanggan }} ({{ $kodePelanggan }})
                                                         </option>
                                                         @endforeach
                                                     </select>

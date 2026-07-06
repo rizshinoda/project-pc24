@@ -268,6 +268,8 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::get('admin/work-order-relokasi/export', [AdminController::class, 'exportWoRelokasi'])->name('work-order-relokasi.export');
     Route::get('admin/work-order-gantivendor/export', [AdminController::class, 'exportWoGantiVendor'])->name('work-order-gantivendor.export');
 
+    Route::get('admin/Online-Billing/export', [AdminController::class, 'exportOB'])->name('admin.work-OB.export');
+
     Route::post('admin/OB/import-online-billing', [AdminController::class, 'import'])->name('import.proses');
 });
 
