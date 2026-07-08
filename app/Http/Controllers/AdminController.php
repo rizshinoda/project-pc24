@@ -3897,35 +3897,39 @@ class AdminController extends Controller
     {
         // Validasi request
         $validatedData = $request->validate([
-            'pelanggan_id' => 'required|exists:pelanggans,id',
-            'vendor_id' => 'required|exists:vendors,id',
-            'instansi_id' => 'required|exists:instansis,id',
-            'nama_site' => 'required|string',
+            'pelanggan_id'      => 'required|exists:pelanggans,id',
+            'vendor_id'         => 'required|exists:vendors,id',
+            'instansi_id'       => 'required|exists:instansis,id',
+            'nama_site'         => 'required|string',
             'alamat_pemasangan' => 'required|string',
-            'nama_pic' => 'nullable|string',
-            'no_pic' => 'nullable|string',
-            'layanan' => 'required|string',
-            'media' => 'required|string',
-            'bandwidth' => 'required|string',
-            'provinsi' => 'required|string',
-            'satuan' => 'required|string',
-            'nni' => 'nullable|string',
-            'vlan' => 'nullable|string',
-            'no_jaringan' => 'nullable|string',
-            'tanggal_mulai' => 'nullable|date',
-            'tanggal_akhir' => 'nullable|date',
-            'durasi' => 'nullable|integer',
-            'sid_vendor' => 'nullable|string',
-            'nama_durasi' => 'nullable|string',
-            'harga_sewa_hidden' => 'required|integer',
-            'status' => 'required|in:active,dismantle',
+            'nama_pic'          => 'nullable|string',
+            'no_pic'            => 'nullable|string',
+            'layanan'           => 'required|string',
+            'media'             => 'required|string',
+            'bandwidth'         => 'required|string',
+            'provinsi'          => 'required|string',
+            'satuan'            => 'required|string',
+            'nni'               => 'nullable|string',
+            'vlan'              => 'nullable|string',
+            'no_jaringan'       => 'nullable|string',
+            'tanggal_mulai'     => 'nullable|date',
+            'tanggal_akhir'     => 'nullable|date',
+            'durasi'            => 'nullable|integer',
+            'sid_vendor'        => 'nullable|string',
+            'nama_durasi'       => 'nullable|string',
+            'harga_sewa'        => 'required|string',
+            'status'            => 'required|in:active,dismantle',
         ]);
 
-        // Temukan data Work Order Install
+        // Ubah format Rupiah menjadi angka
+        $validatedData['harga_sewa'] = (int) preg_replace('/\D/', '', $request->harga_sewa);
+
+        // Temukan data Online Billing
         $workOrder = OnlineBilling::findOrFail($id);
 
         // Update foto jika ada
         if ($request->hasFile('foto')) {
+
             // Hapus foto lama jika ada
             if ($workOrder->foto) {
                 Storage::delete('public/surveys/' . $workOrder->foto);
@@ -3939,35 +3943,33 @@ class AdminController extends Controller
             $workOrder->foto = $filename;
         }
 
-        // Update data Work Order Install
+        // Update data Online Billing
         $workOrder->update([
-            'pelanggan_id' => $validatedData['pelanggan_id'],
-            'instansi_id' => $validatedData['instansi_id'],
-            'vendor_id' => $validatedData['vendor_id'],
-            'nama_site' => $validatedData['nama_site'],
+            'pelanggan_id'      => $validatedData['pelanggan_id'],
+            'instansi_id'       => $validatedData['instansi_id'],
+            'vendor_id'         => $validatedData['vendor_id'],
+            'nama_site'         => $validatedData['nama_site'],
             'alamat_pemasangan' => $validatedData['alamat_pemasangan'],
-            'nama_pic' => $validatedData['nama_pic'],
-            'no_pic' => $validatedData['no_pic'],
-            'layanan' => $validatedData['layanan'],
-            'media' => $validatedData['media'],
-            'bandwidth' => $validatedData['bandwidth'],
-            'satuan' => $validatedData['satuan'],
-            'nni' => $validatedData['nni'],
-            'provinsi' => $validatedData['provinsi'],
-            'vlan' => $validatedData['vlan'],
-            'no_jaringan' => $validatedData['no_jaringan'],
-            'tanggal_mulai' => $validatedData['tanggal_mulai'],
-            'tanggal_akhir' => $validatedData['tanggal_akhir'],
-            'durasi' => $validatedData['durasi'],
-            'nama_durasi' => $validatedData['nama_durasi'],
-            'harga_sewa' => $validatedData['harga_sewa_hidden'],
-            'sid_vendor' => $validatedData['sid_vendor'],
-
+            'nama_pic'          => $validatedData['nama_pic'],
+            'no_pic'            => $validatedData['no_pic'],
+            'layanan'           => $validatedData['layanan'],
+            'media'             => $validatedData['media'],
+            'bandwidth'         => $validatedData['bandwidth'],
+            'satuan'            => $validatedData['satuan'],
+            'nni'               => $validatedData['nni'],
+            'provinsi'          => $validatedData['provinsi'],
+            'vlan'              => $validatedData['vlan'],
+            'no_jaringan'       => $validatedData['no_jaringan'],
+            'tanggal_mulai'     => $validatedData['tanggal_mulai'],
+            'tanggal_akhir'     => $validatedData['tanggal_akhir'],
+            'durasi'            => $validatedData['durasi'],
+            'nama_durasi'       => $validatedData['nama_durasi'],
+            'harga_sewa'        => $validatedData['harga_sewa'],
+            'sid_vendor'        => $validatedData['sid_vendor'],
         ]);
 
-
-
-        return redirect()->route('admin.OB')->with('success', 'Online Billing berhasil diperbarui.');
+        return redirect()->route('admin.OB')
+            ->with('success', 'Online Billing berhasil diperbarui.');
     }
     public function showMonitoring($id)
     {

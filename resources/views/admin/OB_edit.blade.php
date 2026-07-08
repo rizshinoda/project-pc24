@@ -349,12 +349,12 @@
                                                 <label for="harga_sewa" class="col-sm-4 col-form-label">Harga Sewa</label>
                                                 <div class="col-sm-8">
                                                     <input type="text"
+                                                        type="text"
                                                         name="harga_sewa"
                                                         id="harga_sewa"
                                                         class="form-control"
-                                                        value="{{ old('harga_sewa', number_format($getOB->harga_sewa, 0, ',', '.')) }}"
-                                                        onkeyup="formatRupiah(this)"
-                                                        required>
+                                                        value="{{ old('harga_sewa', 'Rp. '.number_format($getOB->harga_sewa,0,',','.')) }}"
+                                                        onkeyup="formatRupiah(this)">
                                                     <!-- Hidden input untuk angka murni -->
                                                     <input type="hidden" name="harga_sewa_hidden" id="harga_sewa_hidden" value="{{ old('harga_sewa_hidden', $getOB->harga_sewa) }}">
                                                 </div>
