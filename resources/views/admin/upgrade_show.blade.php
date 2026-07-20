@@ -225,34 +225,212 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">
-                                        <i class="mdi mdi-paperclip"></i> Lampiran Work Order
-                                    </h4>
 
-                                    @if (!empty($getUpgrade->attachments))
+                            <div class="card">
+
+                                <div class="card-body">
+
+                                    <h4 class="card-title d-flex justify-content-between align-items-center">
+
+                                        <h4 class="card-title">
+                                            <i class="mdi mdi-paperclip"></i>
+                                            Lampiran Work Order
+                                        </h4>
+
+                                    </h4>
+                                    <div class="text-right mb-3">
+
+                                        <button
+                                            class="btn btn-info btn-sm"
+                                            data-toggle="modal"
+                                            data-target="#uploadAttachment">
+
+                                            <i class="mdi mdi-plus"></i>
+
+                                            Tambah Lampiran
+
+                                        </button>
+
+                                    </div>
+                                    @if(!empty($getUpgrade->attachments))
+
                                     <div class="list-group">
-                                        @foreach ($getUpgrade->attachments as $file)
-                                        <a href="{{ asset('storage/'.$file) }}"
-                                            target="_blank"
-                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                                        @foreach($getUpgrade->attachments as $index => $file)
+
+                                        @php
+                                        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+                                        $icon = match($ext){
+                                        'pdf' => 'mdi-file-pdf text-danger',
+                                        'jpg','jpeg','png' => 'mdi-file-image text-success',
+                                        'doc','docx' => 'mdi-file-word text-primary',
+                                        'xls','xlsx' => 'mdi-file-excel text-success',
+                                        default => 'mdi-file'
+                                        };
+                                        @endphp
+
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
 
                                             <span>
                                                 <i class="mdi mdi-file"></i>
-                                                {{ basename($file) }}
+
+                                                <a href="{{ asset('storage/'.$file) }}"
+                                                    target="_blank"
+                                                    class="text-dark text-decoration-none">
+
+                                                    {{ preg_replace('/^\d+_/', '', basename($file)) }}
+
+                                                </a>
                                             </span>
 
-                                            <span class="badge badge-info">Download</span>
-                                        </a>
+                                            <div>
+
+                                                <a href="{{ asset('storage/'.$file) }}"
+                                                    target="_blank"
+                                                    class="btn btn-info btn-sm">
+
+                                                    <i class="mdi mdi-download"></i>
+                                                    Download
+
+                                                </a>
+
+                                                <form
+                                                    id="delete-form-{{ $index }}"
+                                                    action="{{ route('attachment.delete.admin',[
+                                                'type'=>$woType,
+                                                'id'=>$getUpgrade->id,
+                                                'index'=>$index
+                                        ]) }}"
+                                                    method="POST"
+                                                    class="d-inline">
+
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-danger btn-sm"
+                                                        onclick="confirmDelete('{{ $index }}')">
+
+                                                        <i class="mdi mdi-delete"></i>
+                                                        Hapus
+
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+
                                         @endforeach
+
                                     </div>
+
                                     @else
+
                                     <p class="text-muted mb-0">Tidak ada file terlampir.</p>
+
+
                                     @endif
+
+
+
                                 </div>
+
                             </div>
+
                         </div>
+
+                    </div>
+                    <div class="modal fade" id="uploadAttachment">
+
+                        <div class="modal-dialog">
+
+                            <form
+                                action="{{ route('attachment.store.admin',[
+                    'type'=>$woType,
+                    'id'=>$getUpgrade->id
+            ]) }}"
+                                method="POST"
+                                enctype="multipart/form-data">
+
+                                @csrf
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+                                            Tambah Lampiran
+                                        </h5>
+
+                                        <button
+                                            type="button"
+                                            class="close"
+                                            data-dismiss="modal">
+
+                                            &times;
+
+                                        </button>
+
+                                    </div>
+
+                                    <div class="modal-body">
+
+                                        <div class="form-group">
+
+                                            <label>Pilih File</label>
+
+                                            <input
+                                                type="file"
+                                                name="attachments[]"
+                                                class="form-control"
+                                                multiple
+                                                required>
+
+                                            <small class="text-muted">
+
+                                                PDF, DOC, DOCX, JPG, JPEG, PNG
+                                                <br>
+                                                Maksimal 5 MB / File.
+
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="modal-footer">
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary"
+                                            data-dismiss="modal">
+
+                                            Batal
+
+                                        </button>
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-info">
+
+                                            <i class="mdi mdi-upload"></i>
+
+                                            Upload
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
                     </div>
                     <div class="container mt-4">
                         @php

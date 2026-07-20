@@ -738,21 +738,42 @@ class AdminController extends Controller
     }
     public function showinstalasi($id)
     {
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        // Notifikasi
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
 
-        // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
+        // Progress Instalasi
         $progressList = InstallProgress::where('work_order_install_id', $id)->get();
 
-        // Menampilkan detail work order
-        $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')->findOrFail($id);
-        // Cek apakah sudah ada di tabel online_billing
-        $billingExists = OnlineBilling::where('work_order_install_id', $getInstall->id)->exists();
-        // Mendapatkan berita acara yang terkait dengan work order ini
-        $beritaAcara = $getInstall->beritaAcara;        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('billingExists', 'beritaAcara', 'progressList', 'getInstall', 'notifications'));
+        // Detail WO
+        $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')
+            ->findOrFail($id);
 
-        // Render view berdasarkan role
+        // Billing
+        $billingExists = OnlineBilling::where(
+            'work_order_install_id',
+            $getInstall->id
+        )->exists();
+
+        // Berita Acara
+        $beritaAcara = $getInstall->beritaAcara;
+
+        // Jenis WO
+        $woType = 'instalasi';
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'billingExists',
+                'beritaAcara',
+                'progressList',
+                'getInstall',
+                'notifications',
+                'woType'
+            )
+        );
+
         return $this->renderView('wo_instalasi_show', $data);
     }
 
@@ -1726,9 +1747,10 @@ class AdminController extends Controller
         // Menampilkan detail work order
         $getSurvey = WorkOrderSurvey::with('admin')->findOrFail($id);
         $beritaAcara = $getSurvey->beritaAcara;        // Gabungkan data survey ke dalam data role
+        $woType = 'survey';
 
         // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('beritaAcara', 'getSurvey', 'progressList', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('woType', 'beritaAcara', 'getSurvey', 'progressList', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('wo_survey_show', $data);
@@ -2254,6 +2276,7 @@ class AdminController extends Controller
         $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
         // Gabungkan data survey ke dalam data role
         $progressList = UpgradeProgress::where('work_order_upgrade_id', $id)->get();
+        $woType = 'upgrade';
 
         // Menampilkan detail work order dengan relasi ke onlineBilling dan admin
         $getUpgrade = WorkOrderUpgrade::with([
@@ -2265,7 +2288,7 @@ class AdminController extends Controller
         $beritaAcara = $getUpgrade->beritaAcara;        // Gabungkan data survey ke dalam data role
 
         // Gabungkan data ke dalam array data role
-        $data = array_merge($this->ambilDataRole(), compact('beritaAcara', 'progressList', 'getUpgrade', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('woType', 'beritaAcara', 'progressList', 'getUpgrade', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('upgrade_show', $data);
@@ -2641,7 +2664,7 @@ class AdminController extends Controller
         $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
         // Gabungkan data survey ke dalam data role
         $progressList = DowngradeProgress::where('work_order_downgrade_id', $id)->get();
-
+        $woType = 'downgrade';
         // Menampilkan detail work order dengan relasi ke onlineBilling dan admin
         $getDowngrade = WorkOrderDowngrade::with([
             'admin',
@@ -2652,7 +2675,7 @@ class AdminController extends Controller
         $beritaAcara = $getDowngrade->beritaAcara;        // Gabungkan data survey ke dalam data role
 
         // Gabungkan data ke dalam array data role
-        $data = array_merge($this->ambilDataRole(), compact('beritaAcara', 'progressList', 'getDowngrade', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('woType', 'beritaAcara', 'progressList', 'getDowngrade', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('downgrade_show', $data);
@@ -3005,9 +3028,9 @@ class AdminController extends Controller
             'onlineBilling.instansi'
         ])->findOrFail($id);
         $beritaAcara = $getDismantle->beritaAcara;        // Gabungkan data survey ke dalam data role
-
+        $woType = 'dismantle';
         // Gabungkan data ke dalam array data role
-        $data = array_merge($this->ambilDataRole(), compact('beritaAcara', 'dismantleItems', 'progressList', 'getDismantle', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('woType', 'beritaAcara', 'dismantleItems', 'progressList', 'getDismantle', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('dismantle_show', $data);
@@ -3402,11 +3425,11 @@ class AdminController extends Controller
 
         // Menampilkan detail work order
         $getRelokasi = WorkOrderRelokasi::with('WorkOrderRelokasiDetail.stockBarang')->findOrFail($id);
-
+        $woType = 'relokasi';
         $beritaAcara = $getRelokasi->beritaAcara;        // Gabungkan data survey ke dalam data role
 
         // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('beritaAcara', 'progressList', 'getRelokasi', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('woType', 'beritaAcara', 'progressList', 'getRelokasi', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('relokasi_show', $data);
@@ -5686,5 +5709,88 @@ class AdminController extends Controller
     public function exportOB()
     {
         return Excel::download(new OnlineBillingExport, ' Laporan OnlineBilling.xlsx');
+    }
+
+
+    private function getWorkOrderModel($type)
+    {
+        return match ($type) {
+
+            'survey'        => WorkOrderSurvey::class,
+
+            'instalasi'     => WorkOrderInstall::class,
+
+            'upgrade'       => WorkOrderUpgrade::class,
+
+            'downgrade'     => WorkOrderDowngrade::class,
+
+            'relokasi'      => WorkOrderRelokasi::class,
+
+            'maintenance'   => WorkOrderMaintenance::class,
+
+            'dismantle'     => WorkOrderDismantle::class,
+
+            'gantivendor'   => WorkOrderGantiVendor::class,
+
+            default => abort(404)
+        };
+    }
+
+    public function storeAttachment(Request $request, $type, $id)
+    {
+        $request->validate([
+            'attachments.*' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+        ]);
+
+        $model = $this->getWorkOrderModel($type);
+
+        $workOrder = $model::findOrFail($id);
+
+        $attachments = $workOrder->attachments ?? [];
+
+        if ($request->hasFile('attachments')) {
+
+            foreach ($request->file('attachments') as $file) {
+
+                $filename =  $file->getClientOriginalName();
+
+                $path = $file->storeAs(
+                    "attachments/$type",
+                    $filename,
+                    'public'
+                );
+
+                $attachments[] = $path;
+            }
+        }
+
+        $workOrder->attachments = $attachments;
+        $workOrder->save();
+
+        return back()->with('success', 'Lampiran berhasil ditambahkan.');
+    }
+
+    public function deleteAttachment($type, $id, $index)
+    {
+        $model = $this->getWorkOrderModel($type);
+
+        $workOrder = $model::findOrFail($id);
+
+        $attachments = $workOrder->attachments ?? [];
+
+        if (!isset($attachments[$index])) {
+
+            return back()->with('error', 'Lampiran tidak ditemukan.');
+        }
+
+        Storage::disk('public')->delete($attachments[$index]);
+
+        unset($attachments[$index]);
+
+        $workOrder->attachments = array_values($attachments);
+
+        $workOrder->save();
+
+        return back()->with('success', 'Lampiran berhasil dihapus.');
     }
 }
