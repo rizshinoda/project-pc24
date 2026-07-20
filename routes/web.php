@@ -271,6 +271,15 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::get('admin/Online-Billing/export', [AdminController::class, 'exportOB'])->name('admin.work-OB.export');
 
     Route::post('admin/OB/import-online-billing', [AdminController::class, 'import'])->name('import.proses');
+    Route::post(
+        'admin/attachment/{type}/{id}',
+        [AdminController::class, 'storeAttachment']
+    )->name('attachment.store.admin');
+
+    Route::delete(
+        'admin/attachment/{type}/{id}/{index}',
+        [AdminController::class, 'deleteAttachment']
+    )->name('attachment.delete.admin');
 });
 
 Route::group(['middleware' => ['ga', SessionTimeout::class]], function () {
@@ -503,6 +512,16 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
     Route::get('helpdesk/chat', Index::class)->name('helpdesk.chat.index');
     Route::get('helpdesk/chat/{query}', Chat::class)->name('helpdesk.chat');
     Route::get('helpdesk/users', Users::class)->name('helpdesk.users');
+
+    Route::post(
+        'helpdesk/attachment/{type}/{id}',
+        [HelpdeskController::class, 'storeAttachment']
+    )->name('attachment.store.hd');
+
+    Route::delete(
+        'helpdesk/attachment/{type}/{id}/{index}',
+        [HelpdeskController::class, 'deleteAttachment']
+    )->name('attachment.delete.hd');
 });
 
 Route::group(['middleware' => ['na', SessionTimeout::class]], function () {

@@ -47,6 +47,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use setasign\Fpdi\Fpdi;
@@ -1344,9 +1345,10 @@ class HelpdeskController extends Controller
             'onlineBilling.vendor',
             'onlineBilling.instansi'
         ])->findOrFail($id);
+        $woType = 'gantivendor';
 
         // Gabungkan data ke dalam array data role
-        $data = array_merge($this->ambilDataRole(), compact('progressList', 'getGantivendor', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('woType', 'progressList', 'getGantivendor', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('gantivendor_show', $data);
@@ -3065,6 +3067,88 @@ class HelpdeskController extends Controller
         }
 
         return redirect()->route('hd.poc_show', $id)->with('success', 'Progress berhasil ditambahkan.');
+    }
+
+    private function getWorkOrderModel($type)
+    {
+        return match ($type) {
+
+            'survey'        => WorkOrderSurvey::class,
+
+            'instalasi'     => WorkOrderInstall::class,
+
+            'upgrade'       => WorkOrderUpgrade::class,
+
+            'downgrade'     => WorkOrderDowngrade::class,
+
+            'relokasi'      => WorkOrderRelokasi::class,
+
+            'maintenance'   => WorkOrderMaintenance::class,
+
+            'dismantle'     => WorkOrderDismantle::class,
+
+            'gantivendor'   => WorkOrderGantiVendor::class,
+
+            default => abort(404)
+        };
+    }
+
+    public function storeAttachment(Request $request, $type, $id)
+    {
+        $request->validate([
+            'attachments.*' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+        ]);
+
+        $model = $this->getWorkOrderModel($type);
+
+        $workOrder = $model::findOrFail($id);
+
+        $attachments = $workOrder->attachments ?? [];
+
+        if ($request->hasFile('attachments')) {
+
+            foreach ($request->file('attachments') as $file) {
+
+                $filename = $file->getClientOriginalName();
+
+                $path = $file->storeAs(
+                    "attachments/$type",
+                    $filename,
+                    'public'
+                );
+
+                $attachments[] = $path;
+            }
+        }
+
+        $workOrder->attachments = $attachments;
+        $workOrder->save();
+
+        return back()->with('success', 'Lampiran berhasil ditambahkan.');
+    }
+
+    public function deleteAttachment($type, $id, $index)
+    {
+        $model = $this->getWorkOrderModel($type);
+
+        $workOrder = $model::findOrFail($id);
+
+        $attachments = $workOrder->attachments ?? [];
+
+        if (!isset($attachments[$index])) {
+
+            return back()->with('error', 'Lampiran tidak ditemukan.');
+        }
+
+        Storage::disk('public')->delete($attachments[$index]);
+
+        unset($attachments[$index]);
+
+        $workOrder->attachments = array_values($attachments);
+
+        $workOrder->save();
+
+        return back()->with('success', 'Lampiran berhasil dihapus.');
     }
 }
 
