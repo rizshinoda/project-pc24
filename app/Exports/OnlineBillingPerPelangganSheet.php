@@ -44,7 +44,9 @@ class OnlineBillingPerPelangganSheet extends DefaultValueBinder implements
 
     public function collection()
     {
-        return OnlineBilling::where('pelanggan_id', $this->pelanggan->id)->get();
+        return OnlineBilling::where('pelanggan_id', $this->pelanggan->id)
+            ->where('status', 'active')
+            ->get();
     }
 
     /**

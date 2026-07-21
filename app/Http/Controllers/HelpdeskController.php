@@ -16,12 +16,14 @@ use App\Models\GantiVendorProgress;
 use App\Models\GantiVendorProgressPhoto;
 use App\Models\InstallProgress;
 use App\Models\InstallProgressPhoto;
+use App\Models\Instansi;
 use App\Models\Jenis;
 use App\Models\MaintenanceProgress;
 use App\Models\MaintenanceProgressPhoto;
 use App\Models\NomorSurat;
 use App\Models\Notification;
 use App\Models\OnlineBilling;
+use App\Models\Pelanggan;
 use App\Models\RelokasiProgress;
 use App\Models\RelokasiProgressPhoto;
 use App\Models\ReqBarangProgress;
@@ -33,6 +35,7 @@ use App\Models\StockBarang;
 use App\Models\UpgradeProgress;
 use App\Models\UpgradeProgressPhoto;
 use App\Models\User;
+use App\Models\Vendor;
 use App\Models\WorkOrderDismantle;
 use App\Models\WorkOrderDowngrade;
 use App\Models\WorkOrderGantiVendor;
@@ -1393,68 +1396,228 @@ class HelpdeskController extends Controller
     }
     public function OB(Request $request)
     {
-        // Ambil parameter dari request
-        $status = $request->get('status', 'active'); // Default status ke 'active'
+        /*
+    |--------------------------------------------------------------------------
+    | Parameter Filter
+    |--------------------------------------------------------------------------
+    */
+
+        $status = $request->get('status', 'active');
         $search = $request->get('search');
-        $month = $request->get('month');
-        $year = $request->get('year');
-        $provinsi = $request->get('provinsi'); // Ambil provinsi
+        $month  = $request->get('month');
+        $year   = $request->get('year');
 
-        // Query untuk mendapatkan data survey
-        $query = OnlineBilling::orderBy('created_at', 'desc');
+        $field  = $request->get('field');
+        $value  = $request->get('value');
 
-        // Filter berdasarkan status
+        /*
+    |--------------------------------------------------------------------------
+    | Query
+    |--------------------------------------------------------------------------
+    */
+
+        $query = OnlineBilling::with([
+            'pelanggan',
+            'instansi',
+            'vendor',
+            'admin'
+        ])->orderBy('created_at', 'desc');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Status
+    |--------------------------------------------------------------------------
+    */
+
         if ($status != 'all') {
             $query->where('status', $status);
         }
-        // Filter berdasarkan provinsi
-        if (!empty($provinsi)) {
-            $query->where('provinsi', $provinsi);
-        }
-        // Pencarian di semua kolom yang relevan (nama pelanggan, instansi, nama site, dan nama admin)
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                    $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                })
-                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
-                    })
-                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
-                    ->orWhere('no_jaringan', 'like', '%' . $search . '%')
 
-                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
-                        $q->where('name', 'like', '%' . $search . '%');
-                    });
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
+        if (!empty($search)) {
+
+            $query->where(function ($q) use ($search) {
+
+                $q->whereHas('pelanggan', function ($q) use ($search) {
+
+                    $q->where('nama_pelanggan', 'like', "%{$search}%");
+                })
+
+                    ->orWhereHas('instansi', function ($q) use ($search) {
+
+                        $q->where('nama_instansi', 'like', "%{$search}%");
+                    })
+
+                    ->orWhereHas('admin', function ($q) use ($search) {
+
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+
+                    ->orWhere('nama_site', 'like', "%{$search}%")
+                    ->orWhere('no_jaringan', 'like', "%{$search}%");
             });
         }
 
-        // Filter berdasarkan bulan dan tahun
-        if (!empty($month) && !empty($year)) {
-            $query->whereMonth('created_at', $month)
-                ->whereYear('created_at', $year);
-        } elseif (!empty($year)) {
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Tahun
+    |--------------------------------------------------------------------------
+    */
+
+        if (!empty($year)) {
             $query->whereYear('created_at', $year);
         }
 
-        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $onlinebilling = $query->paginate(10)->appends([
-            'status' => $status,
-            'search' => $search,
-            'month' => $month,
-            'year' => $year,
-            'provinsi' => $provinsi
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Bulan
+    |--------------------------------------------------------------------------
+    */
 
-        ]);
+        if (!empty($month)) {
+            $query->whereMonth('created_at', $month);
+        }
 
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        /*
+    |--------------------------------------------------------------------------
+    | Dynamic Filter
+    |--------------------------------------------------------------------------
+    */
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('onlinebilling', 'status', 'search', 'month', 'year', 'provinsi', 'notifications'));
+        $filterMap = [
+
+            'vendor'      => 'vendor_id',
+            'pelanggan'   => 'pelanggan_id',
+            'instansi'    => 'instansi_id',
+
+            'provinsi'    => 'provinsi',
+
+
+        ];
+
+        if (
+            !empty($field) &&
+            !empty($value) &&
+            isset($filterMap[$field])
+        ) {
+
+            $query->where(
+                $filterMap[$field],
+                $value
+            );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+        $onlinebilling = $query
+            ->paginate(10)
+            ->appends($request->query());
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Filter
+    |--------------------------------------------------------------------------
+    */
+
+        $vendors = Vendor::orderBy('nama_vendor')->get();
+
+        $pelanggans = Pelanggan::orderBy('nama_pelanggan')->get();
+
+        $instansis = Instansi::orderBy('nama_instansi')->get();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Nilai
+    |--------------------------------------------------------------------------
+    */
+
+        $filterValues = [];
+
+        switch ($field) {
+
+            case 'vendor':
+
+                $filterValues = Vendor::orderBy('nama_vendor')
+                    ->pluck('nama_vendor', 'id');
+
+                break;
+
+            case 'pelanggan':
+
+                $filterValues = Pelanggan::orderBy('nama_pelanggan')
+                    ->pluck('nama_pelanggan', 'id');
+
+                break;
+
+            case 'instansi':
+
+                $filterValues = Instansi::orderBy('nama_instansi')
+                    ->pluck('nama_instansi', 'id');
+
+                break;
+
+
+
+            case 'provinsi':
+
+                $filterValues = OnlineBilling::select('provinsi')
+                    ->whereNotNull('provinsi')
+                    ->distinct()
+                    ->orderBy('provinsi')
+                    ->pluck('provinsi', 'provinsi');
+
+                break;
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Notification
+    |--------------------------------------------------------------------------
+    */
+
+        $notifications = Notification::where(
+            'user_id',
+            Auth::id()
+        )
+            ->where('is_read', false)
+            ->get();
+
+        /*
+    |--------------------------------------------------------------------------
+    | View
+    |--------------------------------------------------------------------------
+    */
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'onlinebilling',
+                'status',
+                'search',
+                'month',
+                'year',
+                'field',
+                'value',
+                'vendors',
+                'pelanggans',
+                'instansis',
+                'filterValues',
+                'notifications'
+            )
+        );
 
         return $this->renderView('OB', $data);
     }
+
 
     public function showOB($id)
     {  // Ambil notifikasi yang belum dibaca
