@@ -809,3 +809,24 @@
         billingOptions
     ).render();
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const field = document.getElementById('field');
+        const form = document.getElementById('filterForm');
+        const auto = document.getElementById('auto');
+
+        field.addEventListener('change', function() {
+
+            // tandai bahwa submit berasal dari perubahan filter
+            auto.value = "1";
+
+            // kosongkan nilai lama
+            document.querySelector('select[name="value"]').value = "";
+
+            form.submit();
+
+        });
+
+    });
+</script>

@@ -26,7 +26,9 @@ class OnlineBillingExport implements WithMultipleSheets
     {
         $sheets = [];
 
-        $pelanggans = Pelanggan::whereHas('onlineBillings')->get();
+        $pelanggans = Pelanggan::whereHas('onlineBillings', function ($query) {
+            $query->where('status', 'active');
+        })->get();
 
         foreach ($pelanggans as $pelanggan) {
             $sheets[] = new OnlineBillingPerPelangganSheet($pelanggan);

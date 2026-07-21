@@ -98,6 +98,7 @@
             <!-- partial -->
 
             <!-- Main Panel -->
+            <!-- Main Panel -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -128,79 +129,208 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4>Daftar Online Billing</h4>
-                                <!-- Form Pencarian dan Filter -->
-                                <form method="GET" action="{{ route('hd.OB') }}" class="mb-4">
+                                <!-- Form Import Excel -->
+                                <!-- <form action="{{ route('import.proses') }}" method="POST" enctype="multipart/form-data" class="mb-3">
+                                    @csrf
                                     <div class="row">
-                                        <!-- Kolom Pencarian -->
-                                        <div class="col-md-6 mb-3">
-                                            <input type="text" name="search" class="form-control contoh1" placeholder="Cari Data" value="{{ request('search') }}">
+                                        <div class="col-md-4">
+                                            <input type="file" name="file" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="submit" class="btn btn-sm btn-success">Import Excel</button>
+                                        </div>
+                                    </div>
+                                </form> -->
+                                <!-- Form Pencarian dan Filter -->
+                                <form id="filterForm" method="GET" action="{{ route('hd.OB') }}" class="mb-4">
+                                    <div class="row">
 
+                                        {{-- Search --}}
+                                        <div class="col-md-4 mb-3">
+
+                                            <input
+                                                type="text"
+                                                name="search"
+                                                class="form-control"
+                                                placeholder="Cari Data"
+                                                value="{{ request('search') }}">
                                         </div>
 
-                                        <!-- Filter Bulan -->
-                                        <div class="col-md-3 mb-3">
-                                            <select name="month" class="form-control">
-                                                <option value="">Pilih Bulan</option>
-                                                @for($m = 1; $m <= 12; $m++)
-                                                    <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>
-                                                    {{ date('F', mktime(0, 0, 0, $m, 1)) }}
-                                                    </option>
-                                                    @endfor
-                                            </select>
-                                        </div>
+                                        {{-- Tahun --}}
+                                        <div class="col-md-2 mb-3">
 
-                                        <!-- Filter Tahun -->
-                                        <div class="col-md-3 mb-3">
-                                            <select name="year" class="form-control">
+                                            <select
+                                                name="year"
+                                                class="form-control">
+
                                                 <option value="">Pilih Tahun</option>
+
                                                 @for($y = date('Y'); $y >= 2020; $y--)
-                                                <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>
+
+                                                <option
+                                                    value="{{ $y }}"
+                                                    {{ request('year') == $y ? 'selected' : '' }}>
+
                                                     {{ $y }}
+
                                                 </option>
+
                                                 @endfor
+
                                             </select>
                                         </div>
-                                        <!-- Filter Provinsi -->
-                                        <div class="col-md-3 mb-3">
-                                            <select name="provinsi" class="form-control">
-                                                <option value="">Pilih Provinsi</option>
-                                                @php
-                                                $listProvinsi = ['Aceh', 'Bali', 'Banten', 'Bengkulu', 'DI Yogyakarta', 'DKI Jakarta', 'Gorontalo', 'Jambi', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Kalimantan Barat', 'Kalimantan Selatan', 'Kalimantan Tengah', 'Kalimantan Timur', 'Kalimantan Utara', 'Bangka Belitung', 'Kepulauan Riau', 'Lampung', 'Maluku', 'Maluku Utara', 'Nusa Tenggara Barat', 'Nusa Tenggara Timur', 'Papua', 'Papua Barat', 'Papua Selatan', 'Papua Tengah', 'Papua Pegunungan', 'Riau', 'Sulawesi Barat', 'Sulawesi Selatan', 'Sulawesi Tengah', 'Sulawesi Tenggara', 'Sulawesi Utara', 'Sumatera Barat', 'Sumatera Selatan', 'Sumatera Utara'];
-                                                @endphp
-                                                @foreach($listProvinsi as $item)
-                                                <option value="{{ $item }}" {{ request('provinsi') == $item ? 'selected' : '' }}>{{ $item }}</option>
+
+                                        {{-- Bulan --}}
+                                        <div class="col-md-2 mb-3">
+
+
+                                            <select
+                                                name="month"
+                                                class="form-control">
+
+                                                <option value="">Pilih Bulan</option>
+
+                                                @for($m = 1; $m <= 12; $m++)
+
+                                                    <option
+                                                    value="{{ $m }}"
+                                                    {{ request('month') == $m ? 'selected' : '' }}>
+
+                                                    {{ date('F', mktime(0,0,0,$m,1)) }}
+
+                                                    </option>
+
+                                                    @endfor
+
+                                            </select>
+
+                                        </div>
+
+                                        {{-- Filter Berdasarkan --}}
+                                        <div class="col-md-2 mb-3">
+
+
+                                            <select
+                                                name="field"
+                                                id="field"
+                                                class="form-control">
+
+                                                <option value="">Pilih Filter</option>
+
+                                                <option value="vendor"
+                                                    {{ request('field')=='vendor' ? 'selected' : '' }}>
+                                                    Vendor
+                                                </option>
+
+                                                <option value="pelanggan"
+                                                    {{ request('field')=='pelanggan' ? 'selected' : '' }}>
+                                                    Pelanggan
+                                                </option>
+
+                                                <option value="instansi"
+                                                    {{ request('field')=='instansi' ? 'selected' : '' }}>
+                                                    Instansi
+                                                </option>
+
+                                                <option value="provinsi"
+                                                    {{ request('field')=='provinsi' ? 'selected' : '' }}>
+                                                    Provinsi
+                                                </option>
+
+
+                                            </select>
+
+                                        </div>
+
+                                        {{-- Nilai --}}
+                                        <div class="col-md-2 mb-3">
+
+
+                                            <select
+                                                name="value"
+                                                class="form-control">
+
+                                                <option value="">Semua</option>
+
+                                                @foreach($filterValues as $id => $text)
+
+                                                <option
+                                                    value="{{ $id }}"
+                                                    {{ request('value') == $id ? 'selected' : '' }}>
+
+                                                    {{ $text }}
+
+                                                </option>
+
                                                 @endforeach
+
                                             </select>
-                                        </div>
-                                        <!-- Tombol Filter -->
-                                        <div class="">
-                                            <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
-                                            <a href="{{ route('work-OB.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a>
 
                                         </div>
 
                                     </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-12">
+                                            <input type="hidden" name="auto" id="auto" value="">
+                                            <button
+                                                type="submit"
+                                                class="btn btn-sm btn-info">
+
+                                                <i class="fa fa-search"></i>
+                                                Cari
+
+                                            </button>
+
+                                            <!-- <a
+                                                href="{{ route('hd.OB') }}"
+                                                class="btn btn-sm btn-secondary">
+
+                                                <i class="fa fa-refresh"></i>
+                                                Reset
+
+                                            </a> -->
+
+                                            <a
+                                                href="{{ route('work-OB.export', request()->query()) }}"
+                                                class="btn btn-sm btn-success pull-right">
+
+                                                <i class="fa fa-file-excel-o"></i>
+                                                Export Excel
+
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
                                 </form>
 
-                                <div class=" table-responsive">
+                                <div class="table-responsive">
                                     <table class="table table-bordered wrap">
-                                        <thead>
+
+                                        <thead class="text-center">
                                             <tr>
-                                                <th style="text-align: center; vertical-align: middle;">No</th>
-                                                <th style="text-align: center; vertical-align: middle;">No <br> Jaringan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Nama <br> Pelanggan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Perusahaan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Nama <br> Site</th>
-                                                <th style="text-align: center; vertical-align: middle;">Alamat <br> Pemasangan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Vlan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Volume</th>
-                                                <th style="text-align: center; vertical-align: middle;">Tanggal <br>Aktif</th>
-                                                <th style="text-align: center; vertical-align: middle;">Aksi</th>
+                                                <th width="5%">No</th>
+                                                <th>No Jaringan</th>
+                                                <th>Nama Pelanggan</th>
+                                                <th>Perusahaan</th>
+                                                <th>Nama Site</th>
+                                                <th>Alamat Pemasangan</th>
+                                                <th>VLAN</th>
+                                                <th>Volume</th>
+                                                <th>Tanggal Aktif</th>
+                                                <th width="10%">Aksi</th>
                                             </tr>
                                         </thead>
+
                                         <tbody>
-                                            @foreach ($onlinebilling as $key => $OB)
+
+                                            @forelse($onlinebilling as $key => $OB)
+
                                             <tr>
+
                                                 <td style=" text-align: center; vertical-align: middle;">{{$onlinebilling->firstItem()+ $key}} </td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->no_jaringan }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->pelanggan->nama_pelanggan }}</td>
@@ -212,32 +342,78 @@
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->vlan }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->bandwidth }} {{ $OB->satuan }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->created_at->format('d M Y') }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">
-                                                    <a href="{{ route('hd.OB_show', $OB->id) }}" class="btn btn-success btn-sm " style="display:inline-block; padding: 8px 11px;"><i class="fa fa-eye"></i></a>
+                                                <td class="text-center">
+
+                                                    <a href="{{ route('hd.OB_show',$OB->id) }}"
+                                                        class="btn btn-success btn-sm"
+                                                        title="Detail">
+
+                                                        <i class="fa fa-eye"></i>
+
+                                                    </a>
+
+
                                                 </td>
+
                                             </tr>
-                                            @endforeach
+
+                                            @empty
+
+                                            <tr>
+
+                                                <td colspan="10" class="text-center">
+
+                                                    Tidak ada data ditemukan.
+
+                                                </td>
+
+                                            </tr>
+
+                                            @endforelse
+
                                         </tbody>
+
                                     </table>
                                 </div>
-                                <div class="mt-3">
-                                    Showing
-                                    {{$onlinebilling->firstItem()}}
-                                    to
-                                    {{$onlinebilling->lastItem()}}
-                                    of
-                                    {{$onlinebilling->total()}}
-                                    entries
+                                <div class="row mt-3">
+
+                                    <div class="col-md-6">
+
+                                        @if($onlinebilling->count())
+
+                                        Showing
+
+                                        {{ $onlinebilling->firstItem() }}
+
+                                        to
+
+                                        {{ $onlinebilling->lastItem() }}
+
+                                        of
+
+                                        {{ $onlinebilling->total() }}
+
+                                        entries
+
+                                        @else
+
+                                        Showing 0 entries
+
+                                        @endif
+
+                                    </div>
+
 
                                 </div>
-                                <div class="pull-right">
+
+                                <div class=" pull-right">
+
                                     {{ $onlinebilling->links() }}
+
                                 </div>
 
                             </div>
-
                         </div>
-
                     </div>
 
                 </div>
