@@ -131,12 +131,11 @@
                                 <div class="card-body ">
                                     <h5 class="card-title">Details:</h5>
                                     <p><strong>Diterbitkan oleh:</strong> {{ $onlinebilling->admin->name }}</p>
-                                    <p><strong>Tanggal Aktif:</strong> {{ $onlinebilling->created_at->translatedFormat('d M Y') }}</p>
                                     <p><strong>Durasi:</strong> {{ $onlinebilling->durasi }} {{ $onlinebilling->nama_durasi }}</p>
-                                    <p><strong>Awal Kontrak:</strong>
-                                        {{ $onlinebilling->tanggal_mulai ? \Carbon\Carbon::parse($onlinebilling->tanggal_mulai)->translatedFormat('d M Y'): 'Belum diatur' }}
+                                    <p><strong>Tanggal Awal:</strong>
+                                        {{ $onlinebilling->tanggal_mulai ? \Carbon\Carbon::parse($onlinebilling->tanggal_mulai)->translatedFormat('d M Y'): '-' }}
                                     </p>
-                                    <p><strong>Akhir Kontrak:</strong> {{ $onlinebilling->tanggal_akhir ?  \Carbon\Carbon::parse($onlinebilling->tanggal_akhir)->translatedFormat('d M Y'): 'Belum diatur'}} </p>
+                                    <p><strong>Tanggal Akhir:</strong> {{ $onlinebilling->tanggal_akhir ?  \Carbon\Carbon::parse($onlinebilling->tanggal_akhir)->translatedFormat('d M Y'): '-'}} </p>
 
                                     <br>
                                     <!-- Foto Pelanggan -->

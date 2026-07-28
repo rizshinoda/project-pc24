@@ -38,6 +38,8 @@ class OnlineBilling extends Model
     ];
     protected $casts = [
         'tanggal_mulai' => 'datetime',
+        'tanggal_akhir' => 'datetime',
+
     ];
     public function admin()
     {
