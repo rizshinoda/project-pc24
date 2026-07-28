@@ -36,7 +36,9 @@ class OnlineBilling extends Model
         'sid_vendor',
         'cacti_link'
     ];
-
+    protected $casts = [
+        'tanggal_mulai' => 'datetime',
+    ];
     public function admin()
     {
         return $this->belongsTo(User::class, 'admin_id');

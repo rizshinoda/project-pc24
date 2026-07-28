@@ -3905,28 +3905,52 @@ class AdminController extends Controller
     | Dynamic Filter
     |--------------------------------------------------------------------------
     */
-
         $filterMap = [
 
             'vendor'      => 'vendor_id',
             'pelanggan'   => 'pelanggan_id',
             'instansi'    => 'instansi_id',
-
             'provinsi'    => 'provinsi',
-
 
         ];
 
         if (
             !empty($field) &&
-            !empty($value) &&
-            isset($filterMap[$field])
+            !empty($value)
         ) {
 
-            $query->where(
-                $filterMap[$field],
-                $value
-            );
+            if ($field == 'kelengkapan') {
+
+                switch ($value) {
+
+                    case 'tanggal_mulai':
+                        $query->whereNull('tanggal_mulai');
+                        break;
+                    case 'layanan':
+                        $query->whereNull('layanan');
+                        break;
+
+                    case 'media':
+                        $query->whereNull('media');
+                        break;
+                    case 'vendor':
+                        $query->whereNull('vendor_id');
+                        break;
+
+                    case 'sid_vendor':
+                        $query->where(function ($q) {
+                            $q->whereNull('sid_vendor')
+                                ->orWhere('sid_vendor', '');
+                        });
+                        break;
+                }
+            } elseif (isset($filterMap[$field])) {
+
+                $query->where(
+                    $filterMap[$field],
+                    $value
+                );
+            }
         }
 
         /*
@@ -3991,6 +4015,18 @@ class AdminController extends Controller
                     ->distinct()
                     ->orderBy('provinsi')
                     ->pluck('provinsi', 'provinsi');
+
+                break;
+
+            case 'kelengkapan':
+
+                $filterValues = collect([
+                    'tanggal_mulai' => 'Tanggal Mulai Kosong',
+                    'layanan'        => 'Layanan Kosong',
+                    'media'        => 'Media Kosong',
+                    'vendor'        => 'Vendor Kosong',
+                    'sid_vendor'    => 'SID Vendor Kosong',
+                ]);
 
                 break;
         }
