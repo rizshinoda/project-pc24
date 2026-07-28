@@ -320,7 +320,7 @@
                                                 <th>Alamat Pemasangan</th>
                                                 <th>VLAN</th>
                                                 <th>Volume</th>
-                                                <th>Tanggal Aktif</th>
+                                                <th>Tanggal Mulai</th>
                                                 <th width="10%">Aksi</th>
                                             </tr>
                                         </thead>
@@ -341,7 +341,7 @@
                                                 </td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->vlan }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->bandwidth }} {{ $OB->satuan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->created_at->format('d M Y') }}</td>
+                                                <td style="text-align: center; vertical-align: middle;"> {{ $OB->tanggal_mulai ? $OB->tanggal_mulai->format('d M Y') : '-' }}
                                                 <td class="text-center">
 
                                                     <a href="{{ route('hd.OB_show',$OB->id) }}"
