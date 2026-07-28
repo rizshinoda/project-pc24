@@ -180,7 +180,7 @@
                                                 <th style="text-align: center; vertical-align: middle;">Alamat <br> Pemasangan</th>
                                                 <th style="text-align: center; vertical-align: middle;">Vlan</th>
                                                 <th style="text-align: center; vertical-align: middle;">Volume</th>
-                                                <th style="text-align: center; vertical-align: middle;">Tanggal <br>Aktif</th>
+                                                <th style="text-align: center; vertical-align: middle;">Tanggal <br>Akhir</th>
                                                 <th style="text-align: center; vertical-align: middle;">Aksi</th>
                                             </tr>
                                         </thead>
@@ -197,7 +197,7 @@
                                                 </td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->vlan }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">{{ $OB->bandwidth }} {{ $OB->satuan }}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->created_at->format('d M Y') }}</td>
+                                                <td style="text-align: center; vertical-align: middle;">{{ $OB->tanggal_akhir ? $OB->tanggal_akhir->format('d M Y') : '-' }}</td>
                                                 <td style="text-align: center; vertical-align: middle;">
                                                     <a href="{{ route('noc.showsitedismantle', $OB->id) }}" class="btn btn-success btn-sm " style="display:inline-block; padding: 8px 11px;"><i class="fa fa-eye"></i></a>
                                                 </td>

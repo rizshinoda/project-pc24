@@ -3154,10 +3154,10 @@ class PsbController extends Controller
 
         // Filter berdasarkan bulan dan tahun
         if (!empty($month) && !empty($year)) {
-            $query->whereMonth('created_at', $month)
-                ->whereYear('created_at', $year);
+            $query->whereMonth('tanggal_mulai', $month)
+                ->whereYear('tanggal_mulai', $year);
         } elseif (!empty($year)) {
-            $query->whereYear('created_at', $year);
+            $query->whereYear('tanggal_mulai', $year);
         }
 
         // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL

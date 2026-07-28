@@ -134,13 +134,13 @@
                                     <h5 class="card-title">Details:</h5>
                                     <p><strong>Diterbitkan oleh:</strong> {{ $onlinebilling->admin->name }}</p>
                                     <p><strong>Tanggal Instalasi:</strong>
-                                        {{ $onlinebilling->tanggal_instalasi ? \Carbon\Carbon::parse($onlinebilling->tanggal_instalasi)->translatedFormat('d M Y'): 'Belum diatur' }}
+                                        {{ $onlinebilling->tanggal_instalasi ? \Carbon\Carbon::parse($onlinebilling->tanggal_instalasi)->translatedFormat('d M Y'): '-' }}
                                     </p>
                                     <p><strong>Durasi:</strong> {{ $onlinebilling->durasi }} {{ $onlinebilling->nama_durasi }}</p>
                                     <p><strong>Tanggal Mulai:</strong>
-                                        {{ $onlinebilling->tanggal_mulai ? \Carbon\Carbon::parse($onlinebilling->tanggal_mulai)->translatedFormat('d M Y'): 'Belum diatur' }}
+                                        {{ $onlinebilling->tanggal_mulai ? \Carbon\Carbon::parse($onlinebilling->tanggal_mulai)->translatedFormat('d M Y'): '-' }}
                                     </p>
-                                    <p><strong>Tanggal Akhir:</strong> {{ $onlinebilling->tanggal_akhir ?  \Carbon\Carbon::parse($onlinebilling->tanggal_akhir)->translatedFormat('d M Y'): 'Belum diatur'}} </p>
+                                    <p><strong>Tanggal Akhir:</strong> {{ $onlinebilling->tanggal_akhir ?  \Carbon\Carbon::parse($onlinebilling->tanggal_akhir)->translatedFormat('d M Y'): '-'}} </p>
 
                                     <br>
                                     <!-- Foto Pelanggan -->

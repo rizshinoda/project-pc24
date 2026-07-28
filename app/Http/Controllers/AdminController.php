@@ -3887,7 +3887,7 @@ class AdminController extends Controller
     */
 
         if (!empty($year)) {
-            $query->whereYear('created_at', $year);
+            $query->whereYear('tanggal_mulai', $year);
         }
 
         /*
@@ -3897,7 +3897,7 @@ class AdminController extends Controller
     */
 
         if (!empty($month)) {
-            $query->whereMonth('created_at', $month);
+            $query->whereMonth('tanggal_mulai', $month);
         }
 
         /*
