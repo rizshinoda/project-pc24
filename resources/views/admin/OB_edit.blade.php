@@ -320,7 +320,13 @@
                                             <div class="form-group row">
                                                 <label for="no_pelanggan" class="col-sm-4 col-form-label">Tanggal Mulai</label>
                                                 <div class="col-sm-8">
-                                                    <input type="date" class="form-control" id="tanggal_mulai" name="tanggal_mulai" value="{{ old('tanggal_mulai', $getOB->tanggal_mulai) }}" required>
+                                                    <input
+                                                        type="date"
+                                                        class="form-control"
+                                                        id="tanggal_mulai"
+                                                        name="tanggal_mulai"
+                                                        value="{{ old('tanggal_mulai', optional($getOB->tanggal_mulai)->format('Y-m-d')) }}"
+                                                        required>
                                                 </div>
                                             </div>
                                             <!-- Edit Durasi -->
@@ -488,7 +494,13 @@
                                             <div class="form-group row">
                                                 <label for="no_pelanggan" class="col-sm-4 col-form-label">Tanggal Akhir</label>
                                                 <div class="col-sm-8">
-                                                    <input type="date" class="form-control" id="tanggal_akhir" name="tanggal_akhir" value="{{ old('tanggal_akhir', $getOB->tanggal_akhir) }}" required>
+                                                    <input
+                                                        type="date"
+                                                        class="form-control"
+                                                        id="tanggal_akhir"
+                                                        name="tanggal_akhir"
+                                                        value="{{ old('tanggal_akhir', optional($getOB->tanggal_akhir)->format('Y-m-d')) }}"
+                                                        required>
                                                 </div>
                                             </div>
                                             <div class="form-group row">

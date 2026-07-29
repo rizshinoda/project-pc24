@@ -5662,8 +5662,10 @@ class AdminController extends Controller
             }
             // Update status online billing menjadi dismantle
             $onlineBilling = $getDismantle->onlineBilling;
-            $onlineBilling->update(['status' => 'dismantle']);
-
+            $onlineBilling->update([
+                'status'        => 'dismantle',
+                'tanggal_akhir' => $getDismantle->tanggal_rfs,
+            ]);
             // // Dapatkan semua admin (atau role yang sesuai)
             // $adminUsers = User::where('is_role', 1)->get(); // 1 adalah role untuk admin
 
