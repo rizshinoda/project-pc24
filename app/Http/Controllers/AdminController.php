@@ -4937,6 +4937,7 @@ class AdminController extends Controller
 
         // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
         $progressList = InstallProgress::where('work_order_install_id', $id)->get();
+        $woType = 'instalasi';
 
         // Menampilkan detail work order
         $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')->findOrFail($id);
@@ -4945,7 +4946,7 @@ class AdminController extends Controller
         // Mendapatkan berita acara yang terkait dengan work order ini
         $beritaAcara = $getInstall->beritaAcara;        // Gabungkan data survey ke dalam data role
         // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('billingExists', 'beritaAcara', 'progressList', 'getInstall', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('woType', 'billingExists', 'beritaAcara', 'progressList', 'getInstall', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('wo_jasa_show', $data);
@@ -5025,6 +5026,7 @@ class AdminController extends Controller
 
         // $progressList = SurveyProgress::where('work_order_survey_id', $id)->get();
         $progressList = InstallProgress::where('work_order_install_id', $id)->get();
+        $woType = 'instalasi';
 
         // Menampilkan detail work order
         $getInstall = WorkOrderInstall::with('WorkOrderInstallDetail.stockBarang')->findOrFail($id);
@@ -5033,7 +5035,7 @@ class AdminController extends Controller
         // Mendapatkan berita acara yang terkait dengan work order ini
         $beritaAcara = $getInstall->beritaAcara;        // Gabungkan data survey ke dalam data role
         // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('billingExists', 'beritaAcara', 'progressList', 'getInstall', 'notifications'));
+        $data = array_merge($this->ambilDataRole(), compact('woType', 'billingExists', 'beritaAcara', 'progressList', 'getInstall', 'notifications'));
 
         // Render view berdasarkan role
         return $this->renderView('wo_poc_show', $data);
