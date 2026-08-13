@@ -1110,7 +1110,7 @@ class AdminController extends Controller
             'nama_durasi' => $workOrder->nama_durasi,
             'harga_sewa' => $workOrder->harga_sewa,
             'sid_vendor' => $request->sid_vendor, // ← SID diinput manual
-            'admin_id' => $workOrder->admin_id,
+            'admin_id' => Auth::id(),
             'status' => 'active'
         ]);
 
