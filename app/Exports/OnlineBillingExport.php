@@ -2,6 +2,8 @@
 
 namespace App\Exports;
 
+use App\Exports\EmptyOnlineBillingSheet;
+use App\Exports\OnlineBillingPerPelangganSheet;
 use App\Models\OnlineBilling;
 use App\Models\Pelanggan;
 use App\Models\WorkOrderDismantle;
@@ -22,16 +24,91 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class OnlineBillingExport implements WithMultipleSheets
 {
+    protected $onlineBillingIds;
+
+    public function __construct(array $onlineBillingIds)
+    {
+        $this->onlineBillingIds = $onlineBillingIds;
+    }
+
     public function sheets(): array
     {
         $sheets = [];
 
-        $pelanggans = Pelanggan::whereHas('onlineBillings', function ($query) {
-            $query->where('status', 'active');
-        })->get();
+        /*
+        |--------------------------------------------------------------------------
+        | Tidak ada data
+        |--------------------------------------------------------------------------
+        */
+
+        if (empty($this->onlineBillingIds)) {
+            return [
+                new EmptyOnlineBillingSheet()
+            ];
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ambil Online Billing hasil filter
+        |--------------------------------------------------------------------------
+        */
+
+        $onlineBillings = OnlineBilling::whereIn(
+            'id',
+            $this->onlineBillingIds
+        )
+            ->with([
+                'pelanggan',
+                'instansi',
+                'vendor',
+                'admin',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Kelompokkan berdasarkan pelanggan
+        |--------------------------------------------------------------------------
+        */
+
+        $pelangganIds = $onlineBillings
+            ->pluck('pelanggan_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $pelanggans = Pelanggan::whereIn(
+            'id',
+            $pelangganIds
+        )
+            ->orderBy('nama_pelanggan')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Buat sheet
+        |--------------------------------------------------------------------------
+        */
 
         foreach ($pelanggans as $pelanggan) {
-            $sheets[] = new OnlineBillingPerPelangganSheet($pelanggan);
+
+            $sheets[] = new OnlineBillingPerPelangganSheet(
+                $pelanggan,
+                $this->onlineBillingIds
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pengaman
+        |--------------------------------------------------------------------------
+        */
+
+        if (empty($sheets)) {
+            return [
+                new EmptyOnlineBillingSheet()
+            ];
         }
 
         return $sheets;

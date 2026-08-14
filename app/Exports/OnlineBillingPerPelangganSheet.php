@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\OnlineBilling;
 use App\Models\WorkOrderDismantle;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
@@ -30,25 +31,36 @@ class OnlineBillingPerPelangganSheet extends DefaultValueBinder implements
     WithTitle
 {
     protected $pelanggan;
+    protected $onlineBillingIds;
 
-    private $index = 0; // Untuk nomor urut otomatis
+    private $index = 0;
 
-    /**
-     * Mengambil data dari database
-     */
-
-    public function __construct($pelanggan)
-    {
+    public function __construct(
+        $pelanggan,
+        array $onlineBillingIds
+    ) {
         $this->pelanggan = $pelanggan;
+        $this->onlineBillingIds = $onlineBillingIds;
     }
-
     public function collection()
     {
-        return OnlineBilling::where('pelanggan_id', $this->pelanggan->id)
-            ->where('status', 'active')
+        return OnlineBilling::whereIn(
+            'id',
+            $this->onlineBillingIds
+        )
+            ->where(
+                'pelanggan_id',
+                $this->pelanggan->id
+            )
+            ->with([
+                'pelanggan',
+                'instansi',
+                'vendor',
+                'admin',
+            ])
+            ->orderBy('created_at', 'desc')
             ->get();
     }
-
     /**
      * Mapping data yang akan diexport
      */
@@ -70,13 +82,23 @@ class OnlineBillingPerPelangganSheet extends DefaultValueBinder implements
             $workOrder->provinsi ?? '-',
             $workOrder->nni ?? '-',
             $workOrder->vlan ?? '-',
-            $workOrder->tanggal_instalasi ?? '-',
 
-            // pindah ke sini
-            is_numeric($workOrder->harga_sewa) ? (float) $workOrder->harga_sewa : 0,
+            $workOrder->tanggal_instalasi
+                ? Carbon::parse($workOrder->tanggal_instalasi)->format('d/m/y')
+                : '-',
 
-            $workOrder->tanggal_mulai ?? '-',
-            $workOrder->tanggal_akhir ?? '-',
+            is_numeric($workOrder->harga_sewa)
+                ? (float) $workOrder->harga_sewa
+                : 0,
+
+            $workOrder->tanggal_mulai
+                ? Carbon::parse($workOrder->tanggal_mulai)->format('d/m/y')
+                : '-',
+
+            $workOrder->tanggal_akhir
+                ? Carbon::parse($workOrder->tanggal_akhir)->format('d/m/y')
+                : '-',
+
             $workOrder->durasi ?? '-',
             $workOrder->nama_durasi ?? '-',
             $workOrder->vendor->nama_vendor ?? '-',

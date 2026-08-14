@@ -5905,11 +5905,261 @@ class AdminController extends Controller
         return redirect()->route('admin.wo_poc_show', $id)->with('success', 'Progress berhasil ditambahkan.');
     }
 
-    public function exportOB()
+    public function exportOB(Request $request)
     {
-        return Excel::download(new OnlineBillingExport, ' Laporan OnlineBilling.xlsx');
-    }
 
+
+        $status = $request->get('status', 'active');
+        $search = $request->get('search');
+        $month  = $request->get('month');
+        $year   = $request->get('year');
+
+        $field = $request->get('field');
+        $value = $request->get('value');
+
+        $query = OnlineBilling::query();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Status
+    |--------------------------------------------------------------------------
+    */
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
+        if (!empty($search)) {
+
+            $query->where(function ($q) use ($search) {
+
+                $q->whereHas('pelanggan', function ($q) use ($search) {
+                    $q->where(
+                        'nama_pelanggan',
+                        'like',
+                        '%' . $search . '%'
+                    );
+                })
+
+                    ->orWhereHas('instansi', function ($q) use ($search) {
+                        $q->where(
+                            'nama_instansi',
+                            'like',
+                            '%' . $search . '%'
+                        );
+                    })
+
+                    ->orWhereHas('admin', function ($q) use ($search) {
+                        $q->where(
+                            'name',
+                            'like',
+                            '%' . $search . '%'
+                        );
+                    })
+
+                    ->orWhere(
+                        'nama_site',
+                        'like',
+                        '%' . $search . '%'
+                    )
+
+                    ->orWhere(
+                        'no_jaringan',
+                        'like',
+                        '%' . $search . '%'
+                    );
+            });
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Tahun
+    |--------------------------------------------------------------------------
+    */
+
+        if ($year !== null && $year !== '') {
+
+            $query->whereYear(
+                'tanggal_mulai',
+                (int) $year
+            );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Bulan
+    |--------------------------------------------------------------------------
+    */
+
+        if ($month !== null && $month !== '') {
+
+            $query->whereMonth(
+                'tanggal_mulai',
+                (int) $month
+            );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Dinamis
+    |--------------------------------------------------------------------------
+    */
+
+        /*
+|--------------------------------------------------------------------------
+| Filter Dinamis
+|--------------------------------------------------------------------------
+*/
+
+        if (
+            !empty($field) &&
+            $value !== null &&
+            $value !== ''
+        ) {
+
+            /*
+    |--------------------------------------------------------------------------
+    | Filter Kelengkapan Data
+    |--------------------------------------------------------------------------
+    */
+
+            if ($field === 'kelengkapan') {
+
+                switch ($value) {
+
+                    case 'tanggal_mulai':
+
+                        $query->where(function ($q) {
+                            $q->whereNull('tanggal_mulai')
+                                ->orWhere('tanggal_mulai', '');
+                        });
+
+                        break;
+
+                    case 'layanan':
+
+                        $query->where(function ($q) {
+                            $q->whereNull('layanan')
+                                ->orWhere('layanan', '');
+                        });
+
+                        break;
+
+                    case 'media':
+
+                        $query->where(function ($q) {
+                            $q->whereNull('media')
+                                ->orWhere('media', '');
+                        });
+
+                        break;
+
+                    case 'vendor':
+
+                        $query->whereNull('vendor_id');
+
+                        break;
+
+                    case 'sid_vendor':
+
+                        $query->where(function ($q) {
+                            $q->whereNull('sid_vendor')
+                                ->orWhere('sid_vendor', '');
+                        });
+
+                        break;
+                }
+            }
+
+            /*
+    |--------------------------------------------------------------------------
+    | Filter Biasa
+    |--------------------------------------------------------------------------
+    */ else {
+
+                switch ($field) {
+
+                    case 'vendor':
+
+                        $query->where('vendor_id', $value);
+                        break;
+
+                    case 'pelanggan':
+
+                        $query->where('pelanggan_id', $value);
+                        break;
+
+                    case 'instansi':
+
+                        $query->where('instansi_id', $value);
+                        break;
+
+                    case 'provinsi':
+
+                        $query->where('provinsi', $value);
+                        break;
+
+                    case 'media':
+
+                        $query->where('media', $value);
+                        break;
+
+                    case 'bandwidth':
+
+                        $query->where('bandwidth', $value);
+                        break;
+
+                    case 'vlan':
+
+                        $query->where('vlan', $value);
+                        break;
+
+                    case 'sid_vendor':
+
+                        $query->where('sid_vendor', $value);
+                        break;
+
+                    case 'nama_site':
+
+                        $query->where('nama_site', $value);
+                        break;
+
+                    case 'no_jaringan':
+
+                        $query->where('no_jaringan', $value);
+                        break;
+                }
+            }
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Ambil ID hasil filter
+    |--------------------------------------------------------------------------
+    */
+
+        $onlineBillingIds = $query
+            ->orderBy('created_at', 'desc')
+            ->pluck('id')
+            ->toArray();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Export
+    |--------------------------------------------------------------------------
+    */
+
+        return Excel::download(
+            new OnlineBillingExport($onlineBillingIds),
+            'online-billing.xlsx'
+        );
+    }
 
     private function getWorkOrderModel($type)
     {
