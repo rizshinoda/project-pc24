@@ -280,6 +280,48 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
         'admin/attachment/{type}/{id}/{index}',
         [AdminController::class, 'deleteAttachment']
     )->name('attachment.delete.admin');
+
+    Route::get('admin/accurate/connect', [
+        AdminController::class,
+        'connect'
+    ])->name('accurate.connect');
+
+    Route::get('admin/accurate/callback', [
+        AdminController::class,
+        'callback'
+    ])->name('accurate.callback');
+    Route::get('admin/accurate/databases', [
+        AdminController::class,
+        'accurateDatabases'
+    ])->name('accurate.databases');
+
+    Route::get('admin/accurate/open-db', [
+        AdminController::class,
+        'openAccurateDatabase'
+    ])->name('accurate.open-db');
+
+    Route::get('admin/accurate/status', [
+        AdminController::class,
+        'accurateStatus'
+    ])->name('accurate.status');
+    Route::get('admin/accurate/test-customer', [
+        AdminController::class,
+        'testAccurateCustomer'
+    ])->name('accurate.test-customer');
+
+    Route::get('admin/accurate/test-customer-list', [
+        AdminController::class,
+        'testAccurateCustomerList'
+    ])->name('accurate.test-customer-list');
+    Route::get('admin/accurate/test-find-customer', [
+        AdminController::class,
+        'testFindAccurateCustomer'
+    ])->name('accurate.test-find-customer');
+
+    Route::get('admin/accurate/test-find-or-create-customer', [
+        AdminController::class,
+        'testFindOrCreateAccurateCustomer'
+    ])->name('accurate.test-find-or-create-customer');
 });
 
 Route::group(['middleware' => ['ga', SessionTimeout::class]], function () {

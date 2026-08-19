@@ -53,11 +53,13 @@ use App\Models\WorkOrderRelokasiDetail;
 use App\Models\WorkOrderSurvey;
 use App\Models\WorkOrderUpgrade;
 use App\Models\WorkOrderUpgradeDetail;
+use App\Services\AccurateService;
 use Carbon\Carbon;
 use id;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
@@ -1121,6 +1123,177 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'Gagal memindahkan data ke Online Billing.');
         }
     }
+
+    // public function storebilling(
+    //     Request $request,
+    //     $id,
+    //     AccurateService $accurate
+    // ) {
+    //     // Cari Work Order Install
+    //     $workOrder = WorkOrderInstall::find($id);
+
+    //     if (!$workOrder) {
+    //         return redirect()->back()
+    //             ->with('error', 'Work Order tidak ditemukan.');
+    //     }
+
+    //     try {
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | 1. Hitung tanggal akhir
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         $durasi = $workOrder->durasi ?? 1;
+    //         $jenisDurasi = $workOrder->nama_durasi ?? 'bulan';
+
+    //         $tanggalAkhir = match ($jenisDurasi) {
+    //             'tahun' => now()->addYears($durasi),
+    //             'bulan' => now()->addMonths($durasi),
+    //             'hari' => now()->addDays($durasi),
+    //             default => now()->addMonths(1),
+    //         };
+
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | 2. Buat Online Billing
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         $billing = OnlineBilling::create([
+    //             'work_order_install_id' => $workOrder->id,
+    //             'pelanggan_id' => $workOrder->pelanggan_id,
+    //             'instansi_id' => $workOrder->instansi_id,
+    //             'vendor_id' => $workOrder->vendor_id,
+
+    //             'nama_site' => $workOrder->nama_site,
+    //             'alamat_pemasangan' => $workOrder->alamat_pemasangan,
+
+    //             'nama_pic' => $workOrder->nama_pic,
+    //             'no_pic' => $workOrder->no_pic,
+
+    //             'layanan' => $workOrder->layanan,
+    //             'media' => $workOrder->media,
+    //             'bandwidth' => $workOrder->bandwidth,
+
+    //             'provinsi' => $workOrder->provinsi,
+    //             'satuan' => $workOrder->satuan,
+
+    //             'nni' => $workOrder->nni,
+    //             'vlan' => $workOrder->vlan,
+    //             'no_jaringan' => $workOrder->no_jaringan,
+
+    //             'tanggal_instalasi' => $workOrder->tanggal_instalasi,
+    //             'tanggal_mulai' => now(),
+    //             'tanggal_akhir' => $tanggalAkhir,
+
+    //             'durasi' => $workOrder->durasi,
+    //             'nama_durasi' => $workOrder->nama_durasi,
+
+    //             'harga_sewa' => $workOrder->harga_sewa,
+
+    //             'sid_vendor' => $request->sid_vendor,
+
+    //             'admin_id' => Auth::id(),
+
+    //             'status' => 'active',
+    //         ]);
+
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | 3. Ambil data pelanggan
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         $pelanggan = $workOrder->pelanggan;
+
+    //         if (!$pelanggan) {
+
+    //             $billing->update([
+    //                 'accurate_sync_error' => 'Data pelanggan tidak ditemukan.',
+    //             ]);
+
+    //             return redirect()
+    //                 ->route('admin.OB')
+    //                 ->with(
+    //                     'warning',
+    //                     'Online Billing berhasil dibuat, tetapi customer Accurate gagal dibuat karena pelanggan tidak ditemukan.'
+    //                 );
+    //         }
+
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | 4. Cari / buat Customer di Accurate
+    //     |--------------------------------------------------------------------------
+    //     |
+    //     | 1 site = 1 customer Accurate
+    //     |
+    //     */
+
+    //         $customer = $accurate->findOrCreateCustomer(
+    //             $pelanggan->nama_pelanggan,
+    //             $workOrder->nama_site
+    //         );
+
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | 5. Simpan ID Customer Accurate
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         $billing->update([
+    //             'accurate_customer_id' => $customer['id'],
+    //             'accurate_customer_no' => $customer['no'] ?? null,
+    //             'accurate_synced_at' => now(),
+    //             'accurate_sync_error' => null,
+    //         ]);
+
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | 6. Berhasil
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         return redirect()
+    //             ->route('admin.OB')
+    //             ->with(
+    //                 'success',
+    //                 'Data berhasil dipindahkan ke Online Billing dan Customer Accurate berhasil disinkronkan.'
+    //             );
+    //     } catch (\Throwable $e) {
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | Accurate gagal
+    //     |--------------------------------------------------------------------------
+    //     |
+    //     | Online Billing tetap tersimpan.
+    //     | Error Accurate dicatat agar bisa diperbaiki/sync ulang.
+    //     |
+    //     */
+
+    //         if (isset($billing)) {
+
+    //             $billing->update([
+    //                 'accurate_sync_error' => $e->getMessage(),
+    //             ]);
+    //         }
+
+    //         return redirect()
+    //             ->route('admin.OB')
+    //             ->with(
+    //                 'error',
+    //                 'Online Billing berhasil dibuat, tetapi sinkronisasi Accurate gagal: ' .
+    //                     $e->getMessage()
+    //             );
+    //     }
+    // }
 
     public function pelanggan(Request $request)
     {
@@ -6241,5 +6414,265 @@ class AdminController extends Controller
         $workOrder->save();
 
         return back()->with('success', 'Lampiran berhasil dihapus.');
+    }
+
+    public function connect()
+    {
+        $query = http_build_query([
+            'client_id' => config('services.accurate.client_id'),
+            'response_type' => 'code',
+            'redirect_uri' => config('services.accurate.redirect_uri'),
+
+            'scope' => 'customer_view customer_save',
+        ]);
+
+        return redirect(
+            'https://account.accurate.id/oauth/authorize?' . $query
+        );
+    }
+    public function callback(Request $request)
+    {
+        if ($request->has('error')) {
+            return response()->json([
+                'success' => false,
+                'error' => $request->error,
+                'description' => $request->error_description,
+            ], 400);
+        }
+
+        if (!$request->code) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authorization code tidak ditemukan.',
+            ], 400);
+        }
+
+        $response = Http::asForm()
+            ->withBasicAuth(
+                config('services.accurate.client_id'),
+                config('services.accurate.client_secret')
+            )
+            ->post('https://account.accurate.id/oauth/token', [
+                'code' => $request->code,
+                'grant_type' => 'authorization_code',
+                'redirect_uri' => config('services.accurate.redirect_uri'),
+            ]);
+
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mendapatkan access token.',
+                'response' => $response->json(),
+            ], $response->status());
+        }
+
+        $data = $response->json();
+
+        session([
+            'accurate_access_token' => $data['access_token'],
+            'accurate_refresh_token' => $data['refresh_token'] ?? null,
+            'accurate_expires_in' => $data['expires_in'] ?? null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OAuth Accurate berhasil.',
+        ]);
+    }
+
+    public function accurateDatabases()
+    {
+        $accessToken = session('accurate_access_token');
+
+        if (!$accessToken) {
+            return redirect()
+                ->route('accurate.connect')
+                ->with('error', 'Accurate belum terhubung.');
+        }
+
+        $response = Http::withToken($accessToken)
+            ->get('https://account.accurate.id/api/db-list.do');
+
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil daftar database Accurate.',
+                'response' => $response->json(),
+            ], $response->status());
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $response->json(),
+        ]);
+    }
+
+    public function openAccurateDatabase()
+    {
+        $accessToken = session('accurate_access_token');
+
+        if (!$accessToken) {
+            return redirect()
+                ->route('accurate.connect')
+                ->with('error', 'Accurate belum terhubung.');
+        }
+
+        $databaseId = 2849400;
+
+        $response = Http::withToken($accessToken)
+            ->get('https://account.accurate.id/api/open-db.do', [
+                'id' => $databaseId,
+            ]);
+
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuka database Accurate.',
+                'response' => $response->json(),
+            ], $response->status());
+        }
+
+        $result = $response->json();
+
+        if (!($result['s'] ?? false)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accurate gagal membuka database.',
+                'response' => $result,
+            ], 400);
+        }
+
+        session([
+            'accurate_database_id' => $databaseId,
+            'accurate_database_alias' => 'PT Testing ISP',
+            'accurate_host' => $result['host'],
+            'accurate_session' => $result['session'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Database Accurate berhasil dibuka.',
+            'database' => [
+                'id' => $databaseId,
+                'alias' => 'PT Testing ISP',
+                'host' => $result['host'],
+                'session' => 'tersimpan',
+            ],
+        ]);
+    }
+
+    public function accurateStatus()
+    {
+        return response()->json([
+            'connected' => session()->has('accurate_access_token')
+                && session()->has('accurate_host')
+                && session()->has('accurate_session'),
+
+            'database_id' => session('accurate_database_id'),
+
+            'database_alias' => session('accurate_database_alias'),
+
+            'host' => session('accurate_host'),
+
+            'session' => session()->has('accurate_session')
+                ? 'tersimpan'
+                : null,
+        ]);
+    }
+
+    public function testAccurateCustomer()
+    {
+        try {
+
+            $accurate = app(AccurateService::class);
+
+            $response = $accurate->customerSave([
+                'name' => 'PT Customer Test 2',
+                'transDate' => now()->format('d/m/Y'),
+            ]);
+
+            return response()->json([
+                'http_status' => $response->status(),
+                'response' => $response->json(),
+            ]);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function testAccurateCustomerList()
+    {
+        try {
+
+            $accurate = app(AccurateService::class);
+
+            $response = $accurate->customerList([
+                'fields' => 'id,name,no',
+                'filter.keywords.op' => 'CONTAIN',
+                'filter.keywords.val' => 'PT Customer Test',
+            ]);
+
+            return response()->json([
+                'http_status' => $response->status(),
+                'response' => $response->json(),
+            ]);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function testFindAccurateCustomer()
+    {
+        try {
+
+            $accurate = app(AccurateService::class);
+
+            $customer = $accurate->findCustomer(
+                'PT Customer Test'
+            );
+
+            return response()->json([
+                'success' => true,
+                'customer' => $customer,
+            ]);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function testFindOrCreateAccurateCustomer()
+    {
+        try {
+
+            $accurate = app(AccurateService::class);
+
+            $customer = $accurate->findOrCreateCustomer(
+                'PT ABC',
+                'Site Jakarta'
+            );
+
+            return response()->json([
+                'success' => true,
+                'customer' => $customer,
+            ]);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
