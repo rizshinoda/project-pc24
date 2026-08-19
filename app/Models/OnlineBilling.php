@@ -34,7 +34,14 @@ class OnlineBilling extends Model
         'admin_id',
         'status',
         'sid_vendor',
-        'cacti_link'
+        'cacti_link',
+        // Accurate
+        'accurate_customer_id',
+        'accurate_customer_no',
+        'accurate_invoice_id',
+        'accurate_invoice_no',
+        'accurate_synced_at',
+        'accurate_sync_error',
     ];
     protected $casts = [
         'tanggal_mulai' => 'datetime',
