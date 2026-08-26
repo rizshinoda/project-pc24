@@ -151,67 +151,306 @@
                     </div>
                     <div class="col-lg-12 grid-margin stretch-card">
                         <div class="card">
-
                             <div class="card-body">
-                                <form method="GET" action="{{ route('admin.namavendor') }}" class="mb-4">
+
+                                {{-- =========================
+                SEARCH & BUTTON
+            ========================== --}}
+                                <form method="GET"
+                                    action="{{ route('admin.namavendor') }}"
+                                    class="mb-4">
+
                                     <div class="row">
-                                        <!-- Kolom Pencarian -->
+
+                                        {{-- Pencarian --}}
                                         <div class="col-md-6 mb-3">
-                                            <input type="text" name="search" class="form-control contoh1" placeholder="Cari Data" value="{{ request('search') }}">
+                                            <input type="text"
+                                                name="search"
+                                                class="form-control contoh1"
+                                                placeholder="Cari Nama Vendor / Contact"
+                                                value="{{ request('search') }}">
                                         </div>
 
+                                        {{-- Tombol --}}
+                                        <div class="col-md-6 mb-3">
 
-                                        <!-- Tombol Filter -->
-                                        <div class="">
-                                            <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
-                                            <a href="{{route('vendor.create')}}" class="btn btn-info btn-sm mb-4 ">Tambah Data</a>
-                                            <!-- <a href="{{ route('work-order-install.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a> -->
+                                            <button type="submit"
+                                                class="btn btn-info btn-sm mb-4">
+                                                <i class="fa fa-search"></i>
+                                                Cari
+                                            </button>
+
+                                            <a href="{{ route('vendor.create') }}"
+                                                class="btn btn-info btn-sm mb-4">
+                                                <i class="fa fa-plus"></i>
+                                                Tambah Data
+                                            </a>
 
                                         </div>
+
                                     </div>
                                 </form>
-                                <div class=" table-responsive">
+
+
+                                {{-- =========================
+                TABLE
+            ========================== --}}
+                                <div class="table-responsive">
 
                                     <table class="table table-hover wrap">
+
                                         <thead>
                                             <tr>
-                                                <th style="text-align: center; vertical-align: middle;">No</th>
-                                                <th style="text-align: center; vertical-align: middle;">Nama Vendor</th>
-                                                <th style="text-align: center; vertical-align: middle;">Contact</th>
-                                                <th style="text-align: center; vertical-align: middle;">Aksi</th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    No
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Nama Vendor
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Contact
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Survey
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Instalasi/Jasa/POC
+                                                </th>
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Ganti Vendor
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Online Billing
+                                                </th>
+
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Aksi
+                                                </th>
+
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            @foreach ($getVendor as $key => $vendor)
-                                            <tr>
-                                                <td style=" text-align: center; vertical-align: middle;">{{$getVendor->firstItem()+ $key}} </td>
-                                                <td style="text-align: center; vertical-align: middle;">{{$vendor->nama_vendor}}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{$vendor->contact}}</td>
 
+
+                                        <tbody>
+
+                                            @forelse ($getVendor as $key => $vendor)
+
+                                            @php
+                                            $totalRelasi =
+                                            $vendor->surveys_count +
+                                            $vendor->installs_count +
+                                            $vendor->gantivendor_count +
+                                            $vendor->online_billings_count;
+                                            @endphp
+
+                                            <tr>
+
+                                                {{-- No --}}
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    <!-- Tombol Edit -->
-                                                    <a href=" {{ route('vendor.edit', $vendor->id) }}" class="btn btn-sm btn-warning" style="display:inline-block; "><i class="fa fa-edit"></i></a>
+                                                    {{ $getVendor->firstItem() + $key }}
+                                                </td>
+
+
+                                                {{-- Nama Vendor --}}
+                                                <td style="vertical-align: middle;">
+                                                    {{ $vendor->nama_vendor }}
+                                                </td>
+
+
+                                                {{-- Contact --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+                                                    {{ $vendor->contact ?? '-' }}
+                                                </td>
+
+
+                                                {{-- Survey --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+
+                                                    @if ($vendor->surveys_count > 0)
+
+                                                    <span class="badge badge-info">
+                                                        {{ $vendor->surveys_count }}
+                                                    </span>
+
+                                                    @else
+
+                                                    <span class="badge badge-secondary">
+                                                        0
+                                                    </span>
+
+                                                    @endif
 
                                                 </td>
+
+
+                                                {{-- Instalasi --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+
+                                                    @if ($vendor->installs_count > 0)
+
+                                                    <span class="badge badge-info">
+                                                        {{ $vendor->installs_count }}
+                                                    </span>
+
+                                                    @else
+
+                                                    <span class="badge badge-secondary">
+                                                        0
+                                                    </span>
+
+                                                    @endif
+
+                                                </td>
+                                                {{-- Ganti Vendor --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+
+                                                    @if ($vendor->gantivendor_count > 0)
+
+                                                    <span class="badge badge-info">
+                                                        {{ $vendor->gantivendor_count }}
+                                                    </span>
+
+                                                    @else
+
+                                                    <span class="badge badge-secondary">
+                                                        0
+                                                    </span>
+
+                                                    @endif
+
+                                                </td>
+
+
+                                                {{-- Online Billing --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+
+                                                    @if ($vendor->online_billings_count > 0)
+
+                                                    <span class="badge badge-info">
+                                                        {{ $vendor->online_billings_count }}
+                                                    </span>
+
+                                                    @else
+
+                                                    <span class="badge badge-secondary">
+                                                        0
+                                                    </span>
+
+                                                    @endif
+
+                                                </td>
+
+
+
+
+
+                                                {{-- Aksi --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+
+                                                    {{-- EDIT --}}
+                                                    <a href="{{ route('vendor.edit', $vendor->id) }}"
+                                                        class="btn btn-sm btn-warning"
+                                                        title="Edit Vendor">
+
+                                                        <i class="fa fa-edit"></i>
+
+                                                    </a>
+
+
+                                                    {{-- DELETE --}}
+                                                    @if ($totalRelasi == 0)
+
+                                                    <form action="{{ route('vendor.destroy', $vendor->id) }}"
+                                                        method="POST"
+                                                        style="display: inline-block;"
+                                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus vendor {{ $vendor->nama_vendor }}?')">
+
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button type="submit"
+                                                            class="btn btn-sm btn-danger"
+                                                            title="Hapus Vendor">
+
+                                                            <i class="fa fa-trash"></i>
+
+                                                        </button>
+
+                                                    </form>
+
+                                                    @else
+
+                                                    {{-- Vendor masih memiliki relasi --}}
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-secondary"
+                                                        disabled
+                                                        title="Vendor masih memiliki relasi">
+
+                                                        <i class="fa fa-lock"></i>
+
+                                                    </button>
+
+                                                    @endif
+
+                                                </td>
+
                                             </tr>
-                                            @endforeach
+
+                                            @empty
+
+                                            <tr>
+
+                                                <td colspan="8"
+                                                    class="text-center"
+                                                    style="padding: 30px;">
+
+                                                    Tidak ada data vendor.
+
+                                                </td>
+
+                                            </tr>
+
+                                            @endforelse
+
                                         </tbody>
+
                                     </table>
 
                                 </div>
+
+
+                                {{-- =========================
+                INFORMATION
+            ========================== --}}
                                 <div class="mt-3">
+
                                     Showing
-                                    {{$getVendor->firstItem()}}
+                                    {{ $getVendor->firstItem() ?? 0 }}
                                     to
-                                    {{$getVendor->lastItem()}}
+                                    {{ $getVendor->lastItem() ?? 0 }}
                                     of
-                                    {{$getVendor->total()}}
+                                    {{ $getVendor->total() }}
                                     entries
 
                                 </div>
+
+
+                                {{-- =========================
+                PAGINATION
+            ========================== --}}
                                 <div class="d-flex justify-content-end">
+
                                     {{ $getVendor->links() }}
+
                                 </div>
+
                             </div>
                         </div>
                     </div>

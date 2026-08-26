@@ -155,44 +155,148 @@
                             <div class="card-body">
                                 <h4>Daftar WO Jasa</h4>
                                 <!-- Form Pencarian dan Filter -->
-                                <form method="GET" action="{{ route('admin.jasa') }}" class="mb-4">
+                                <form method="GET"
+                                    action="{{ route('admin.jasa') }}"
+                                    class="mb-4">
+
                                     <div class="row">
+
                                         <!-- Kolom Pencarian -->
-                                        <div class="col-md-6 mb-3">
-                                            <input type="text" name="search" class="form-control contoh1" placeholder="Cari Data" value="{{ request('search') }}">
+                                        <div class="col-md-4 mb-3">
+
+                                            <input type="text"
+                                                name="search"
+                                                class="form-control contoh1"
+                                                placeholder="Cari Data"
+                                                value="{{ request('search') }}">
+
                                         </div>
+
+
+                                        <!-- Filter Berdasarkan -->
+                                        <div class="col-md-3 mb-3">
+
+                                            <select name="field"
+                                                id="field"
+                                                class="form-control"
+                                                onchange="this.form.submit()">
+
+                                                <option value="">
+                                                    Filter Berdasarkan
+                                                </option>
+
+                                                <option value="vendor"
+                                                    {{ request('field') == 'vendor' ? 'selected' : '' }}>
+                                                    Vendor
+                                                </option>
+
+                                                <option value="pelanggan"
+                                                    {{ request('field') == 'pelanggan' ? 'selected' : '' }}>
+                                                    Pelanggan
+                                                </option>
+
+                                            </select>
+
+                                        </div>
+
+
+                                        <!-- Filter Nilai -->
+                                        <div class="col-md-3 mb-3">
+
+                                            <select name="value"
+                                                id="value"
+                                                class="form-control">
+
+                                                <option value="">
+                                                    Pilih Nilai
+                                                </option>
+
+                                                @foreach ($filterValues as $id => $nama)
+
+                                                <option value="{{ $id }}"
+                                                    {{ request('value') == $id ? 'selected' : '' }}>
+
+                                                    {{ $nama }}
+
+                                                </option>
+
+                                                @endforeach
+
+                                            </select>
+
+                                        </div>
+
 
                                         <!-- Filter Bulan -->
-                                        <div class="col-md-3 mb-3">
-                                            <select name="month" class="form-control">
-                                                <option value="">Pilih Bulan</option>
+                                        <div class="col-md-2 mb-3">
+
+                                            <select name="month"
+                                                class="form-control">
+
+                                                <option value="">
+                                                    Semua Bulan
+                                                </option>
+
                                                 @for($m = 1; $m <= 12; $m++)
-                                                    <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>
+
+                                                    <option value="{{ $m }}"
+                                                    {{ request('month') == $m ? 'selected' : '' }}>
+
                                                     {{ date('F', mktime(0, 0, 0, $m, 1)) }}
+
                                                     </option>
+
                                                     @endfor
+
                                             </select>
+
                                         </div>
+
 
                                         <!-- Filter Tahun -->
-                                        <div class="col-md-3 mb-3">
-                                            <select name="year" class="form-control">
-                                                <option value="">Pilih Tahun</option>
-                                                @for($y = date('Y'); $y >= 2020; $y--)
-                                                <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>
-                                                    {{ $y }}
+                                        <div class="col-md-2 mb-3">
+
+                                            <select name="year"
+                                                class="form-control">
+
+                                                <option value="">
+                                                    Semua Tahun
                                                 </option>
+
+                                                @for($y = date('Y'); $y >= 2020; $y--)
+
+                                                <option value="{{ $y }}"
+                                                    {{ request('year') == $y ? 'selected' : '' }}>
+
+                                                    {{ $y }}
+
+                                                </option>
+
                                                 @endfor
+
                                             </select>
-                                        </div>
-
-                                        <!-- Tombol Filter -->
-                                        <div class="">
-                                            <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
-
 
                                         </div>
+
+
+                                        <!-- Tombol -->
+                                        <div class="col-md-12">
+
+                                            <button type="submit"
+                                                class="btn btn-info btn-sm mb-4">
+
+                                                <i class="fa fa-search"></i>
+                                                Cari
+
+                                            </button>
+
+
+
+
+                                        </div>
+
                                     </div>
+
                                 </form>
                                 <!-- Tab Status -->
                                 <ul class="nav nav-tabs justify-content-center mb-4" id="surveyTab" role="tablist">

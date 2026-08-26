@@ -150,7 +150,10 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::get('/admin/vendor/{id}/edit', [AdminController::class, 'EditVendor'])->name('vendor.edit');
     Route::put('/admin/vendor/{id}', [AdminController::class, 'UpdateVendor'])->name('vendor.update');
     Route::delete('/admin/vendor/{id}', [AdminController::class, 'HapusVendor'])->name('vendor.hapus');
-
+    Route::delete(
+        '/admin/vendor/{id}',
+        [AdminController::class, 'destroyVendor']
+    )->name('vendor.destroy');
     // Routes untuk Instansi
     Route::get('/admin/instansi', [AdminController::class, 'instansi'])->name('admin.instansi');
     Route::get('/admin/instansi/create', [AdminController::class, 'CreateInstansi'])->name('instansi.create');

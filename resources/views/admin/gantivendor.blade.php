@@ -155,44 +155,148 @@
                             <div class="card-body">
                                 <h4>Daftar WO Ganti Vendor</h4>
                                 <!-- Form Pencarian dan Filter -->
-                                <form method="GET" action="{{ route('admin.gantivendor') }}" class="mb-4">
+                                <form method="GET"
+                                    action="{{ route('admin.gantivendor') }}"
+                                    class="mb-4">
+
                                     <div class="row">
-                                        <!-- Kolom Pencarian -->
-                                        <div class="col-md-6 mb-3">
-                                            <input type="text" name="search" class="form-control contoh1" placeholder="Cari Data" value="{{ request('search') }}">
+
+                                        {{-- Search --}}
+                                        <div class="col-md-4 mb-3">
+
+                                            <input type="text"
+                                                name="search"
+                                                class="form-control contoh1"
+                                                placeholder="Cari Data"
+                                                value="{{ request('search') }}">
+
                                         </div>
 
-                                        <!-- Filter Bulan -->
-                                        <div class="col-md-3 mb-3">
-                                            <select name="month" class="form-control">
-                                                <option value="">Pilih Bulan</option>
-                                                @for($m = 1; $m <= 12; $m++)
-                                                    <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>
-                                                    {{ date('F', mktime(0, 0, 0, $m, 1)) }}
-                                                    </option>
-                                                    @endfor
-                                            </select>
-                                        </div>
 
-                                        <!-- Filter Tahun -->
+                                        {{-- Filter --}}
                                         <div class="col-md-3 mb-3">
-                                            <select name="year" class="form-control">
-                                                <option value="">Pilih Tahun</option>
-                                                @for($y = date('Y'); $y >= 2020; $y--)
-                                                <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>
-                                                    {{ $y }}
+
+                                            <select name="field"
+                                                class="form-control"
+                                                onchange="this.form.submit()">
+
+                                                <option value="">
+                                                    Filter Berdasarkan
                                                 </option>
-                                                @endfor
+
+                                                <option value="vendor"
+                                                    {{ request('field') == 'vendor' ? 'selected' : '' }}>
+
+                                                    Vendor
+
+                                                </option>
+
                                             </select>
-                                        </div>
-
-                                        <!-- Tombol Filter -->
-                                        <div class="">
-                                            <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
-                                            <a href="{{ route('work-order-gantivendor.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a>
 
                                         </div>
+
+
+                                        {{-- Value --}}
+                                        <div class="col-md-3 mb-3">
+
+                                            <select name="value"
+                                                class="form-control">
+
+                                                <option value="">
+                                                    Pilih Vendor
+                                                </option>
+
+                                                @foreach ($filterValues as $id => $nama)
+
+                                                <option value="{{ $id }}"
+                                                    {{ request('value') == $id ? 'selected' : '' }}>
+
+                                                    {{ $nama }}
+
+                                                </option>
+
+                                                @endforeach
+
+                                            </select>
+
+                                        </div>
+
+
+                                        {{-- Bulan --}}
+                                        <div class="col-md-2 mb-3">
+
+                                            <select name="month"
+                                                class="form-control">
+
+                                                <option value="">
+                                                    Semua Bulan
+                                                </option>
+
+                                                @for($m = 1; $m <= 12; $m++)
+
+                                                    <option value="{{ $m }}"
+                                                    {{ request('month') == $m ? 'selected' : '' }}>
+
+                                                    {{ date('F', mktime(0, 0, 0, $m, 1)) }}
+
+                                                    </option>
+
+                                                    @endfor
+
+                                            </select>
+
+                                        </div>
+
+
+                                        {{-- Tahun --}}
+                                        <div class="col-md-2 mb-3">
+
+                                            <select name="year"
+                                                class="form-control">
+
+                                                <option value="">
+                                                    Semua Tahun
+                                                </option>
+
+                                                @for($y = date('Y'); $y >= 2020; $y--)
+
+                                                <option value="{{ $y }}"
+                                                    {{ request('year') == $y ? 'selected' : '' }}>
+
+                                                    {{ $y }}
+
+                                                </option>
+
+                                                @endfor
+
+                                            </select>
+
+                                        </div>
+
+
+                                        {{-- Tombol --}}
+                                        <div class="col-md-12">
+
+                                            <button type="submit"
+                                                class="btn btn-info btn-sm mb-4">
+
+                                                <i class="fa fa-search"></i>
+                                                Cari
+
+                                            </button>
+
+
+                                            <a href="{{ route('work-order-gantivendor.export') }}"
+                                                class="btn btn-sm btn-success pull-right">
+
+                                                Export Excel
+
+                                            </a>
+
+                                        </div>
+
                                     </div>
+
                                 </form>
                                 <!-- Tab Status -->
                                 <ul class="nav nav-tabs justify-content-center mb-4" id="surveyTab" role="tablist">

@@ -23,4 +23,22 @@ class Vendor extends Model
     {
         return $this->hasMany(WorkOrderGantiVendor::class, 'vendor_id');
     }
+    /**
+     * Relasi ke Work Order Instalasi
+     */
+    public function installs()
+    {
+        return $this->hasMany(WorkOrderInstall::class, 'vendor_id');
+    }
+
+    /**
+     * Relasi ke Online Billing
+     *
+     * Upgrade, Downgrade, Relokasi, Dismantle, dll
+     * mengambil vendor melalui Online Billing.
+     */
+    public function onlineBillings()
+    {
+        return $this->hasMany(OnlineBilling::class, 'vendor_id');
+    }
 }
