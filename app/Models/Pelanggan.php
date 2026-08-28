@@ -28,4 +28,13 @@ class Pelanggan extends Model
     {
         return $this->hasMany(OnlineBilling::class, 'pelanggan_id');
     }
+    public function installations()
+    {
+        return $this->hasMany(WorkOrderInstall::class, 'pelanggan_id');
+    }
+
+    public function getKodePelangganAttribute()
+    {
+        return 'C' . str_pad($this->id, 2, '0', STR_PAD_LEFT);
+    }
 }

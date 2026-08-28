@@ -167,12 +167,12 @@
                                             <input type="text"
                                                 name="search"
                                                 class="form-control contoh1"
-                                                placeholder="Cari Nama Vendor / Contact"
+                                                placeholder="Cari Data"
                                                 value="{{ request('search') }}">
                                         </div>
 
                                         {{-- Tombol --}}
-                                        <div class="col-md-6 mb-3">
+                                        <div class="">
 
                                             <button type="submit"
                                                 class="btn btn-info btn-sm mb-4">
@@ -185,7 +185,12 @@
                                                 <i class="fa fa-plus"></i>
                                                 Tambah Data
                                             </a>
+                                            <a href="{{ route('vendor.export') }}"
+                                                class="btn btn-sm btn-success pull-right">
 
+                                                Export Excel
+
+                                            </a>
                                         </div>
 
                                     </div>
@@ -201,42 +206,13 @@
 
                                         <thead>
                                             <tr>
-
-                                                <th style="text-align: center; vertical-align: middle;">
-                                                    No
-                                                </th>
-
-                                                <th style="text-align: center; vertical-align: middle;">
-                                                    Nama Vendor
-                                                </th>
-
-                                                <th style="text-align: center; vertical-align: middle;">
-                                                    Contact
-                                                </th>
-
-                                                <th style="text-align: center; vertical-align: middle;">
-                                                    Survey
-                                                </th>
-
-                                                <th style="text-align: center; vertical-align: middle;">
-                                                    Instalasi/Jasa/POC
-                                                </th>
-                                                <th style="text-align: center; vertical-align: middle;">
-                                                    Ganti Vendor
-                                                </th>
-
-                                                <th style="text-align: center; vertical-align: middle;">
-                                                    Online Billing
-                                                </th>
-
-
-                                                <th style="text-align: center; vertical-align: middle;">
-                                                    Aksi
-                                                </th>
-
+                                                <th style="text-align: center; vertical-align: middle;">No</th>
+                                                <th style="text-align: center; vertical-align: middle;">Nama Vendor</th>
+                                                <th style="text-align: center; vertical-align: middle;">Contact</th>
+                                                <th style="text-align: center; vertical-align: middle;">Total Relasi</th>
+                                                <th style="text-align: center; vertical-align: middle;">Aksi</th>
                                             </tr>
                                         </thead>
-
 
                                         <tbody>
 
@@ -257,127 +233,60 @@
                                                     {{ $getVendor->firstItem() + $key }}
                                                 </td>
 
-
                                                 {{-- Nama Vendor --}}
                                                 <td style="vertical-align: middle;">
                                                     {{ $vendor->nama_vendor }}
                                                 </td>
-
 
                                                 {{-- Contact --}}
                                                 <td style="text-align: center; vertical-align: middle;">
                                                     {{ $vendor->contact ?? '-' }}
                                                 </td>
 
-
-                                                {{-- Survey --}}
+                                                {{-- Total Relasi --}}
                                                 <td style="text-align: center; vertical-align: middle;">
 
-                                                    @if ($vendor->surveys_count > 0)
-
-                                                    <span class="badge badge-info">
-                                                        {{ $vendor->surveys_count }}
+                                                    <span class="badge {{ $totalRelasi == 0 ? 'badge-danger' : 'badge-info' }}">
+                                                        {{ $totalRelasi }}
                                                     </span>
-
-                                                    @else
-
-                                                    <span class="badge badge-secondary">
-                                                        0
-                                                    </span>
-
-                                                    @endif
 
                                                 </td>
-
-
-                                                {{-- Instalasi --}}
-                                                <td style="text-align: center; vertical-align: middle;">
-
-                                                    @if ($vendor->installs_count > 0)
-
-                                                    <span class="badge badge-info">
-                                                        {{ $vendor->installs_count }}
-                                                    </span>
-
-                                                    @else
-
-                                                    <span class="badge badge-secondary">
-                                                        0
-                                                    </span>
-
-                                                    @endif
-
-                                                </td>
-                                                {{-- Ganti Vendor --}}
-                                                <td style="text-align: center; vertical-align: middle;">
-
-                                                    @if ($vendor->gantivendor_count > 0)
-
-                                                    <span class="badge badge-info">
-                                                        {{ $vendor->gantivendor_count }}
-                                                    </span>
-
-                                                    @else
-
-                                                    <span class="badge badge-secondary">
-                                                        0
-                                                    </span>
-
-                                                    @endif
-
-                                                </td>
-
-
-                                                {{-- Online Billing --}}
-                                                <td style="text-align: center; vertical-align: middle;">
-
-                                                    @if ($vendor->online_billings_count > 0)
-
-                                                    <span class="badge badge-info">
-                                                        {{ $vendor->online_billings_count }}
-                                                    </span>
-
-                                                    @else
-
-                                                    <span class="badge badge-secondary">
-                                                        0
-                                                    </span>
-
-                                                    @endif
-
-                                                </td>
-
-
-
-
 
                                                 {{-- Aksi --}}
                                                 <td style="text-align: center; vertical-align: middle;">
 
-                                                    {{-- EDIT --}}
-                                                    <a href="{{ route('vendor.edit', $vendor->id) }}"
-                                                        class="btn btn-sm btn-warning"
-                                                        title="Edit Vendor">
-
-                                                        <i class="fa fa-edit"></i>
-
+                                                    {{-- Lihat Relasi --}}
+                                                    <a
+                                                        href="{{ route('vendor.relasi', $vendor->id) }}"
+                                                        class="btn btn-sm btn-info"
+                                                        title="Lihat Relasi">
+                                                        <i class="fa fa-search"></i>
                                                     </a>
 
+                                                    {{-- Edit --}}
+                                                    <a
+                                                        href="{{ route('vendor.edit', $vendor->id) }}"
+                                                        class="btn btn-sm btn-warning"
+                                                        title="Edit Vendor">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
 
-                                                    {{-- DELETE --}}
+                                                    {{-- Hapus --}}
                                                     @if ($totalRelasi == 0)
 
-                                                    <form action="{{ route('vendor.destroy', $vendor->id) }}"
+                                                    <form
+                                                        action="{{ route('vendor.destroy', $vendor->id) }}"
                                                         method="POST"
-                                                        style="display: inline-block;"
-                                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus vendor {{ $vendor->nama_vendor }}?')">
+                                                        style="display:inline-block;"
+                                                        class="form-hapus-vendor">
 
                                                         @csrf
                                                         @method('DELETE')
 
-                                                        <button type="submit"
+                                                        <button
+                                                            type="submit"
                                                             class="btn btn-sm btn-danger"
-                                                            title="Hapus Vendor">
+                                                            title="Hapus">
 
                                                             <i class="fa fa-trash"></i>
 
@@ -387,13 +296,13 @@
 
                                                     @else
 
-                                                    {{-- Vendor masih memiliki relasi --}}
-                                                    <button type="button"
+                                                    <button
+                                                        type="button"
                                                         class="btn btn-sm btn-secondary"
-                                                        disabled
-                                                        title="Vendor masih memiliki relasi">
+                                                        title="Tidak dapat dihapus karena masih memiliki relasi"
+                                                        disabled>
 
-                                                        <i class="fa fa-lock"></i>
+                                                        <i class="fa fa-trash"></i>
 
                                                     </button>
 
@@ -406,21 +315,16 @@
                                             @empty
 
                                             <tr>
-
-                                                <td colspan="8"
+                                                <td colspan="5"
                                                     class="text-center"
                                                     style="padding: 30px;">
-
                                                     Tidak ada data vendor.
-
                                                 </td>
-
                                             </tr>
 
                                             @endforelse
 
                                         </tbody>
-
                                     </table>
 
                                 </div>

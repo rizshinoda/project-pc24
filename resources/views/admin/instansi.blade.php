@@ -163,8 +163,10 @@
 
                                         <!-- Tombol Filter -->
                                         <div class="">
-                                            <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
-                                            <a href="{{route('instansi.create')}}" class="btn btn-info btn-sm mb-4 ">Tambah Data</a>
+                                            <button type="submit" class="btn btn-info btn-sm mb-4 "> <i class="fa fa-search"></i>
+                                                Cari</button>
+                                            <a href="{{route('instansi.create')}}" class="btn btn-info btn-sm mb-4  "> <i class="fa fa-plus"></i>
+                                                Tambah Data</a>
                                             <!-- <a href="{{ route('work-order-install.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a> -->
 
                                         </div>

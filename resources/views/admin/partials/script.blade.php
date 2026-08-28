@@ -957,3 +957,739 @@
 
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        /*
+        |--------------------------------------------------------------------------
+        | ================================================================
+        | PINDAH RELASI PELANGGAN
+        | ================================================================
+        |--------------------------------------------------------------------------
+        */
+
+        const formPelanggan =
+            document.getElementById('formPindahkanRelasi');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cek apakah form ini adalah form pelanggan
+        |--------------------------------------------------------------------------
+        |
+        | Karena script.blade.php dipakai global, script pelanggan hanya
+        | dijalankan apabila terdapat pelanggan_tujuan_id.
+        |
+        */
+
+        if (
+            formPelanggan &&
+            formPelanggan.querySelector(
+                'select[name="pelanggan_tujuan_id"]'
+            )
+        ) {
+
+            const btnPindahkan =
+                document.getElementById('btnPindahkan');
+
+            const jumlahDipilih =
+                document.getElementById('jumlahDipilih');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update jumlah relasi yang dipilih
+            |--------------------------------------------------------------------------
+            */
+
+            function updateJumlahDipilih() {
+
+                const checked = document.querySelectorAll(
+                    'input[name="survey_ids[]"]:checked,' +
+                    'input[name="instalasi_ids[]"]:checked,' +
+                    'input[name="online_billing_ids[]"]:checked'
+                );
+
+                const jumlah = checked.length;
+
+                if (jumlahDipilih) {
+                    jumlahDipilih.textContent = jumlah;
+                }
+
+                if (btnPindahkan) {
+                    btnPindahkan.disabled = jumlah === 0;
+                }
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Checkbox Survey
+            |--------------------------------------------------------------------------
+            */
+
+            document
+                .querySelectorAll('.survey-checkbox')
+                .forEach(function(checkbox) {
+
+                    checkbox.addEventListener(
+                        'change',
+                        updateJumlahDipilih
+                    );
+
+                });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Checkbox Instalasi
+            |--------------------------------------------------------------------------
+            */
+
+            document
+                .querySelectorAll('.instalasi-checkbox')
+                .forEach(function(checkbox) {
+
+                    checkbox.addEventListener(
+                        'change',
+                        updateJumlahDipilih
+                    );
+
+                });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Checkbox Online Billing
+            |--------------------------------------------------------------------------
+            */
+
+            document
+                .querySelectorAll('.billing-checkbox')
+                .forEach(function(checkbox) {
+
+                    checkbox.addEventListener(
+                        'change',
+                        updateJumlahDipilih
+                    );
+
+                });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Select All Survey
+            |--------------------------------------------------------------------------
+            */
+
+            const checkAllSurvey =
+                document.getElementById('checkAllSurvey');
+
+            if (checkAllSurvey) {
+
+                checkAllSurvey.addEventListener(
+                    'change',
+                    function() {
+
+                        document
+                            .querySelectorAll('.survey-checkbox')
+                            .forEach(function(checkbox) {
+
+                                checkbox.checked =
+                                    checkAllSurvey.checked;
+
+                            });
+
+                        updateJumlahDipilih();
+
+                    }
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Select All Instalasi
+            |--------------------------------------------------------------------------
+            */
+
+            const checkAllInstalasi =
+                document.getElementById('checkAllInstalasi');
+
+            if (checkAllInstalasi) {
+
+                checkAllInstalasi.addEventListener(
+                    'change',
+                    function() {
+
+                        document
+                            .querySelectorAll('.instalasi-checkbox')
+                            .forEach(function(checkbox) {
+
+                                checkbox.checked =
+                                    checkAllInstalasi.checked;
+
+                            });
+
+                        updateJumlahDipilih();
+
+                    }
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Select All Online Billing
+            |--------------------------------------------------------------------------
+            */
+
+            const checkAllBilling =
+                document.getElementById('checkAllBilling');
+
+            if (checkAllBilling) {
+
+                checkAllBilling.addEventListener(
+                    'change',
+                    function() {
+
+                        document
+                            .querySelectorAll('.billing-checkbox')
+                            .forEach(function(checkbox) {
+
+                                checkbox.checked =
+                                    checkAllBilling.checked;
+
+                            });
+
+                        updateJumlahDipilih();
+
+                    }
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Submit Pindah Relasi Pelanggan
+            |--------------------------------------------------------------------------
+            */
+
+            formPelanggan.addEventListener(
+                'submit',
+                function(e) {
+
+                    e.preventDefault();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Cek relasi
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const selected =
+                        document.querySelectorAll(
+                            'input[name="survey_ids[]"]:checked,' +
+                            'input[name="instalasi_ids[]"]:checked,' +
+                            'input[name="online_billing_ids[]"]:checked'
+                        );
+
+
+                    if (selected.length === 0) {
+
+                        Swal.fire({
+
+                            icon: 'warning',
+
+                            title: 'Belum ada relasi',
+
+                            text: 'Silakan pilih relasi yang ingin dipindahkan.'
+
+                        });
+
+                        return;
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Cek pelanggan tujuan
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const tujuan =
+                        formPelanggan.querySelector(
+                            'select[name="pelanggan_tujuan_id"]'
+                        );
+
+
+                    if (!tujuan || !tujuan.value) {
+
+                        Swal.fire({
+
+                            icon: 'warning',
+
+                            title: 'Pelanggan tujuan belum dipilih',
+
+                            text: 'Silakan pilih pelanggan tujuan terlebih dahulu.'
+
+                        });
+
+                        return;
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Nama pelanggan tujuan
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const namaTujuan =
+                        tujuan.options[
+                            tujuan.selectedIndex
+                        ].text.trim();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Konfirmasi
+                    |--------------------------------------------------------------------------
+                    */
+
+                    Swal.fire({
+
+                        title: 'Pindahkan Relasi?',
+
+                        html: 'Sebanyak <strong>' +
+                            selected.length +
+                            ' relasi</strong> akan dipindahkan ke:' +
+                            '<br><br>' +
+                            '<strong>' +
+                            namaTujuan +
+                            '</strong>',
+
+                        icon: 'warning',
+
+                        showCancelButton: true,
+
+                        confirmButtonText: 'Ya, Pindahkan',
+
+                        cancelButtonText: 'Batal',
+
+                        reverseButtons: false
+
+                    }).then(function(result) {
+
+                        if (result.isConfirmed) {
+
+                            formPelanggan.submit();
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Jalankan pertama kali
+            |--------------------------------------------------------------------------
+            */
+
+            updateJumlahDipilih();
+
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ================================================================
+        | HAPUS PELANGGAN
+        | ================================================================
+        |--------------------------------------------------------------------------
+        */
+
+        document
+            .querySelectorAll('.form-hapus-pelanggan')
+            .forEach(function(form) {
+
+                form.addEventListener(
+                    'submit',
+                    function(e) {
+
+                        e.preventDefault();
+
+
+                        Swal.fire({
+
+                            title: 'Hapus Pelanggan?',
+
+                            text: 'Data pelanggan akan dihapus secara permanen.',
+
+                            icon: 'warning',
+
+                            showCancelButton: true,
+
+                            confirmButtonText: 'Ya, Hapus',
+
+                            cancelButtonText: 'Batal',
+
+                            reverseButtons: false
+
+                        }).then(function(result) {
+
+                            if (result.isConfirmed) {
+
+                                form.submit();
+
+                            }
+
+                        });
+
+                    }
+                );
+
+            });
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ================================================================
+        | PINDAH RELASI VENDOR
+        | ================================================================
+        |--------------------------------------------------------------------------
+        */
+
+        /*
+        |--------------------------------------------------------------------------
+        | Karena ID form sama, kita cek apakah terdapat vendor_tujuan_id.
+        |--------------------------------------------------------------------------
+        */
+
+        const formVendor =
+            document.getElementById('formPindahkanRelasi');
+
+
+        if (
+            formVendor &&
+            formVendor.querySelector(
+                'select[name="vendor_tujuan_id"]'
+            )
+        ) {
+
+            const btnPindahkanVendor =
+                document.getElementById('btnPindahkan');
+
+            const jumlahDipilihVendor =
+                document.getElementById('jumlahDipilih');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update jumlah checkbox vendor
+            |--------------------------------------------------------------------------
+            */
+
+            function updateButtonVendor() {
+
+                const selected =
+                    document.querySelectorAll(
+                        '.check-relasi:checked'
+                    );
+
+                const jumlah =
+                    selected.length;
+
+
+                if (jumlahDipilihVendor) {
+
+                    jumlahDipilihVendor.textContent =
+                        jumlah;
+
+                }
+
+
+                if (btnPindahkanVendor) {
+
+                    btnPindahkanVendor.disabled =
+                        jumlah === 0;
+
+                }
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Checkbox Select All Vendor
+            |--------------------------------------------------------------------------
+            */
+
+            const checkAll =
+                document.querySelectorAll('.check-all');
+
+
+            checkAll.forEach(function(checkbox) {
+
+                checkbox.addEventListener(
+                    'change',
+                    function() {
+
+                        const target =
+                            this.dataset.target;
+
+
+                        const items =
+                            document.querySelectorAll(
+                                '.check-relasi.' + target
+                            );
+
+
+                        items.forEach(
+                            function(item) {
+
+                                item.checked =
+                                    checkbox.checked;
+
+                            }
+                        );
+
+
+                        updateButtonVendor();
+
+                    }
+                );
+
+            });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Checkbox individual vendor
+            |--------------------------------------------------------------------------
+            */
+
+            const checkboxes =
+                document.querySelectorAll(
+                    '.check-relasi'
+                );
+
+
+            checkboxes.forEach(
+                function(checkbox) {
+
+                    checkbox.addEventListener(
+                        'change',
+                        function() {
+
+                            updateButtonVendor();
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Submit pindah vendor
+            |--------------------------------------------------------------------------
+            */
+
+            formVendor.addEventListener(
+                'submit',
+                function(e) {
+
+                    e.preventDefault();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Relasi yang dipilih
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const selected =
+                        document.querySelectorAll(
+                            '.check-relasi:checked'
+                        );
+
+
+                    if (selected.length === 0) {
+
+                        Swal.fire({
+
+                            icon: 'warning',
+
+                            title: 'Belum ada relasi',
+
+                            text: 'Silakan pilih relasi yang ingin dipindahkan.'
+
+                        });
+
+                        return;
+
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Vendor tujuan
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const vendorTujuan =
+                        formVendor.querySelector(
+                            'select[name="vendor_tujuan_id"]'
+                        );
+
+
+                    if (
+                        !vendorTujuan ||
+                        !vendorTujuan.value
+                    ) {
+
+                        Swal.fire({
+
+                            icon: 'warning',
+
+                            title: 'Vendor tujuan belum dipilih',
+
+                            text: 'Silakan pilih vendor tujuan terlebih dahulu.'
+
+                        });
+
+                        return;
+
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Nama vendor tujuan
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const namaVendor =
+                        vendorTujuan
+                        .options[
+                            vendorTujuan.selectedIndex
+                        ]
+                        .text.trim();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Konfirmasi
+                    |--------------------------------------------------------------------------
+                    */
+
+                    Swal.fire({
+
+                        title: 'Pindahkan Relasi?',
+
+                        html: 'Sebanyak <strong>' +
+                            selected.length +
+                            ' relasi</strong> akan dipindahkan ke vendor:' +
+                            '<br><br>' +
+                            '<strong>' +
+                            namaVendor +
+                            '</strong>',
+
+                        icon: 'question',
+
+                        showCancelButton: true,
+
+                        confirmButtonText: 'Ya, Pindahkan',
+
+                        cancelButtonText: 'Batal',
+
+                        reverseButtons: false
+
+                    }).then(function(result) {
+
+                        if (result.isConfirmed) {
+
+                            formVendor.submit();
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Jalankan pertama kali
+            |--------------------------------------------------------------------------
+            */
+
+            updateButtonVendor();
+
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ================================================================
+        | HAPUS VENDOR
+        | ================================================================
+        |--------------------------------------------------------------------------
+        */
+
+        document
+            .querySelectorAll('.form-hapus-vendor')
+            .forEach(function(form) {
+
+                form.addEventListener(
+                    'submit',
+                    function(e) {
+
+                        e.preventDefault();
+
+
+                        Swal.fire({
+
+                            title: 'Hapus Vendor?',
+
+                            text: 'Data vendor akan dihapus secara permanen.',
+
+                            icon: 'warning',
+
+                            showCancelButton: true,
+
+                            confirmButtonText: 'Ya, Hapus',
+
+                            cancelButtonText: 'Batal',
+
+                            reverseButtons: false
+
+                        }).then(function(result) {
+
+                            if (result.isConfirmed) {
+
+                                form.submit();
+
+                            }
+
+                        });
+
+                    }
+                );
+
+            });
+
+    });
+</script>
