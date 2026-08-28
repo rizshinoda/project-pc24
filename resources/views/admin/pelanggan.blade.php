@@ -283,7 +283,7 @@
 
                                                 {{-- Alamat --}}
                                                 <td style="vertical-align: middle;">
-                                                    {{ Str::limit($pelanggan->alamat, 70) }}
+                                                    {{ Str::limit($pelanggan->alamat,50) }}
                                                 </td>
 
                                                 {{-- Total Relasi --}}

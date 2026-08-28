@@ -568,7 +568,7 @@
                                                 <button
                                                     type="submit"
                                                     id="btnPindahkan"
-                                                    class="btn btn-warning"
+                                                    class="btn btn-info"
                                                     disabled>
                                                     <i class="fa fa-exchange"></i>
                                                     Pindahkan Terpilih
