@@ -253,7 +253,8 @@
 
                                                     <input
                                                         type="checkbox"
-                                                        id="checkAllSurvey">
+                                                        class="check-all"
+                                                        data-target="survey">
 
                                                 </th>
 
@@ -391,7 +392,8 @@
 
                                                     <input
                                                         type="checkbox"
-                                                        id="checkAllInstalasi">
+                                                        class="check-all"
+                                                        data-target="instalasi">
 
                                                 </th>
 
