@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Exports\OnlineBillingExport;
+use App\Exports\PelangganExport;
+use App\Exports\VendorExport;
 use App\Exports\WorkOrderDismantleExport;
 use App\Exports\WorkOrderDowngradeExport;
 use App\Exports\WorkOrderGantiVendorExport;
@@ -377,21 +379,51 @@ class AdminController extends Controller
 
     public function instalasi(Request $request)
     {
-        // Ambil parameter dari request
+        /*
+    |--------------------------------------------------------------------------
+    | Parameter Filter
+    |--------------------------------------------------------------------------
+    */
+
         $status = $request->get('status', 'all');
         $search = $request->get('search');
-        $month = $request->get('month');
-        $year = $request->get('year');
+        $month  = $request->get('month');
+        $year   = $request->get('year');
+        $field  = $request->get('field');
+        $value  = $request->get('value');
 
-        // Query untuk mendapatkan data survey
-        $query = WorkOrderInstall::where('jenis_pekerjaan', 'instalasi')
-            ->orderBy('created_at', 'desc');
-        // Filter berdasarkan status
+
+        /*
+    |--------------------------------------------------------------------------
+    | Query
+    |--------------------------------------------------------------------------
+    */
+
+        $query = WorkOrderInstall::where(
+            'jenis_pekerjaan',
+            'instalasi'
+        )->orderBy('created_at', 'desc');
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Status
+    |--------------------------------------------------------------------------
+    */
+
         if ($status != 'all') {
             $query->where('status', $status);
         }
-        // filter overdue
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Overdue
+    |--------------------------------------------------------------------------
+    */
+
         if ($request->filter == 'overdue') {
+
             $query->whereDate('tanggal_rfs', '<', today())
                 ->whereNotIn('status', [
                     'Completed',
@@ -399,49 +431,223 @@ class AdminController extends Controller
                     'Canceled'
                 ]);
         }
-        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
         if (!empty($search)) {
+
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
-                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+
+                $q->where(
+                    'no_spk',
+                    'like',
+                    '%' . $search . '%'
+                )
+
+                    ->orWhereHas('pelanggan', function ($q) use ($search) {
+                        $q->where(
+                            'nama_pelanggan',
+                            'like',
+                            '%' . $search . '%'
+                        );
                     })
-                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+
+                    ->orWhereHas('instansi', function ($q) use ($search) {
+                        $q->where(
+                            'nama_instansi',
+                            'like',
+                            '%' . $search . '%'
+                        );
                     })
+
                     ->orWhere('nama_site', 'like', '%' . $search . '%')
+
                     ->orWhere('no_jaringan', 'like', '%' . $search . '%')
-                    // Pencarian di kolom nama_site
-                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
-                        $q->where('name', 'like', '%' . $search . '%');
+
+                    ->orWhereHas('admin', function ($q) use ($search) {
+                        $q->where(
+                            'name',
+                            'like',
+                            '%' . $search . '%'
+                        );
+                    })
+
+                    // Tambahan pencarian nama vendor
+                    ->orWhereHas('vendor', function ($q) use ($search) {
+                        $q->where(
+                            'nama_vendor',
+                            'like',
+                            '%' . $search . '%'
+                        );
                     });
             });
         }
 
-        // Filter berdasarkan bulan dan tahun
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dynamic Filter Vendor / Pelanggan
+    |--------------------------------------------------------------------------
+    */
+
+        $filterMap = [
+            'vendor'    => 'vendor_id',
+            'pelanggan' => 'pelanggan_id',
+        ];
+
+
+        if (!empty($field) && !empty($value)) {
+
+            if (isset($filterMap[$field])) {
+
+                $query->where(
+                    $filterMap[$field],
+                    $value
+                );
+            }
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Bulan dan Tahun
+    |--------------------------------------------------------------------------
+    */
+
         if (!empty($month) && !empty($year)) {
+
             $query->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year);
         } elseif (!empty($year)) {
+
             $query->whereYear('created_at', $year);
+        } elseif (!empty($month)) {
+
+            $query->whereMonth('created_at', $month);
         }
 
-        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $getInstall = $query->paginate(10)->appends([
-            'status' => $status,
-            'search' => $search,
-            'month' => $month,
-            'year' => $year,
-        ]);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+        $getInstall = $query
+            ->paginate(10)
+            ->appends($request->query());
 
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Vendor
+    |--------------------------------------------------------------------------
+    */
 
-        // Render view berdasarkan role
-        return $this->renderView('instalasi', $data);
+        $vendors = Vendor::orderBy('nama_vendor')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Pelanggan
+    |--------------------------------------------------------------------------
+    */
+
+        $pelanggans = Pelanggan::orderBy('nama_pelanggan')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Nilai Berdasarkan Field
+    |--------------------------------------------------------------------------
+    */
+
+        $filterValues = collect();
+
+
+        switch ($field) {
+
+            case 'vendor':
+
+                $filterValues = Vendor::orderBy('nama_vendor')
+                    ->pluck(
+                        'nama_vendor',
+                        'id'
+                    );
+
+                break;
+
+
+            case 'pelanggan':
+
+                $filterValues = Pelanggan::orderBy('nama_pelanggan')
+                    ->pluck(
+                        'nama_pelanggan',
+                        'id'
+                    );
+
+                break;
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Notification
+    |--------------------------------------------------------------------------
+    */
+
+        $notifications = Notification::where(
+            'user_id',
+            Auth::user()->id
+        )
+            ->where(
+                'is_read',
+                false
+            )
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | View
+    |--------------------------------------------------------------------------
+    */
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'getInstall',
+                'status',
+                'search',
+                'month',
+                'year',
+                'field',
+                'value',
+                'vendors',
+                'pelanggans',
+                'filterValues',
+                'notifications'
+            )
+        );
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
+
+        return $this->renderView(
+            'instalasi',
+            $data
+        );
     }
 
     public function createinstalasi()
@@ -1299,10 +1505,20 @@ class AdminController extends Controller
     {
         $search = $request->get('search');
 
-        $query = Pelanggan::query();
+        $query = Pelanggan::withCount([
+            'onlineBillings',
+            'surveys',
+            'installations',
+        ]);
 
         if (!empty($search)) {
-            $query->where('nama_pelanggan', 'like', '%' . $search . '%');
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('nama_pelanggan', 'like', '%' . $search . '%')
+                    ->orWhere('no_pelanggan', 'like', '%' . $search . '%')
+                    ->orWhere('nama_gedung', 'like', '%' . $search . '%');
+            });
         }
 
         $getPelanggan = $query
@@ -1312,18 +1528,165 @@ class AdminController extends Controller
                 'search' => $search,
             ]);
 
-        $notifications = Notification::where('user_id', Auth::user()->id)
+        $notifications = Notification::where(
+            'user_id',
+            Auth::user()->id
+        )
             ->where('is_read', false)
             ->get();
 
         $data = array_merge(
             $this->ambilDataRole(),
-            compact('getPelanggan', 'search', 'notifications')
+            compact(
+                'getPelanggan',
+                'search',
+                'notifications'
+            )
         );
 
         return $this->renderView('pelanggan', $data);
     }
 
+    public function pelangganRelasi($id)
+    {
+        $pelanggan = Pelanggan::findOrFail($id);
+
+        // Relasi Survey
+        $survey = WorkOrderSurvey::where('pelanggan_id', $pelanggan->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Relasi Instalasi
+        $instalasi = WorkOrderInstall::where('pelanggan_id', $pelanggan->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Relasi Online Billing
+        $onlineBilling = OnlineBilling::where('pelanggan_id', $pelanggan->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $notifications = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->get();
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'pelanggan',
+                'survey',
+                'instalasi',
+                'onlineBilling',
+                'notifications'
+            )
+        );
+
+        return $this->renderView('pelanggan_relasi', $data);
+    }
+
+    public function pindahkanRelasiPelanggan(Request $request, $id)
+    {
+        $pelangganAsal = Pelanggan::findOrFail($id);
+
+        $request->validate([
+            'pelanggan_tujuan_id' => [
+                'required',
+                'exists:pelanggans,id',
+                'different:' . $id,
+            ],
+
+            'survey_ids' => [
+                'nullable',
+                'array',
+            ],
+
+            'survey_ids.*' => [
+                'integer',
+                'exists:work_order_surveys,id',
+            ],
+
+            'instalasi_ids' => [
+                'nullable',
+                'array',
+            ],
+
+            'instalasi_ids.*' => [
+                'integer',
+                'exists:work_order_installs,id',
+            ],
+
+            'online_billing_ids' => [
+                'nullable',
+                'array',
+            ],
+
+            'online_billing_ids.*' => [
+                'integer',
+                'exists:online_billings,id',
+            ],
+        ]);
+
+        $pelangganTujuan = Pelanggan::findOrFail(
+            $request->pelanggan_tujuan_id
+        );
+
+        DB::transaction(function () use ($request, $pelangganAsal, $pelangganTujuan) {
+
+            /*
+        |--------------------------------------------------------------------------
+        | Survey
+        |--------------------------------------------------------------------------
+        */
+
+            if ($request->filled('survey_ids')) {
+
+                WorkOrderSurvey::where('pelanggan_id', $pelangganAsal->id)
+                    ->whereIn('id', $request->survey_ids)
+                    ->update([
+                        'pelanggan_id' => $pelangganTujuan->id,
+                    ]);
+            }
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Instalasi
+        |--------------------------------------------------------------------------
+        */
+
+            if ($request->filled('instalasi_ids')) {
+
+                WorkOrderInstall::where('pelanggan_id', $pelangganAsal->id)
+                    ->whereIn('id', $request->instalasi_ids)
+                    ->update([
+                        'pelanggan_id' => $pelangganTujuan->id,
+                    ]);
+            }
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Online Billing
+        |--------------------------------------------------------------------------
+        */
+
+            if ($request->filled('online_billing_ids')) {
+
+                OnlineBilling::where('pelanggan_id', $pelangganAsal->id)
+                    ->whereIn('id', $request->online_billing_ids)
+                    ->update([
+                        'pelanggan_id' => $pelangganTujuan->id,
+                    ]);
+            }
+        });
+
+        return redirect()
+            ->route('pelanggan.relasi', $pelangganAsal->id)
+            ->with(
+                'success',
+                'Relasi pelanggan berhasil dipindahkan.'
+            );
+    }
     public function CreatePelanggan()
     {
         // Ambil data pelanggan
@@ -1456,33 +1819,447 @@ class AdminController extends Controller
         // Redirect ke halaman pelanggan dengan pesan sukses
         return redirect()->route('admin.pelanggan')->with('success', 'Data pelanggan berhasil dihapus.');
     }
+    public function destroyPelanggan($id)
+    {
+        $pelanggan = Pelanggan::withCount([
+            'onlineBillings',
+            'surveys',
+            'installations',
+        ])->findOrFail($id);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Cek Relasi
+    |--------------------------------------------------------------------------
+    */
+
+        if ($pelanggan->online_billings_count > 0) {
+
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    'Pelanggan tidak dapat dihapus karena masih memiliki relasi dengan Online Billing.'
+                );
+        }
+
+        if ($pelanggan->surveys_count > 0) {
+
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    'Pelanggan tidak dapat dihapus karena masih memiliki relasi dengan Work Order Survey.'
+                );
+        }
+
+        if ($pelanggan->installations_count > 0) {
+
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    'Pelanggan tidak dapat dihapus karena masih memiliki relasi dengan Work Order Instalasi.'
+                );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Hapus
+    |--------------------------------------------------------------------------
+    */
+
+        $pelanggan->delete();
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                'Pelanggan berhasil dihapus.'
+            );
+    }
     public function namavendor(Request $request)
     {
         $search = $request->get('search');
 
-        $query = Vendor::query();
-
-        if (!empty($search)) {
-            $query->where('nama_vendor', 'like', '%' . $search . '%');
-        }
-
-        $getVendor = $query
+        $getVendor = Vendor::withCount([
+            'surveys',
+            'installs',
+            'gantivendor',
+            'onlineBillings',
+        ])
+            ->when($request->filled('search'), function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama_vendor', 'like', '%' . $search . '%')
+                        ->orWhere('contact', 'like', '%' . $search . '%');
+                });
+            })
             ->orderBy('id', 'desc')
             ->paginate(10)
-            ->appends([
-                'search' => $search,
-            ]);
+            ->withQueryString();
 
-        $notifications = Notification::where('user_id', Auth::user()->id)
+        $notifications = Notification::where('user_id', Auth::id())
             ->where('is_read', false)
             ->get();
 
         $data = array_merge(
             $this->ambilDataRole(),
-            compact('getVendor', 'search', 'notifications')
+            compact(
+                'getVendor',
+                'search',
+                'notifications'
+            )
         );
 
         return $this->renderView('namavendor', $data);
+    }
+
+    public function relasiVendor($id)
+    {
+        $vendor = Vendor::findOrFail($id);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Relasi Vendor
+    |--------------------------------------------------------------------------
+    */
+
+        $surveys = WorkOrderSurvey::with([
+            'pelanggan',
+            'vendor'
+        ])
+            ->where('vendor_id', $vendor->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+
+        $installs = WorkOrderInstall::with([
+            'pelanggan',
+            'vendor'
+        ])
+            ->where('vendor_id', $vendor->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Ganti Vendor
+    |--------------------------------------------------------------------------
+    |
+    | Ganti Vendor mempunyai vendor_id sendiri.
+    | Jadi langsung cari berdasarkan vendor_id.
+    |
+    */
+
+        $gantiVendors = WorkOrderGantiVendor::with([
+            'onlineBilling'
+        ])
+            ->where('vendor_id', $vendor->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Online Billing
+    |--------------------------------------------------------------------------
+    */
+
+        $onlineBillings = OnlineBilling::with([
+            'pelanggan',
+            'vendor',
+            'instansi'
+        ])
+            ->where('vendor_id', $vendor->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Notification
+    |--------------------------------------------------------------------------
+    */
+
+        $notifications = Notification::where(
+            'user_id',
+            Auth::id()
+        )
+            ->where('is_read', false)
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | View
+    |--------------------------------------------------------------------------
+    */
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'vendor',
+                'surveys',
+                'installs',
+                'gantiVendors',
+                'onlineBillings',
+                'notifications'
+            )
+        );
+
+        return $this->renderView(
+            'vendor_relasi',
+            $data
+        );
+    }
+    public function pindahkanRelasiVendor(Request $request, $id)
+    {
+        $vendorAsal = Vendor::findOrFail($id);
+
+        $request->validate([
+            'vendor_tujuan_id' => [
+                'required',
+                'exists:vendors,id',
+                'different:' . $id,
+            ],
+
+            'relasi' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'relasi.*' => [
+                'string',
+            ],
+        ]);
+
+
+        $vendorTujuan = Vendor::findOrFail(
+            $request->vendor_tujuan_id
+        );
+
+
+        DB::beginTransaction();
+
+        try {
+
+            foreach ($request->relasi as $relasi) {
+
+                /*
+            |--------------------------------------------------------------------------
+            | Pisahkan jenis relasi dan ID
+            |--------------------------------------------------------------------------
+            |
+            | Contoh:
+            | survey:10
+            | instalasi:25
+            | ganti_vendor:7
+            | online_billing:100
+            |
+            */
+
+                [$jenis, $relasiId] = explode(':', $relasi, 2);
+
+
+                /*
+            |--------------------------------------------------------------------------
+            | Survey
+            |--------------------------------------------------------------------------
+            */
+
+                if ($jenis === 'survey') {
+
+                    $survey = WorkOrderSurvey::where(
+                        'id',
+                        $relasiId
+                    )
+                        ->where('vendor_id', $vendorAsal->id)
+                        ->first();
+
+                    if ($survey) {
+
+                        $survey->update([
+                            'vendor_id' => $vendorTujuan->id,
+                        ]);
+                    }
+                }
+
+
+                /*
+            |--------------------------------------------------------------------------
+            | Instalasi
+            |--------------------------------------------------------------------------
+            */ elseif ($jenis === 'instalasi') {
+
+                    $install = WorkOrderInstall::where(
+                        'id',
+                        $relasiId
+                    )
+                        ->where('vendor_id', $vendorAsal->id)
+
+                        ->first();
+
+                    if ($install) {
+
+                        $install->update([
+                            'vendor_id' => $vendorTujuan->id,
+                        ]);
+                    }
+                }
+
+
+                /*
+            |--------------------------------------------------------------------------
+            | Ganti Vendor
+            |--------------------------------------------------------------------------
+            */ elseif ($jenis === 'ganti_vendor') {
+
+                    $gantiVendor = WorkOrderGantiVendor::where(
+                        'id',
+                        $relasiId
+                    )
+                        ->where(
+                            'vendor_id',
+                            $vendorAsal->id
+                        )
+                        ->first();
+
+                    if ($gantiVendor) {
+
+                        $gantiVendor->update([
+                            'vendor_id' => $vendorTujuan->id,
+                        ]);
+                    }
+                }
+
+
+                /*
+            |--------------------------------------------------------------------------
+            | Online Billing
+            |--------------------------------------------------------------------------
+            */ elseif ($jenis === 'online_billing') {
+
+                    $onlineBilling = OnlineBilling::where(
+                        'id',
+                        $relasiId
+                    )
+                        ->where(
+                            'vendor_id',
+                            $vendorAsal->id
+                        )
+                        ->first();
+
+                    if ($onlineBilling) {
+
+                        $onlineBilling->update([
+                            'vendor_id' => $vendorTujuan->id,
+                        ]);
+                    }
+                }
+            }
+
+
+            DB::commit();
+
+
+            return redirect()
+                ->route(
+                    'vendor.relasi',
+                    $vendorAsal->id
+                )
+                ->with(
+                    'success',
+                    'Relasi vendor berhasil dipindahkan.'
+                );
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            return back()
+                ->with(
+                    'error',
+                    'Gagal memindahkan relasi vendor: '
+                        . $e->getMessage()
+                );
+        }
+    }
+    public function destroyVendor($id)
+    {
+        $vendor = Vendor::withCount([
+            'surveys',
+            'installs',
+            'gantivendor',
+            'onlineBillings',
+        ])->findOrFail($id);
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Cek Relasi
+    |--------------------------------------------------------------------------
+    */
+
+        if ($vendor->surveys_count > 0) {
+
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    'Vendor tidak dapat dihapus karena masih memiliki relasi dengan Work Order Survey.'
+                );
+        }
+
+
+        if ($vendor->installs_count > 0) {
+
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    'Vendor tidak dapat dihapus karena masih memiliki relasi dengan Work Order Instalasi.'
+                );
+        }
+
+
+        if ($vendor->gantivendor_count > 0) {
+
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    'Vendor tidak dapat dihapus karena masih memiliki relasi dengan Work Order Ganti Vendor.'
+                );
+        }
+
+
+        if ($vendor->online_billings_count > 0) {
+
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    'Vendor tidak dapat dihapus karena masih memiliki relasi dengan Online Billing.'
+                );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Hapus Vendor
+    |--------------------------------------------------------------------------
+    */
+
+        $vendor->delete();
+
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                'Vendor berhasil dihapus.'
+            );
     }
     public function CreateVendor()
     {
@@ -1678,21 +2455,53 @@ class AdminController extends Controller
 
     public function survey(Request $request)
     {
-        // Ambil parameter dari request
+        /*
+    |--------------------------------------------------------------------------
+    | Parameter Filter
+    |--------------------------------------------------------------------------
+    */
+
         $status = $request->get('status', 'all');
         $search = $request->get('search');
-        $month = $request->get('month');
-        $year = $request->get('year');
+        $month  = $request->get('month');
+        $year   = $request->get('year');
+        $field  = $request->get('field');
+        $value  = $request->get('value');
 
-        // Query untuk mendapatkan data survey
-        $query = WorkOrderSurvey::orderBy('created_at', 'desc');
 
-        // Filter berdasarkan status
+        /*
+    |--------------------------------------------------------------------------
+    | Query
+    |--------------------------------------------------------------------------
+    */
+
+        $query = WorkOrderSurvey::with([
+            'pelanggan',
+            'vendor',
+            'instansi',
+            'admin'
+        ])->orderBy('created_at', 'desc');
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Status
+    |--------------------------------------------------------------------------
+    */
+
         if ($status != 'all') {
             $query->where('status', $status);
         }
-        // filter overdue
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Overdue
+    |--------------------------------------------------------------------------
+    */
+
         if ($request->filter == 'overdue') {
+
             $query->whereDate('tanggal_rfs', '<', today())
                 ->whereNotIn('status', [
                     'Completed',
@@ -1700,47 +2509,218 @@ class AdminController extends Controller
                     'Canceled'
                 ]);
         }
-        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
         if (!empty($search)) {
+
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
-                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+
+                $q->where('no_spk', 'like', "%{$search}%")
+
+                    ->orWhere('nama_site', 'like', "%{$search}%")
+
+                    ->orWhereHas('pelanggan', function ($q) use ($search) {
+                        $q->where(
+                            'nama_pelanggan',
+                            'like',
+                            "%{$search}%"
+                        );
                     })
-                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+
+                    ->orWhereHas('vendor', function ($q) use ($search) {
+                        $q->where(
+                            'nama_vendor',
+                            'like',
+                            "%{$search}%"
+                        );
                     })
-                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
-                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
-                        $q->where('name', 'like', '%' . $search . '%');
+
+                    ->orWhereHas('instansi', function ($q) use ($search) {
+                        $q->where(
+                            'nama_instansi',
+                            'like',
+                            "%{$search}%"
+                        );
+                    })
+
+                    ->orWhereHas('admin', function ($q) use ($search) {
+                        $q->where(
+                            'name',
+                            'like',
+                            "%{$search}%"
+                        );
                     });
             });
         }
 
-        // Filter berdasarkan bulan dan tahun
-        if (!empty($month) && !empty($year)) {
-            $query->whereMonth('created_at', $month)
-                ->whereYear('created_at', $year);
-        } elseif (!empty($year)) {
-            $query->whereYear('created_at', $year);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dynamic Filter
+    |--------------------------------------------------------------------------
+    */
+
+        $filterMap = [
+            'vendor'    => 'vendor_id',
+            'pelanggan' => 'pelanggan_id',
+        ];
+
+
+        if (!empty($field) && !empty($value)) {
+
+            if (isset($filterMap[$field])) {
+
+                $query->where(
+                    $filterMap[$field],
+                    $value
+                );
+            }
         }
 
-        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $getSurvey = $query->paginate(10)->appends([
-            'status' => $status,
-            'search' => $search,
-            'month' => $month,
-            'year' => $year,
-        ]);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Tahun
+    |--------------------------------------------------------------------------
+    */
+
+        if (!empty($year)) {
+
+            $query->whereYear(
+                'created_at',
+                $year
+            );
+        }
 
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('getSurvey', 'status', 'search', 'month', 'year', 'notifications'));
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Bulan
+    |--------------------------------------------------------------------------
+    */
 
-        // Render view berdasarkan role
-        return $this->renderView('survey', $data);
+        if (!empty($month)) {
+
+            $query->whereMonth(
+                'created_at',
+                $month
+            );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+        $getSurvey = $query
+            ->paginate(10)
+            ->appends($request->query());
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Filter
+    |--------------------------------------------------------------------------
+    */
+
+        $vendors = Vendor::orderBy(
+            'nama_vendor'
+        )->get();
+
+        $pelanggans = Pelanggan::orderBy(
+            'nama_pelanggan'
+        )->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Nilai
+    |--------------------------------------------------------------------------
+    */
+
+        $filterValues = collect();
+
+
+        switch ($field) {
+
+            case 'vendor':
+
+                $filterValues = Vendor::orderBy(
+                    'nama_vendor'
+                )->pluck(
+                    'nama_vendor',
+                    'id'
+                );
+
+                break;
+
+
+            case 'pelanggan':
+
+                $filterValues = Pelanggan::orderBy(
+                    'nama_pelanggan'
+                )->pluck(
+                    'nama_pelanggan',
+                    'id'
+                );
+
+                break;
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Notification
+    |--------------------------------------------------------------------------
+    */
+
+        $notifications = Notification::where(
+            'user_id',
+            Auth::id()
+        )
+            ->where(
+                'is_read',
+                false
+            )
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | View
+    |--------------------------------------------------------------------------
+    */
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'getSurvey',
+                'status',
+                'search',
+                'month',
+                'year',
+                'field',
+                'value',
+                'vendors',
+                'pelanggans',
+                'filterValues',
+                'notifications'
+            )
+        );
+
+
+        return $this->renderView(
+            'survey',
+            $data
+        );
     }
 
     public function create()
@@ -3759,61 +4739,290 @@ class AdminController extends Controller
 
     public function gantivendor(Request $request)
     {
-        // Ambil parameter dari request
+        /*
+    |--------------------------------------------------------------------------
+    | Parameter Filter
+    |--------------------------------------------------------------------------
+    */
+
         $status = $request->get('status', 'all');
         $search = $request->get('search');
-        $month = $request->get('month');
-        $year = $request->get('year');
+        $month  = $request->get('month');
+        $year   = $request->get('year');
+        $field  = $request->get('field');
+        $value  = $request->get('value');
 
-        // Query untuk mendapatkan data survey dengan eager loading
+
+        /*
+    |--------------------------------------------------------------------------
+    | Query
+    |--------------------------------------------------------------------------
+    */
+
         $query = WorkOrderGantiVendor::with([
             'onlineBilling.pelanggan',
-            'onlineBilling.vendor',
-            'onlineBilling.instansi'
-        ])->orderBy('created_at', 'desc');
+            'onlineBilling.instansi',
+            'vendor',
+            'admin'
+        ])
+            ->orderBy('created_at', 'desc');
 
-        // Filter berdasarkan status
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Status
+    |--------------------------------------------------------------------------
+    */
+
         if ($status != 'all') {
-            $query->where('status', $status);
+
+            $query->where(
+                'status',
+                $status
+            );
         }
-        // Pencarian di semua kolom yang relevan
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
         if (!empty($search)) {
+
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%')
+
+                /*
+            | No SPK
+            */
+
+                $q->where(
+                    'no_spk',
+                    'like',
+                    '%' . $search . '%'
+                )
+
+
+                    /*
+            | Nama Vendor
+            */
+
+                    ->orWhereHas('vendor', function ($q) use ($search) {
+
+                        $q->where(
+                            'nama_vendor',
+                            'like',
+                            '%' . $search . '%'
+                        );
+                    })
+
+
+                    /*
+            | Data Online Billing
+            */
+
                     ->orWhereHas('onlineBilling', function ($q) use ($search) {
-                        $q->where('nama_site', 'like', '%' . $search . '%')
-                            ->orWhereHas('pelanggan', function ($q) use ($search) {
-                                $q->where('nama_pelanggan', 'like', '%' . $search . '%');
-                            })
-                            ->orWhereHas('instansi', function ($q) use ($search) {
-                                $q->where('nama_instansi', 'like', '%' . $search . '%');
-                            });
+
+                        $q->where(
+                            'nama_site',
+                            'like',
+                            '%' . $search . '%'
+                        )
+
+                            ->orWhere(
+                                'no_jaringan',
+                                'like',
+                                '%' . $search . '%'
+                            );
+
+
+                        /*
+                | Pelanggan
+                */
+
+                        $q->orWhereHas('pelanggan', function ($q) use ($search) {
+
+                            $q->where(
+                                'nama_pelanggan',
+                                'like',
+                                '%' . $search . '%'
+                            );
+                        });
+
+
+                        /*
+                | Instansi
+                */
+
+                        $q->orWhereHas('instansi', function ($q) use ($search) {
+
+                            $q->where(
+                                'nama_instansi',
+                                'like',
+                                '%' . $search . '%'
+                            );
+                        });
                     });
             });
         }
-        // Filter berdasarkan bulan dan tahun
-        if (!empty($month) && !empty($year)) {
-            $query->whereMonth('created_at', $month)
-                ->whereYear('created_at', $year);
-        } elseif (!empty($year)) {
-            $query->whereYear('created_at', $year);
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Vendor
+    |--------------------------------------------------------------------------
+    |
+    | Khusus Ganti Vendor:
+    |
+    | vendor_id berada langsung pada tabel
+    | work_order_ganti_vendors.
+    |
+    */
+
+        if (
+            $field === 'vendor' &&
+            !empty($value)
+        ) {
+
+            $query->where(
+                'vendor_id',
+                $value
+            );
         }
 
-        // Dapatkan data survey dengan pagination
-        $getGantivendor = $query->paginate(10)->appends([
-            'status' => $status,
-            'search' => $search,
-            'month' => $month,
-            'year' => $year,
-        ]);
 
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Bulan dan Tahun
+    |--------------------------------------------------------------------------
+    */
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('getGantivendor', 'status', 'search', 'month', 'year', 'notifications'));
+        if (
+            !empty($month) &&
+            !empty($year)
+        ) {
 
-        return $this->renderView('gantivendor', $data);
+            $query->whereMonth(
+                'created_at',
+                $month
+            )
+                ->whereYear(
+                    'created_at',
+                    $year
+                );
+        } elseif (!empty($year)) {
+
+            $query->whereYear(
+                'created_at',
+                $year
+            );
+        } elseif (!empty($month)) {
+
+            $query->whereMonth(
+                'created_at',
+                $month
+            );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+        $getGantivendor = $query
+            ->paginate(10)
+            ->appends(
+                $request->query()
+            );
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Vendor
+    |--------------------------------------------------------------------------
+    */
+
+        $vendors = Vendor::orderBy(
+            'nama_vendor'
+        )->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Value
+    |--------------------------------------------------------------------------
+    |
+    | Hanya Vendor
+    |
+    */
+
+        $filterValues = collect();
+
+        if ($field === 'vendor') {
+
+            $filterValues = Vendor::orderBy(
+                'nama_vendor'
+            )
+                ->pluck(
+                    'nama_vendor',
+                    'id'
+                );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Notification
+    |--------------------------------------------------------------------------
+    */
+
+        $notifications = Notification::where(
+            'user_id',
+            Auth::user()->id
+        )
+            ->where(
+                'is_read',
+                false
+            )
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Data View
+    |--------------------------------------------------------------------------
+    */
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'getGantivendor',
+                'status',
+                'search',
+                'month',
+                'year',
+                'field',
+                'value',
+                'vendors',
+                'filterValues',
+                'notifications'
+            )
+        );
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
+
+        return $this->renderView(
+            'gantivendor',
+            $data
+        );
     }
     public function showgantivendor($id)
     {
@@ -5000,7 +6209,10 @@ class AdminController extends Controller
     {
         return Excel::download(new WorkOrderInstallExport, ' Laporan WorkOrderInstalasi.xlsx');
     }
-
+    public function exportVendor()
+    {
+        return Excel::download(new VendorExport, ' Laporan DataVendor.xlsx');
+    }
     public function exportWoUpgrade()
     {
         return Excel::download(new WorkOrderUpgradeExport, ' Laporan WorkOrderUpgrade.xlsx');
@@ -5022,7 +6234,10 @@ class AdminController extends Controller
     {
         return Excel::download(new WorkOrderGantiVendorExport, ' Laporan WorkOrderGantiVendor.xlsx');
     }
-
+    public function exportPelanggan()
+    {
+        return Excel::download(new PelangganExport, ' Laporan DataPelanggan.xlsx');
+    }
     public function import(Request $request)
     {
         $request->validate([
@@ -5039,21 +6254,46 @@ class AdminController extends Controller
 
     public function jasa(Request $request)
     {
-        // Ambil parameter dari request
+
         $status = $request->get('status', 'all');
         $search = $request->get('search');
-        $month = $request->get('month');
-        $year = $request->get('year');
+        $month  = $request->get('month');
+        $year   = $request->get('year');
+        $field  = $request->get('field');
+        $value  = $request->get('value');
 
-        // Query untuk mendapatkan data survey
-        $query = WorkOrderInstall::where('jenis_pekerjaan', 'jasa')
-            ->orderBy('created_at', 'desc');
-        // Filter berdasarkan status
+
+        /*
+    |--------------------------------------------------------------------------
+    | Query
+    |--------------------------------------------------------------------------
+    */
+
+        $query = WorkOrderInstall::where(
+            'jenis_pekerjaan',
+            'jasa'
+        )->orderBy('created_at', 'desc');
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Status
+    |--------------------------------------------------------------------------
+    */
+
         if ($status != 'all') {
             $query->where('status', $status);
         }
-        // filter overdue
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Overdue
+    |--------------------------------------------------------------------------
+    */
+
         if ($request->filter == 'overdue') {
+
             $query->whereDate('tanggal_rfs', '<', today())
                 ->whereNotIn('status', [
                     'Completed',
@@ -5061,44 +6301,211 @@ class AdminController extends Controller
                     'Canceled'
                 ]);
         }
-        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
         if (!empty($search)) {
+
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
-                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+
+                $q->where(
+                    'no_spk',
+                    'like',
+                    '%' . $search . '%'
+                )
+
+                    ->orWhereHas('pelanggan', function ($q) use ($search) {
+                        $q->where(
+                            'nama_pelanggan',
+                            'like',
+                            '%' . $search . '%'
+                        );
                     })
-                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+
+                    ->orWhereHas('instansi', function ($q) use ($search) {
+                        $q->where(
+                            'nama_instansi',
+                            'like',
+                            '%' . $search . '%'
+                        );
                     })
-                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
-                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
-                        $q->where('name', 'like', '%' . $search . '%');
+
+                    ->orWhere('nama_site', 'like', '%' . $search . '%')
+
+                    ->orWhere('no_jaringan', 'like', '%' . $search . '%')
+
+                    ->orWhereHas('admin', function ($q) use ($search) {
+                        $q->where(
+                            'name',
+                            'like',
+                            '%' . $search . '%'
+                        );
+                    })
+
+                    // Tambahan pencarian nama vendor
+                    ->orWhereHas('vendor', function ($q) use ($search) {
+                        $q->where(
+                            'nama_vendor',
+                            'like',
+                            '%' . $search . '%'
+                        );
                     });
             });
         }
 
-        // Filter berdasarkan bulan dan tahun
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dynamic Filter Vendor / Pelanggan
+    |--------------------------------------------------------------------------
+    */
+
+        $filterMap = [
+            'vendor'    => 'vendor_id',
+            'pelanggan' => 'pelanggan_id',
+        ];
+
+
+        if (!empty($field) && !empty($value)) {
+
+            if (isset($filterMap[$field])) {
+
+                $query->where(
+                    $filterMap[$field],
+                    $value
+                );
+            }
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Bulan dan Tahun
+    |--------------------------------------------------------------------------
+    */
+
         if (!empty($month) && !empty($year)) {
+
             $query->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year);
         } elseif (!empty($year)) {
+
             $query->whereYear('created_at', $year);
+        } elseif (!empty($month)) {
+
+            $query->whereMonth('created_at', $month);
         }
 
-        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $getInstall = $query->paginate(10)->appends([
-            'status' => $status,
-            'search' => $search,
-            'month' => $month,
-            'year' => $year,
-        ]);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+        $getInstall = $query
+            ->paginate(10)
+            ->appends($request->query());
 
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Vendor
+    |--------------------------------------------------------------------------
+    */
+
+        $vendors = Vendor::orderBy('nama_vendor')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Pelanggan
+    |--------------------------------------------------------------------------
+    */
+
+        $pelanggans = Pelanggan::orderBy('nama_pelanggan')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Nilai Berdasarkan Field
+    |--------------------------------------------------------------------------
+    */
+
+        $filterValues = collect();
+
+
+        switch ($field) {
+
+            case 'vendor':
+
+                $filterValues = Vendor::orderBy('nama_vendor')
+                    ->pluck(
+                        'nama_vendor',
+                        'id'
+                    );
+
+                break;
+
+
+            case 'pelanggan':
+
+                $filterValues = Pelanggan::orderBy('nama_pelanggan')
+                    ->pluck(
+                        'nama_pelanggan',
+                        'id'
+                    );
+
+                break;
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Notification
+    |--------------------------------------------------------------------------
+    */
+
+        $notifications = Notification::where(
+            'user_id',
+            Auth::user()->id
+        )
+            ->where(
+                'is_read',
+                false
+            )
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | View
+    |--------------------------------------------------------------------------
+    */
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'getInstall',
+                'status',
+                'search',
+                'month',
+                'year',
+                'field',
+                'value',
+                'vendors',
+                'pelanggans',
+                'filterValues',
+                'notifications'
+            )
+        );
 
         // Render view berdasarkan role
         return $this->renderView('jasa', $data);
@@ -5127,21 +6534,45 @@ class AdminController extends Controller
 
     public function poc(Request $request)
     {
-        // Ambil parameter dari request
         $status = $request->get('status', 'all');
         $search = $request->get('search');
-        $month = $request->get('month');
-        $year = $request->get('year');
+        $month  = $request->get('month');
+        $year   = $request->get('year');
+        $field  = $request->get('field');
+        $value  = $request->get('value');
 
-        // Query untuk mendapatkan data survey
-        $query = WorkOrderInstall::where('jenis_pekerjaan', 'poc')
-            ->orderBy('created_at', 'desc');
-        // Filter berdasarkan status
+
+        /*
+    |--------------------------------------------------------------------------
+    | Query
+    |--------------------------------------------------------------------------
+    */
+
+        $query = WorkOrderInstall::where(
+            'jenis_pekerjaan',
+            'poc'
+        )->orderBy('created_at', 'desc');
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Status
+    |--------------------------------------------------------------------------
+    */
+
         if ($status != 'all') {
             $query->where('status', $status);
         }
-        // filter overdue
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Overdue
+    |--------------------------------------------------------------------------
+    */
+
         if ($request->filter == 'overdue') {
+
             $query->whereDate('tanggal_rfs', '<', today())
                 ->whereNotIn('status', [
                     'Completed',
@@ -5149,45 +6580,211 @@ class AdminController extends Controller
                     'Canceled'
                 ]);
         }
-        // Pencarian di semua kolom yang relevan (nomor work order dan nama pembuat)
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
         if (!empty($search)) {
+
             $query->where(function ($q) use ($search) {
-                $q->where('no_spk', 'like', '%' . $search . '%') // Pencarian di kolom no_spk
-                    ->orWhereHas('pelanggan', function ($q) use ($search) { // Pencarian di relasi pelanggan
-                        $q->where('nama_pelanggan', 'like', '%' . $search . '%');
+
+                $q->where(
+                    'no_spk',
+                    'like',
+                    '%' . $search . '%'
+                )
+
+                    ->orWhereHas('pelanggan', function ($q) use ($search) {
+                        $q->where(
+                            'nama_pelanggan',
+                            'like',
+                            '%' . $search . '%'
+                        );
                     })
-                    ->orWhereHas('instansi', function ($q) use ($search) { // Pencarian di relasi instansi
-                        $q->where('nama_instansi', 'like', '%' . $search . '%');
+
+                    ->orWhereHas('instansi', function ($q) use ($search) {
+                        $q->where(
+                            'nama_instansi',
+                            'like',
+                            '%' . $search . '%'
+                        );
                     })
-                    ->orWhere('nama_site', 'like', '%' . $search . '%') // Pencarian di kolom nama_site
-                    ->orWhereHas('admin', function ($q) use ($search) { // Pencarian di kolom nama admin melalui relasi
-                        $q->where('name', 'like', '%' . $search . '%');
+
+                    ->orWhere('nama_site', 'like', '%' . $search . '%')
+
+                    ->orWhere('no_jaringan', 'like', '%' . $search . '%')
+
+                    ->orWhereHas('admin', function ($q) use ($search) {
+                        $q->where(
+                            'name',
+                            'like',
+                            '%' . $search . '%'
+                        );
+                    })
+
+                    // Tambahan pencarian nama vendor
+                    ->orWhereHas('vendor', function ($q) use ($search) {
+                        $q->where(
+                            'nama_vendor',
+                            'like',
+                            '%' . $search . '%'
+                        );
                     });
             });
         }
 
-        // Filter berdasarkan bulan dan tahun
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dynamic Filter Vendor / Pelanggan
+    |--------------------------------------------------------------------------
+    */
+
+        $filterMap = [
+            'vendor'    => 'vendor_id',
+            'pelanggan' => 'pelanggan_id',
+        ];
+
+
+        if (!empty($field) && !empty($value)) {
+
+            if (isset($filterMap[$field])) {
+
+                $query->where(
+                    $filterMap[$field],
+                    $value
+                );
+            }
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Filter Bulan dan Tahun
+    |--------------------------------------------------------------------------
+    */
+
         if (!empty($month) && !empty($year)) {
+
             $query->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year);
         } elseif (!empty($year)) {
+
             $query->whereYear('created_at', $year);
+        } elseif (!empty($month)) {
+
+            $query->whereMonth('created_at', $month);
         }
 
-        // Dapatkan data survey dengan pagination, dan tambahkan query ke pagination URL
-        $getInstall = $query->paginate(10)->appends([
-            'status' => $status,
-            'search' => $search,
-            'month' => $month,
-            'year' => $year,
-        ]);
-        // Ambil notifikasi yang belum dibaca
-        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+        $getInstall = $query
+            ->paginate(10)
+            ->appends($request->query());
 
 
-        // Gabungkan data survey ke dalam data role
-        $data = array_merge($this->ambilDataRole(), compact('getInstall', 'status', 'search', 'month', 'year', 'notifications'));
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Vendor
+    |--------------------------------------------------------------------------
+    */
 
+        $vendors = Vendor::orderBy('nama_vendor')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Pelanggan
+    |--------------------------------------------------------------------------
+    */
+
+        $pelanggans = Pelanggan::orderBy('nama_pelanggan')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Dropdown Nilai Berdasarkan Field
+    |--------------------------------------------------------------------------
+    */
+
+        $filterValues = collect();
+
+
+        switch ($field) {
+
+            case 'vendor':
+
+                $filterValues = Vendor::orderBy('nama_vendor')
+                    ->pluck(
+                        'nama_vendor',
+                        'id'
+                    );
+
+                break;
+
+
+            case 'pelanggan':
+
+                $filterValues = Pelanggan::orderBy('nama_pelanggan')
+                    ->pluck(
+                        'nama_pelanggan',
+                        'id'
+                    );
+
+                break;
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Notification
+    |--------------------------------------------------------------------------
+    */
+
+        $notifications = Notification::where(
+            'user_id',
+            Auth::user()->id
+        )
+            ->where(
+                'is_read',
+                false
+            )
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | View
+    |--------------------------------------------------------------------------
+    */
+
+        $data = array_merge(
+            $this->ambilDataRole(),
+            compact(
+                'getInstall',
+                'status',
+                'search',
+                'month',
+                'year',
+                'field',
+                'value',
+                'vendors',
+                'pelanggans',
+                'filterValues',
+                'notifications'
+            )
+        );
         // Render view berdasarkan role
         return $this->renderView('poc', $data);
     }

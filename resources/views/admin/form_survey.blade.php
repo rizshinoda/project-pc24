@@ -177,7 +177,8 @@
                                                             data-no-pelanggan="{{ $pelanggan->no_pelanggan }}"
                                                             data-foto="{{ asset('storage/pelanggan/' . $pelanggan->foto) }}">
 
-                                                            {{ $pelanggan->nama_pelanggan }}
+                                                            {{ $pelanggan->nama_pelanggan }} - ({{ $pelanggan->kode_pelanggan }})
+
                                                         </option>
                                                         @endforeach
                                                     </select>

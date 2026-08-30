@@ -316,7 +316,7 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Vendor Baru</h4>
-                                    @if ($getGantivendor->status === 'On Progress')
+                                    @if ($getGantivendor->status === 'On Progress' || $getGantivendor->status === 'Completed')
                                     <a href="{{ route('admin.gantivendor.input', $getGantivendor->id) }}" class="btn btn-sm btn-info mb-3"> <i class="fa fa-plus"></i>
 
                                         Input Vendor</a>

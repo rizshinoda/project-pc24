@@ -151,6 +151,32 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::put('/admin/vendor/{id}', [AdminController::class, 'UpdateVendor'])->name('vendor.update');
     Route::delete('/admin/vendor/{id}', [AdminController::class, 'HapusVendor'])->name('vendor.hapus');
 
+    Route::get(
+        'admin/pelanggan/{id}/relasi',
+        [AdminController::class, 'pelangganRelasi']
+    )->name('pelanggan.relasi');
+    Route::post(
+        'admin/pelanggan/{id}/pindahkan-relasi',
+        [AdminController::class, 'pindahkanRelasiPelanggan']
+    )->name('pelanggan.pindahkan-relasi');
+
+    Route::delete(
+        '/admin/pelanggan/{id}',
+        [AdminController::class, 'destroyPelanggan']
+    )->name('pelanggan.destroy');
+
+    Route::get(
+        '/admin/vendor/{id}/relasi',
+        [AdminController::class, 'relasiVendor']
+    )->name('vendor.relasi');
+    Route::post(
+        '/admin/vendor/{id}/pindahkan-relasi',
+        [AdminController::class, 'pindahkanRelasiVendor']
+    )->name('vendor.pindahkan-relasi');
+    Route::delete(
+        '/admin/vendor/{id}',
+        [AdminController::class, 'destroyVendor']
+    )->name('vendor.destroy');
     // Routes untuk Instansi
     Route::get('/admin/instansi', [AdminController::class, 'instansi'])->name('admin.instansi');
     Route::get('/admin/instansi/create', [AdminController::class, 'CreateInstansi'])->name('instansi.create');
@@ -267,6 +293,8 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::get('admin/work-order-dismantle/export', [AdminController::class, 'exportWoDismantle'])->name('work-order-dismantle.export');
     Route::get('admin/work-order-relokasi/export', [AdminController::class, 'exportWoRelokasi'])->name('work-order-relokasi.export');
     Route::get('admin/work-order-gantivendor/export', [AdminController::class, 'exportWoGantiVendor'])->name('work-order-gantivendor.export');
+    Route::get('admin/vendor/export', [AdminController::class, 'exportVendor'])->name('vendor.export');
+    Route::get('admin/pelanggan/export', [AdminController::class, 'exportPelanggan'])->name('pelanggan.export');
 
     Route::get('admin/Online-Billing/export', [AdminController::class, 'exportOB'])->name('admin.work-OB.export');
 

@@ -151,80 +151,274 @@
                     </div>
                     <div class="col-lg-12 grid-margin stretch-card">
                         <div class="card">
-
                             <div class="card-body">
-                                <form method="GET" action="{{ route('admin.pelanggan') }}" class="mb-4">
+
+                                {{-- Form Pencarian --}}
+                                <form method="GET"
+                                    action="{{ route('admin.pelanggan') }}"
+                                    class="mb-4">
+
                                     <div class="row">
-                                        <!-- Kolom Pencarian -->
+
+                                        {{-- Kolom Pencarian --}}
                                         <div class="col-md-6 mb-3">
-                                            <input type="text" name="search" class="form-control contoh1" placeholder="Cari Data" value="{{ request('search') }}">
+                                            <input
+                                                type="text"
+                                                name="search"
+                                                class="form-control contoh1"
+                                                placeholder="Cari Data"
+                                                value="{{ request('search') }}">
                                         </div>
 
-
-                                        <!-- Tombol Filter -->
+                                        {{-- Tombol --}}
                                         <div class="">
-                                            <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
-                                            <a href="{{route('pelanggan.create')}}" class="btn btn-info btn-sm mb-4 ">Tambah Data</a>
-                                            <!-- <a href="{{ route('work-order-install.export') }}" class="btn btn-sm btn-success pull-right">Export Excel</a> -->
 
+                                            <button
+                                                type="submit"
+                                                class="btn btn-info btn-sm mb-4"> <i class="fa fa-search"></i>
+
+                                                Cari
+                                            </button>
+
+                                            <a
+                                                href="{{ route('pelanggan.create') }}"
+                                                class="btn btn-info btn-sm mb-4"> <i class="fa fa-plus"></i>
+
+                                                Tambah Data
+                                            </a>
+                                            <a href="{{ route('pelanggan.export') }}"
+                                                class="btn btn-sm btn-success pull-right">
+
+                                                Export Excel
+
+                                            </a>
                                         </div>
+
                                     </div>
                                 </form>
-                                <div class=" table-responsive">
+
+
+                                {{-- Tabel --}}
+                                <div class="table-responsive">
 
                                     <table class="table table-hover wrap">
+
                                         <thead>
                                             <tr>
-                                                <th style="text-align: center; vertical-align: middle;">No</th>
-                                                <th style="text-align: center; vertical-align: middle;">Nama Pelanggan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Nama Gedung</th>
-                                                <th style="text-align: center; vertical-align: middle;">No Pelanggan</th>
-                                                <th style="text-align: center; vertical-align: middle;">Alamat</th>
-                                                <th style="text-align: center; vertical-align: middle;">Foto</th>
-                                                <th style="text-align: center; vertical-align: middle;">Aksi</th>
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    No
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Kode Pelanggan
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Nama Pelanggan
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Nama Gedung
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    No Pelanggan
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Alamat
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Total Relasi
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Foto
+                                                </th>
+
+                                                <th style="text-align: center; vertical-align: middle;">
+                                                    Aksi
+                                                </th>
                                             </tr>
                                         </thead>
+
                                         <tbody>
-                                            @foreach ($getPelanggan as $key => $pelanggan)
+
+                                            @forelse ($getPelanggan as $key => $pelanggan)
+
+                                            @php
+                                            $totalRelasi =
+                                            $pelanggan->surveys_count +
+                                            $pelanggan->installations_count +
+                                            $pelanggan->online_billings_count;
+                                            @endphp
+
                                             <tr>
-                                                <td style=" text-align: center; vertical-align: middle;">{{$getPelanggan->firstItem()+ $key}} </td>
-                                                <td style="text-align: center; vertical-align: middle;">{{$pelanggan->nama_pelanggan}}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{$pelanggan->nama_gedung}}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{$pelanggan->no_pelanggan}}</td>
-                                                <td style="text-align: center; vertical-align: middle;">{{$pelanggan->alamat= \Str::limit($pelanggan->alamat, 70);}}</td>
-                                                <td>
-                                                    @if ($pelanggan->foto)
-                                                    <img src="{{ asset('storage/pelanggan/' . $pelanggan->foto) }}" alt="Foto Pelanggan" class="img-fluid square-image" style="width: 100px;">
-                                                    @endif
-                                                </td>
+
+                                                {{-- No --}}
                                                 <td style="text-align: center; vertical-align: middle;">
-                                                    <!-- Tombol Edit -->
-                                                    <a href=" {{ route('pelanggan.edit', $pelanggan->id) }}" class="btn btn-sm btn-warning" style="display:inline-block; "><i class="fa fa-edit"></i></a>
+                                                    {{ $getPelanggan->firstItem() + $key }}
+                                                </td>
 
+                                                {{-- Kode Pelanggan --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+                                                    {{ $pelanggan->kode_pelanggan }}
+                                                </td>
+
+                                                {{-- Nama Pelanggan --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+                                                    {{ $pelanggan->nama_pelanggan }}
+                                                </td>
+
+                                                {{-- Nama Gedung --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+                                                    {{ $pelanggan->nama_gedung }}
+                                                </td>
+
+                                                {{-- No Pelanggan --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+                                                    {{ $pelanggan->no_pelanggan }}
+                                                </td>
+
+                                                {{-- Alamat --}}
+                                                <td style="vertical-align: middle;">
+                                                    {{ Str::limit($pelanggan->alamat,50) }}
+                                                </td>
+
+                                                {{-- Total Relasi --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+
+                                                    <span class="badge {{ $totalRelasi == 0 ? 'badge-danger' : 'badge-info' }}">
+                                                        {{ $totalRelasi }}
+                                                    </span>
 
                                                 </td>
+
+                                                {{-- Foto --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+
+                                                    @if ($pelanggan->foto)
+
+                                                    <img
+                                                        src="{{ asset('storage/pelanggan/' . $pelanggan->foto) }}"
+                                                        alt="Foto Pelanggan"
+                                                        class="img-fluid square-image"
+                                                        style="width: 100px;">
+
+                                                    @endif
+
+                                                </td>
+
+                                                {{-- Aksi --}}
+                                                <td style="text-align: center; vertical-align: middle;">
+
+                                                    {{-- Lihat Relasi --}}
+                                                    <a
+                                                        href="{{ route('pelanggan.relasi', $pelanggan->id) }}"
+                                                        class="btn btn-sm btn-info"
+                                                        title="Lihat Relasi">
+
+                                                        <i class="fa fa-search"></i>
+
+                                                    </a>
+
+                                                    {{-- Edit --}}
+                                                    <a
+                                                        href="{{ route('pelanggan.edit', $pelanggan->id) }}"
+                                                        class="btn btn-sm btn-warning"
+                                                        title="Edit">
+
+                                                        <i class="fa fa-edit"></i>
+
+                                                    </a>
+
+                                                    {{-- Hapus --}}
+                                                    @if ($totalRelasi == 0)
+
+                                                    <form
+                                                        action="{{ route('pelanggan.destroy', $pelanggan->id) }}"
+                                                        method="POST"
+                                                        style="display: inline-block;"
+                                                        class="form-hapus-pelanggan">
+
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button
+                                                            type="submit"
+                                                            class="btn btn-sm btn-danger"
+                                                            title="Hapus">
+
+                                                            <i class="fa fa-trash"></i>
+
+                                                        </button>
+
+                                                    </form>
+
+                                                    @else
+
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-sm btn-secondary"
+                                                        title="Tidak dapat dihapus karena masih memiliki relasi"
+                                                        disabled>
+
+                                                        <i class="fa fa-trash"></i>
+
+                                                    </button>
+
+                                                    @endif
+
+                                                </td>
+
                                             </tr>
-                                            @endforeach
+
+                                            @empty
+
+                                            <tr>
+
+                                                <td colspan="9" class="text-center">
+                                                    Tidak ada data pelanggan.
+                                                </td>
+
+                                            </tr>
+
+                                            @endforelse
+
                                         </tbody>
+
                                     </table>
+
                                 </div>
+
+
+                                {{-- Informasi Pagination --}}
                                 <div class="mt-3">
+
                                     Showing
-                                    {{$getPelanggan->firstItem()}}
+                                    {{ $getPelanggan->firstItem() ?? 0 }}
+
                                     to
-                                    {{$getPelanggan->lastItem()}}
+                                    {{ $getPelanggan->lastItem() ?? 0 }}
+
                                     of
-                                    {{$getPelanggan->total()}}
+                                    {{ $getPelanggan->total() }}
+
                                     entries
 
                                 </div>
-                                <div class="pull-right">
+
+
+                                {{-- Pagination --}}
+                                <div class="d-flex justify-content-end">
+
                                     {{ $getPelanggan->links() }}
+
                                 </div>
+
                             </div>
-
                         </div>
-
                     </div>
                 </div>
                 <!-- content-wrapper ends -->

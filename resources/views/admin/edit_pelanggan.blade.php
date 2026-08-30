@@ -163,14 +163,7 @@
                                             <input type="text" class="form-control" id="nama_pelanggan" name="nama_pelanggan" value="{{ old('nama_pelanggan', $pelanggans->nama_pelanggan) }}" required>
 
                                         </div>
-                                        <!-- Alamat Pelanggan -->
 
-                                        <div class="form-group ">
-                                            <label for="no_pelanggan">Alamat</label>
-
-                                            <textarea class="form-control" id="alamat" name="alamat" rows="4">{{$pelanggans->alamat}}</textarea>
-
-                                        </div>
                                         <div class=" form-group ">
                                             <label for="no_pelanggan">Nama Gedung</label>
 
@@ -185,7 +178,14 @@
 
                                         </div>
 
+                                        <!-- Alamat Pelanggan -->
 
+                                        <div class="form-group ">
+                                            <label for="no_pelanggan">Alamat</label>
+
+                                            <textarea class="form-control" id="alamat" name="alamat" rows="4">{{$pelanggans->alamat}}</textarea>
+
+                                        </div>
                                         <div class="form-group ">
                                             <label for="no_pelanggan">Foto</label>
                                             <input type="file" class="form-control" id="foto" name="foto">
