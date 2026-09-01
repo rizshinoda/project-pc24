@@ -197,7 +197,7 @@
                                                 <label for="jumlah" class="col-sm-4 col-form-label">Jumlah</label>
                                                 <div class="col-sm-8">
                                                     <input type="number" name="jumlah" class="form-control form-control-sm"
-                                                        value="{{ $stockBarang->jumlah }}" min="1" placeholder="Jumlah">
+                                                        value="{{ $stockBarang->jumlah }}" placeholder="Jumlah" required>
                                                 </div>
                                             </div>
 
