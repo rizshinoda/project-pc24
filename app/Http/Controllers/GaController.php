@@ -897,13 +897,11 @@ class GaController extends Controller
             'jenis_id' => 'required|exists:jenis,id',
             'merek_id' => 'required|exists:mereks,id',
             'tipe_id' => 'required|exists:tipes,id',
-            'jumlah' => 'nullable|integer|min:1',  // Jumlah opsional, minimal 1
+            'jumlah' => 'nullable|integer',  // Jumlah opsional, minimal 1
             'serial_number' => 'nullable|string',
             'kualitas' => 'required|in:baru,bekas',
         ]);
 
-        // Set default jumlah ke 1 jika tidak diisi atau jika nilainya kurang dari 1
-        $validatedData['jumlah'] = $request->input('jumlah') >= 1 ? $request->input('jumlah') : 1;
 
         // Temukan data stok barang berdasarkan ID
         $stockBarang = StockBarang::findOrFail($id);
