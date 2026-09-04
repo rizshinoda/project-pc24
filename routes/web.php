@@ -200,6 +200,8 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
     Route::post('admin/survey/{id}/progressinstall', [AdminController::class, 'storeprogressinstall'])->name('admin.survey.storeprogresinstall');
     Route::get('/admin/survey/{id}/add-progress-survey', [AdminController::class, 'addProgressSurvey'])->name('admin_survey_add_progress');
     Route::post('/admin/survey/{id}/add-progress-survey', [AdminController::class, 'storeProgressSurvey'])->name('admin_survey_store_progress');
+    Route::get('/admin/survey/email-error/{id}', [AdminController::class, 'emailErrorSurvey'])
+        ->name('admin.email-error.survey');
 
     Route::get('admin/upgrade', [AdminController::class, 'upgrade'])->name('admin.upgrade');
     Route::get('admin/upgrade/create/{id}', [AdminController::class, 'upgradeCreate'])->name('admin.upgrade_create');

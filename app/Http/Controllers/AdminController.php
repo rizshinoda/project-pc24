@@ -67,6 +67,7 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
 use setasign\Fpdi\Fpdi;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -2867,19 +2868,52 @@ class AdminController extends Controller
             ->whereNotNull('email')
             ->get();
 
-        foreach ($psbUsers as $psb) {
-            Mail::to($psb->email)->send(
-                new \App\Mail\SurveyMail(
-                    $survey,
+        $emailGagal = false;
 
-                    5 // PSB
-                )
-            );
+        foreach ($psbUsers as $psb) {
+
+            try {
+
+                Mail::to($psb->email)->send(
+                    new \App\Mail\SurveyMail(
+                        $survey,
+                        5 // PSB
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error('Gagal mengirim email survey ke PSB', [
+                    'survey_id' => $survey->id ?? null,
+                    'user_id' => $psb->id,
+                    'email' => $psb->email,
+                    'error' => $e->getMessage(),
+                    'exception' => get_class($e),
+                ]);
+            }
         }
 
-        return redirect()->route('admin.survey')->with('success', 'Work order berhasil diterbitkan.');
-    }
 
+        if ($emailGagal) {
+            return redirect()->route('admin.email-error.survey', [
+                'id' => $survey->id
+            ]);
+        }
+
+        return redirect()
+            ->route('admin.survey')
+            ->with(
+                'success',
+                'Work Order berhasil diterbitkan.'
+            );
+    }
+    public function emailErrorSurvey($id)
+    {
+        $getSurvey = WorkOrderSurvey::findOrFail($id);
+
+        return view('admin.email-error.survey', compact('getSurvey'));
+    }
     public function markAsReadAdmin($id)
     {
         $notification = Notification::findOrFail($id);
