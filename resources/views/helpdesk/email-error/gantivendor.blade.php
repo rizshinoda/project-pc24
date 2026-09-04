@@ -37,8 +37,12 @@
                 </h4>
 
                 <div class="alert alert-warning">
-                    <strong>Work Order Survey berhasil diterbitkan</strong>,
+
+                    <strong>
+                        Work Order Ganti Vendor berhasil diterbitkan
+                    </strong>,
                     tetapi email notifikasi tidak dapat dikirim secara otomatis.
+
                 </div>
 
                 <p class="text-muted">
@@ -47,11 +51,12 @@
 
 
 
-                <a href="{{ route('admin.survey') }}"
+                <a href="{{ route('hd.gantivendor') }}"
                     class="btn btn-primary">
 
                     <i class="fa-solid fa-arrow-left me-1"></i>
-                    Kembali ke Survey
+
+                    Kembali ke Ganti Vendor
 
                 </a>
 

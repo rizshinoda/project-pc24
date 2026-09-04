@@ -925,79 +925,201 @@ class HelpdeskController extends Controller
             'Maintenance',
             $getMaintenance->onlineBilling->nama_site
         );
-        // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+        // =====================================================
+        // AMBIL USER
+        // =====================================================
+
+        // General Affair
         $gaUsers = User::where('is_role', 2)->get();
-        // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
+
+        // NOC
         $nocUsers = User::where('is_role', 4)->get();
 
+        // PSB
         $psbUsers = User::where('is_role', 5)->get();
-        // Buat notifikasi untuk setiap pengguna General Affair
+
+
+        // =====================================================
+        // NOTIFIKASI GA
+        // =====================================================
+
         foreach ($gaUsers as $gaUser) {
-            $url = route('ga.maintenance_show', ['id' => $getMaintenance->id]) . '#maintenance';
+
+            $url = route(
+                'ga.maintenance_show',
+                ['id' => $getMaintenance->id]
+            ) . '#maintenance';
 
             Notification::create([
                 'user_id' => $gaUser->id,
                 'message' => 'WO Maintenance baru telah diterbitkan dengan No Order: ' . $getMaintenance->no_spk,
-                'url' => $url, // URL dengan hash #request
+                'url' => $url,
             ]);
         }
-        // Buat notifikasi untuk setiap pengguna PSB
+
+
+        // =====================================================
+        // NOTIFIKASI PSB
+        // =====================================================
+
         foreach ($psbUsers as $psbUser) {
-            $url = route('psb.maintenance_show', ['id' => $getMaintenance->id]) . '#maintenance';
+
+            $url = route(
+                'psb.maintenance_show',
+                ['id' => $getMaintenance->id]
+            ) . '#maintenance';
 
             Notification::create([
                 'user_id' => $psbUser->id,
                 'message' => 'WO Maintenance baru telah diterbitkan dengan No Order: ' . $getMaintenance->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'url' => $url,
             ]);
         }
-        // Buat notifikasi untuk setiap pengguna PSB
+
+
+        // =====================================================
+        // NOTIFIKASI NOC
+        // =====================================================
+
         foreach ($nocUsers as $nocUser) {
-            $url = route('noc.maintenance_show', ['id' => $getMaintenance->id]) . '#maintenance';
+
+            $url = route(
+                'noc.maintenance_show',
+                ['id' => $getMaintenance->id]
+            ) . '#maintenance';
 
             Notification::create([
                 'user_id' => $nocUser->id,
                 'message' => 'WO Maintenance baru telah diterbitkan dengan No Order: ' . $getMaintenance->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'url' => $url,
             ]);
         }
-        // Ambil semua detail barang dari request_barang_id ini
-        $detailBarang = WorkOrderMaintenanceDetail::where('work_order_maintenance_id', $getMaintenance->id)->get();
 
-        // Load relasi onlineBilling untuk email
+
+        // =====================================================
+        // DETAIL BARANG
+        // =====================================================
+
+        $detailBarang = WorkOrderMaintenanceDetail::where(
+            'work_order_maintenance_id',
+            $getMaintenance->id
+        )->get();
+
+
+        // =====================================================
+        // LOAD RELASI UNTUK EMAIL
+        // =====================================================
+
         $getMaintenance->load('onlineBilling', 'admin');
+
+
+        // =====================================================
+        // PENANDA EMAIL GAGAL
+        // =====================================================
+
+        $emailGagal = false;
+
+
+        // =====================================================
+        // KIRIM EMAIL KE GA
+        // =====================================================
 
         $gaUsers = User::where('is_role', 2)
             ->whereNotNull('email')
             ->get();
 
         foreach ($gaUsers as $ga) {
-            Mail::to($ga->email)->send(
-                new \App\Mail\MaintenanceRequestMail(
-                    $getMaintenance,
-                    $detailBarang,
-                    2 // GA
-                )
-            );
+
+            try {
+
+                Mail::to($ga->email)->send(
+                    new \App\Mail\MaintenanceRequestMail(
+                        $getMaintenance,
+                        $detailBarang,
+                        2 // GA
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error('Gagal mengirim email Work Order Maintenance ke GA', [
+                    'work_order_maintenance_id' => $getMaintenance->id,
+                    'no_spk' => $getMaintenance->no_spk,
+                    'user_id' => $ga->id,
+                    'email' => $ga->email,
+                    'error' => $e->getMessage(),
+                    'exception' => get_class($e),
+                ]);
+            }
         }
+
+
+        // =====================================================
+        // KIRIM EMAIL KE PSB
+        // =====================================================
+
         $psbUsers = User::where('is_role', 5)
             ->whereNotNull('email')
             ->get();
 
         foreach ($psbUsers as $psb) {
-            Mail::to($psb->email)->send(
-                new \App\Mail\MaintenanceRequestMail(
-                    $getMaintenance,
-                    $detailBarang,
-                    5 // PSB
-                )
+
+            try {
+
+                Mail::to($psb->email)->send(
+                    new \App\Mail\MaintenanceRequestMail(
+                        $getMaintenance,
+                        $detailBarang,
+                        5 // PSB
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error('Gagal mengirim email Work Order Maintenance ke PSB', [
+                    'work_order_maintenance_id' => $getMaintenance->id,
+                    'no_spk' => $getMaintenance->no_spk,
+                    'user_id' => $psb->id,
+                    'email' => $psb->email,
+                    'error' => $e->getMessage(),
+                    'exception' => get_class($e),
+                ]);
+            }
+        }
+
+
+        // =====================================================
+        // REDIRECT
+        // =====================================================
+
+        if ($emailGagal) {
+
+            return redirect()->route(
+                'hd.email-error.maintenance',
+                ['id' => $getMaintenance->id]
             );
         }
 
 
-        return redirect()->route('hd.maintenance')->with('success', 'Work order berhasil diterbitkan.');
-    }
+        // SEMUA EMAIL BERHASIL
 
+        return redirect()->route('hd.maintenance')
+            ->with(
+                'success',
+                'Work order berhasil diterbitkan dan email berhasil dikirim.'
+            );
+    }
+    public function emailErrorMaintenance($id)
+    {
+        $getMaintenance = WorkOrderMaintenance::findOrFail($id);
+
+        return view(
+            'helpdesk.email-error.maintenance',
+            compact('getMaintenance')
+        );
+    }
     public function maintenanceShow($id)
     {
         // Ambil notifikasi yang belum dibaca
@@ -1300,39 +1422,114 @@ class HelpdeskController extends Controller
         // Simpan path file ke kolom JSON attachments
         $workOrder->attachments = $uploadedFiles;
         $workOrder->save();
-        // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+        // =====================================================
+        // AMBIL USER ADMIN
+        // =====================================================
+
         $adminUsers = User::where('is_role', 1)->get();
 
-        // Buat notifikasi untuk setiap pengguna General Affair
-        foreach ($adminUsers as $adminUsers) {
+
+        // =====================================================
+        // NOTIFIKASI ADMIN
+        // =====================================================
+
+        foreach ($adminUsers as $adminUser) {
+
             $url = route(
                 'admin.gantivendor.show',
                 ['id' => $workOrder->id]
             ) . '#gantivendor';
 
             Notification::create([
-                'user_id' => $adminUsers->id,
+                'user_id' => $adminUser->id,
                 'message' => 'WO Ganti Vendor baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
-                'url' => $url, // URL dengan hash #request
+                'url' => $url,
             ]);
         }
 
-        // Load relasi onlineBilling untuk email
+
+        // =====================================================
+        // LOAD RELASI UNTUK EMAIL
+        // =====================================================
+
         $workOrder->load('onlineBilling', 'admin');
+
+
+        // =====================================================
+        // PENANDA EMAIL GAGAL
+        // =====================================================
+
+        $emailGagal = false;
+
+
+        // =====================================================
+        // KIRIM EMAIL KE ADMIN
+        // =====================================================
 
         $adminUsers = User::where('is_role', 1)
             ->whereNotNull('email')
             ->get();
 
         foreach ($adminUsers as $admin) {
-            Mail::to([$admin->email, 'presales@pc24.co.id'])->send(
-                new \App\Mail\GantiVendorMail(
-                    $workOrder,
-                    1 // PSB
-                )
+
+            try {
+
+                Mail::to([
+                    $admin->email,
+                    'm.rizal@pc24.net.id'
+                ])->send(
+                    new \App\Mail\GantiVendorMail(
+                        $workOrder,
+                        1 // Admin
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error('Gagal mengirim email Work Order Ganti Vendor', [
+                    'work_order_ganti_vendor_id' => $workOrder->id,
+                    'no_spk' => $workOrder->no_spk,
+                    'user_id' => $admin->id,
+                    'email' => $admin->email,
+                    'cc_email' => 'm.rizal@pc24.net.id',
+                    'error' => $e->getMessage(),
+                    'exception' => get_class($e),
+                ]);
+            }
+        }
+
+
+        // =====================================================
+        // REDIRECT
+        // =====================================================
+
+        if ($emailGagal) {
+
+            return redirect()->route(
+                'hd.email-error.gantivendor',
+                ['id' => $workOrder->id]
             );
         }
-        return redirect()->route('hd.gantivendor')->with('success', 'Work order berhasil diterbitkan.');
+
+
+        // SEMUA EMAIL BERHASIL
+
+        return redirect()->route('hd.gantivendor')
+            ->with(
+                'success',
+                'Work order berhasil diterbitkan dan email berhasil dikirim.'
+            );
+    }
+
+    public function emailErrorGantiVendor($id)
+    {
+        $workOrder = WorkOrderGantiVendor::findOrFail($id);
+
+        return view(
+            'helpdesk.email-error.gantivendor',
+            compact('workOrder')
+        );
     }
     public function gantivendorShow($id)
     {

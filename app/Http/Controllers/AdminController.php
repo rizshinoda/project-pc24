@@ -872,68 +872,190 @@ class AdminController extends Controller
         // Simpan path file ke kolom JSON attachments
         $getInstall->attachments = $uploadedFiles;
         $getInstall->save();
-        // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+        // Dapatkan semua pengguna dengan role General Affair (role 2)
         $gaUsers = User::where('is_role', 2)->get();
-        // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
+
+        // Dapatkan semua pengguna dengan role PSB (role 5)
         $psbUsers = User::where('is_role', 5)->get();
-        // Buat notifikasi untuk setiap pengguna General Affair
+
+
+        // ==========================================================
+        // NOTIFICATION
+        // ==========================================================
+
         $jenis = $getInstall->jenis_pekerjaan;
 
         $routeMap = [
+
             'instalasi' => [
                 'ga'  => 'ga.instalasi.show',
                 'psb' => 'psb.instalasi.show',
             ],
+
             'jasa' => [
                 'ga'  => 'ga.jasa_show',
                 'psb' => 'psb.jasa_show',
             ],
+
             'poc' => [
                 'ga'  => 'ga.poc_show',
                 'psb' => 'psb.poc_show',
             ],
+
         ];
 
         $hash = "#{$jenis}";
+
+
+        // Notification ke GA
         foreach ($gaUsers as $gaUser) {
-            $url = route($routeMap[$jenis]['ga'], ['id' => $getInstall->id]) . $hash;
+
+            $url = route(
+                $routeMap[$jenis]['ga'],
+                ['id' => $getInstall->id]
+            ) . $hash;
 
             Notification::create([
                 'user_id' => $gaUser->id,
-                'message' => 'WO ' . ucfirst($jenis) . ' baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
+                'message' => 'WO ' . ucfirst($jenis) .
+                    ' baru telah diterbitkan dengan No Order: ' .
+                    $getInstall->no_spk,
                 'url' => $url,
             ]);
         }
+
+
+        // Notification ke PSB
         foreach ($psbUsers as $psbUser) {
-            $url = route($routeMap[$jenis]['psb'], ['id' => $getInstall->id]) . $hash;
+
+            $url = route(
+                $routeMap[$jenis]['psb'],
+                ['id' => $getInstall->id]
+            ) . $hash;
 
             Notification::create([
                 'user_id' => $psbUser->id,
-                'message' => 'WO ' . ucfirst($jenis) . ' baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
+                'message' => 'WO ' . ucfirst($jenis) .
+                    ' baru telah diterbitkan dengan No Order: ' .
+                    $getInstall->no_spk,
                 'url' => $url,
             ]);
         }
 
 
-        $detailBarang = WorkOrderInstallDetail::where('work_order_install_id', $getInstall->id)->get();
+        // ==========================================================
+        // EMAIL
+        // ==========================================================
+
+        $detailBarang = WorkOrderInstallDetail::where(
+            'work_order_install_id',
+            $getInstall->id
+        )->get();
 
 
+        // Tentukan mail berdasarkan jenis pekerjaan
         $mailClass = match ($getInstall->jenis_pekerjaan) {
+
             'instalasi' => \App\Mail\InstalasiMail::class,
-            'jasa'      => \App\Mail\JasaMail::class,
-            'poc'       => \App\Mail\POCMail::class,
+
+            'jasa' => \App\Mail\JasaMail::class,
+
+            'poc' => \App\Mail\POCMail::class,
         };
 
+
+        // Penanda jika ada email yang gagal
+        $emailGagal = false;
+
+
+        // ==========================================================
+        // KIRIM EMAIL KE PSB
+        // ==========================================================
+
         foreach ($psbUsers as $psb) {
-            Mail::to($psb->email)->send(
-                new $mailClass($getInstall, $detailBarang, 5)
-            );
+
+            // Lewati jika email kosong
+            if (empty($psb->email)) {
+                continue;
+            }
+
+            try {
+
+                Mail::to($psb->email)->send(
+                    new $mailClass(
+                        $getInstall,
+                        $detailBarang,
+                        5 // PSB
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error(
+                    'Gagal mengirim email Work Order ke PSB',
+                    [
+                        'work_order_install_id' => $getInstall->id,
+                        'no_spk' => $getInstall->no_spk,
+                        'jenis_pekerjaan' => $jenis,
+                        'user_id' => $psb->id,
+                        'email' => $psb->email,
+                        'error' => $e->getMessage(),
+                        'exception' => get_class($e),
+                    ]
+                );
+            }
         }
+
+
+        // ==========================================================
+        // KIRIM EMAIL KE GENERAL AFFAIR
+        // ==========================================================
+
         foreach ($gaUsers as $ga) {
-            Mail::to($ga->email)->send(
-                new $mailClass($getInstall, $detailBarang, 2)
-            );
+
+            // Lewati jika email kosong
+            if (empty($ga->email)) {
+                continue;
+            }
+
+            try {
+
+                Mail::to($ga->email)->send(
+                    new $mailClass(
+                        $getInstall,
+                        $detailBarang,
+                        2 // General Affair
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error(
+                    'Gagal mengirim email Work Order ke General Affair',
+                    [
+                        'work_order_install_id' => $getInstall->id,
+                        'no_spk' => $getInstall->no_spk,
+                        'jenis_pekerjaan' => $jenis,
+                        'user_id' => $ga->id,
+                        'email' => $ga->email,
+                        'error' => $e->getMessage(),
+                        'exception' => get_class($e),
+                    ]
+                );
+            }
         }
+
+
+        // ==========================================================
+        // REDIRECT
+        // ==========================================================
+        $emailErrorRoute = match ($getInstall->jenis_pekerjaan) {
+            'instalasi' => 'admin.email-error.instalasi',
+            'jasa'      => 'admin.email-error.jasa',
+            'poc'       => 'admin.email-error.poc',
+        };
 
         $route = match ($getInstall->jenis_pekerjaan) {
             'instalasi' => 'admin.instalasi',
@@ -941,9 +1063,50 @@ class AdminController extends Controller
             'poc'       => 'admin.poc',
         };
 
+
+        // Jika ada email yang gagal
+        if ($emailGagal) {
+            return redirect()->route($emailErrorRoute, [
+                'id' => $getInstall->id
+            ]);
+        }
+
+
+        // Jika semua email berhasil
         return redirect()
             ->route($route)
-            ->with('success', 'Work order berhasil diterbitkan.');
+            ->with(
+                'success',
+                'Work Order berhasil diterbitkan'
+            );
+    }
+
+    public function emailErrorInstalasi($id)
+    {
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        return view(
+            'admin.email-error.instalasi',
+            compact('getInstall')
+        );
+    }
+    public function emailErrorJasa($id)
+    {
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        return view(
+            'admin.email-error.jasa',
+            compact('getInstall')
+        );
+    }
+    public function emailErrorPoc($id)
+    {
+        $getInstall = WorkOrderInstall::findOrFail($id);
+
+        return view(
+            'admin.email-error.poc',
+            compact('getInstall')
+        );
     }
     public function showinstalasi($id)
     {
@@ -3384,14 +3547,23 @@ class AdminController extends Controller
         // Simpan path file ke kolom JSON attachments
         $workOrder->attachments = $uploadedFiles;
         $workOrder->save();
-        // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+        // ==========================================================
+        // USER
+        // ==========================================================
+
         $naUsers = User::where('is_role', 6)->get();
-        // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
+
         $psbUsers = User::where('is_role', 5)->get();
+
         $gaUsers = User::where('is_role', 2)->get();
 
-        // Buat notifikasi untuk setiap pengguna General Affair
+
+        // ==========================================================
+        // NOTIFICATION KE NA
+        // ==========================================================
+
         foreach ($naUsers as $naUser) {
+
             $url = route(
                 'na.upgrade_show',
                 ['id' => $workOrder->id]
@@ -3399,63 +3571,181 @@ class AdminController extends Controller
 
             Notification::create([
                 'user_id' => $naUser->id,
-                'message' => 'WO Upgrade baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
-                'url' => $url, // URL dengan hash #request
+                'message' => 'WO Upgrade baru telah diterbitkan dengan No Order: '
+                    . $workOrder->no_spk,
+                'url' => $url,
             ]);
         }
-        // Buat notifikasi untuk setiap pengguna PSB
+
+
+        // ==========================================================
+        // NOTIFICATION KE PSB
+        // ==========================================================
+
         foreach ($psbUsers as $psbUser) {
-            $url = route('psb.upgrade_show', ['id' => $workOrder->id]) . '#upgrade';
+
+            $url = route(
+                'psb.upgrade_show',
+                ['id' => $workOrder->id]
+            ) . '#upgrade';
 
             Notification::create([
                 'user_id' => $psbUser->id,
-                'message' => 'WO Upgrade baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'message' => 'WO Upgrade baru telah diterbitkan dengan No Order: '
+                    . $workOrder->no_spk,
+                'url' => $url,
             ]);
         }
+
+
+        // ==========================================================
+        // NOTIFICATION KE GA
+        // ==========================================================
+
         foreach ($gaUsers as $gaUser) {
-            $url = route('ga.upgrade.show', ['id' => $workOrder->id]) . '#upgrade';
+
+            $url = route(
+                'ga.upgrade.show',
+                ['id' => $workOrder->id]
+            ) . '#upgrade';
 
             Notification::create([
                 'user_id' => $gaUser->id,
-                'message' => 'WO Upgrade baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'message' => 'WO Upgrade baru telah diterbitkan dengan No Order: '
+                    . $workOrder->no_spk,
+                'url' => $url,
             ]);
         }
-        $detailBarang = WorkOrderUpgradeDetail::where('work_order_upgrade_id', $workOrder->id)->get();
 
-        // Load relasi onlineBilling untuk email
+
+        // ==========================================================
+        // DETAIL BARANG
+        // ==========================================================
+
+        $detailBarang = WorkOrderUpgradeDetail::where(
+            'work_order_upgrade_id',
+            $workOrder->id
+        )->get();
+
+
+        // Load relasi untuk email
         $workOrder->load('onlineBilling', 'admin');
 
+
+        // ==========================================================
+        // EMAIL
+        // ==========================================================
+
+        $emailGagal = false;
+
+
+        // ----------------------------------------------------------
+        // EMAIL KE PSB
+        // ----------------------------------------------------------
 
         $psbUsers = User::where('is_role', 5)
             ->whereNotNull('email')
             ->get();
 
         foreach ($psbUsers as $psb) {
-            Mail::to($psb->email)->send(
-                new \App\Mail\UpgradeMail(
-                    $workOrder,
-                    $detailBarang,
-                    5 // PSB
-                )
-            );
+
+            try {
+
+                Mail::to($psb->email)->send(
+                    new \App\Mail\UpgradeMail(
+                        $workOrder,
+                        $detailBarang,
+                        5 // PSB
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error(
+                    'Gagal mengirim email Work Order Upgrade ke PSB',
+                    [
+                        'work_order_upgrade_id' => $workOrder->id,
+                        'no_spk' => $workOrder->no_spk,
+                        'user_id' => $psb->id,
+                        'email' => $psb->email,
+                        'error' => $e->getMessage(),
+                        'exception' => get_class($e),
+                    ]
+                );
+            }
         }
+
+
+        // ----------------------------------------------------------
+        // EMAIL KE GA
+        // ----------------------------------------------------------
 
         $gaUsers = User::where('is_role', 2)
             ->whereNotNull('email')
             ->get();
 
         foreach ($gaUsers as $ga) {
-            Mail::to($ga->email)->send(
-                new \App\Mail\UpgradeMail(
-                    $workOrder,
-                    $detailBarang,
-                    2 // PSB
-                )
+
+            try {
+
+                Mail::to($ga->email)->send(
+                    new \App\Mail\UpgradeMail(
+                        $workOrder,
+                        $detailBarang,
+                        2 // GA
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error(
+                    'Gagal mengirim email Work Order Upgrade ke General Affair',
+                    [
+                        'work_order_upgrade_id' => $workOrder->id,
+                        'no_spk' => $workOrder->no_spk,
+                        'user_id' => $ga->id,
+                        'email' => $ga->email,
+                        'error' => $e->getMessage(),
+                        'exception' => get_class($e),
+                    ]
+                );
+            }
+        }
+
+
+        // ==========================================================
+        // REDIRECT
+        // ==========================================================
+
+        if ($emailGagal) {
+
+            return redirect()->route(
+                'admin.email-error.upgrade',
+                [
+                    'id' => $workOrder->id
+                ]
             );
         }
-        return redirect()->route('admin.upgrade')->with('success', 'Work order berhasil diterbitkan.');
+
+
+        return redirect()
+            ->route('admin.upgrade')
+            ->with(
+                'success',
+                'Work Order berhasil diterbitkan.'
+            );
+    }
+
+    public function emailErrorUpgrade($id)
+    {
+        $workOrder = WorkOrderUpgrade::findOrFail($id);
+
+        return view(
+            'admin.email-error.upgrade',
+            compact('workOrder')
+        );
     }
     public function upgradeShow($id)
     {
@@ -3797,53 +4087,134 @@ class AdminController extends Controller
         // Simpan path file ke kolom JSON attachments
         $workOrder->attachments = $uploadedFiles;
         $workOrder->save();
-        // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+        // ==========================================================
+        // USER
+        // ==========================================================
+
+        // Pengguna NA
         $naUsers = User::where('is_role', 6)->get();
-        // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
+
+        // Pengguna PSB
         $psbUsers = User::where('is_role', 5)->get();
-        // Buat notifikasi untuk setiap pengguna General Affair
-        foreach ($naUsers as $gaUser) {
+
+
+        // ==========================================================
+        // NOTIFICATION KE NA
+        // ==========================================================
+
+        foreach ($naUsers as $naUser) {
+
             $url = route(
                 'na.downgrade_show',
                 ['id' => $workOrder->id]
             ) . '#downgrade';
 
             Notification::create([
-                'user_id' => $gaUser->id,
-                'message' => 'WO Downgrade baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
-                'url' => $url, // URL dengan hash #request
+                'user_id' => $naUser->id,
+                'message' => 'WO Downgrade baru telah diterbitkan dengan No Order: '
+                    . $workOrder->no_spk,
+                'url' => $url,
             ]);
         }
-        // Buat notifikasi untuk setiap pengguna PSB
+
+
+        // ==========================================================
+        // NOTIFICATION KE PSB
+        // ==========================================================
+
         foreach ($psbUsers as $psbUser) {
-            $url = route('psb.downgrade_show', ['id' => $workOrder->id]) . '#downgrade';
+
+            $url = route(
+                'psb.downgrade_show',
+                ['id' => $workOrder->id]
+            ) . '#downgrade';
 
             Notification::create([
                 'user_id' => $psbUser->id,
-                'message' => 'WO Downgrade baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'message' => 'WO Downgrade baru telah diterbitkan dengan No Order: '
+                    . $workOrder->no_spk,
+                'url' => $url,
             ]);
         }
 
 
-        // Load relasi onlineBilling untuk email
+        // ==========================================================
+        // LOAD RELASI UNTUK EMAIL
+        // ==========================================================
+
         $workOrder->load('onlineBilling', 'admin');
 
+
+        // ==========================================================
+        // EMAIL KE PSB
+        // ==========================================================
 
         $psbUsers = User::where('is_role', 5)
             ->whereNotNull('email')
             ->get();
 
-        foreach ($psbUsers as $psb) {
-            Mail::to($psb->email)->send(
-                new \App\Mail\DowngradeMail(
-                    $workOrder,
+        $emailGagal = false;
 
-                    5 // PSB
-                )
+        foreach ($psbUsers as $psb) {
+
+            try {
+
+                Mail::to($psb->email)->send(
+                    new \App\Mail\DowngradeMail(
+                        $workOrder,
+                        5 // PSB
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error(
+                    'Gagal mengirim email Work Order Downgrade ke PSB',
+                    [
+                        'work_order_downgrade_id' => $workOrder->id,
+                        'no_spk' => $workOrder->no_spk,
+                        'user_id' => $psb->id,
+                        'email' => $psb->email,
+                        'error' => $e->getMessage(),
+                        'exception' => get_class($e),
+                    ]
+                );
+            }
+        }
+
+
+        // ==========================================================
+        // REDIRECT
+        // ==========================================================
+
+        if ($emailGagal) {
+
+            return redirect()->route(
+                'admin.email-error.downgrade',
+                [
+                    'id' => $workOrder->id
+                ]
             );
         }
-        return redirect()->route('admin.downgrade')->with('success', 'Work order berhasil diterbitkan.');
+
+
+        return redirect()
+            ->route('admin.downgrade')
+            ->with(
+                'success',
+                'Work Order berhasil diterbitkan'
+            );
+    }
+
+    public function emailErrorDowngrade($id)
+    {
+        $workOrder = WorkOrderDowngrade::findOrFail($id);
+
+        return view(
+            'admin.email-error.downgrade',
+            compact('workOrder')
+        );
     }
     public function downgradeShow($id)
     {
@@ -4125,15 +4496,26 @@ class AdminController extends Controller
         $workOrder->attachments = $uploadedFiles;
         $workOrder->save();
 
+        // =====================================================
+        // AMBIL USER
+        // =====================================================
 
-        // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+        // General Affair
         $gaUsers = User::where('is_role', 2)->get();
-        // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
+
+        // PSB
         $psbUsers = User::where('is_role', 5)->get();
-        // Buat notifikasi untuk setiap pengguna General Affair
+
+        // NA
         $naUsers = User::where('is_role', 6)->get();
-        // Buat notifikasi untuk setiap pengguna General Affair
+
+
+        // =====================================================
+        // NOTIFIKASI GA
+        // =====================================================
+
         foreach ($gaUsers as $gaUser) {
+
             $url = route(
                 'ga.dismantle_show',
                 ['id' => $workOrder->id]
@@ -4142,61 +4524,161 @@ class AdminController extends Controller
             Notification::create([
                 'user_id' => $gaUser->id,
                 'message' => 'WO Dismantle baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
-                'url' => $url, // URL dengan hash #request
+                'url' => $url,
             ]);
         }
-        // Buat notifikasi untuk setiap pengguna PSB
+
+
+        // =====================================================
+        // NOTIFIKASI PSB
+        // =====================================================
+
         foreach ($psbUsers as $psbUser) {
-            $url = route('psb.dismantle_show', ['id' => $workOrder->id]) . '#dismantle';
+
+            $url = route(
+                'psb.dismantle_show',
+                ['id' => $workOrder->id]
+            ) . '#dismantle';
 
             Notification::create([
                 'user_id' => $psbUser->id,
                 'message' => 'WO Dismantle baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'url' => $url,
             ]);
         }
-        foreach ($naUsers as $naUsers) {
-            $url = route('na.dismantle_show', ['id' => $workOrder->id]) . '#dismantle';
+
+
+        // =====================================================
+        // NOTIFIKASI NA
+        // =====================================================
+
+        foreach ($naUsers as $naUser) {
+
+            $url = route(
+                'na.dismantle_show',
+                ['id' => $workOrder->id]
+            ) . '#dismantle';
 
             Notification::create([
-                'user_id' => $naUsers->id,
+                'user_id' => $naUser->id,
                 'message' => 'WO Dismantle baru telah diterbitkan dengan No Order: ' . $workOrder->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'url' => $url,
             ]);
         }
 
 
-        // Load relasi onlineBilling untuk email
+        // =====================================================
+        // LOAD RELASI UNTUK EMAIL
+        // =====================================================
+
         $workOrder->load('onlineBilling', 'admin');
+
+
+        // =====================================================
+        // PENANDA EMAIL GAGAL
+        // =====================================================
+
+        $emailGagal = false;
+
+
+        // =====================================================
+        // KIRIM EMAIL KE GA
+        // =====================================================
 
         $gaUsers = User::where('is_role', 2)
             ->whereNotNull('email')
             ->get();
 
         foreach ($gaUsers as $ga) {
-            Mail::to($ga->email)->send(
-                new \App\Mail\DismantleMail(
-                    $workOrder,
 
-                    2 // PSB
-                )
-            );
+            try {
+
+                Mail::to($ga->email)->send(
+                    new \App\Mail\DismantleMail(
+                        $workOrder,
+                        2 // GA
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error('Gagal mengirim email Work Order Dismantle ke GA', [
+                    'work_order_dismantle_id' => $workOrder->id,
+                    'no_spk' => $workOrder->no_spk,
+                    'user_id' => $ga->id,
+                    'email' => $ga->email,
+                    'error' => $e->getMessage(),
+                    'exception' => get_class($e),
+                ]);
+            }
         }
+
+
+        // =====================================================
+        // KIRIM EMAIL KE PSB
+        // =====================================================
 
         $psbUsers = User::where('is_role', 5)
             ->whereNotNull('email')
             ->get();
 
         foreach ($psbUsers as $psb) {
-            Mail::to($psb->email)->send(
-                new \App\Mail\DismantleMail(
-                    $workOrder,
 
-                    5 // PSB
-                )
+            try {
+
+                Mail::to($psb->email)->send(
+                    new \App\Mail\DismantleMail(
+                        $workOrder,
+                        5 // PSB
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error('Gagal mengirim email Work Order Dismantle ke PSB', [
+                    'work_order_dismantle_id' => $workOrder->id,
+                    'no_spk' => $workOrder->no_spk,
+                    'user_id' => $psb->id,
+                    'email' => $psb->email,
+                    'error' => $e->getMessage(),
+                    'exception' => get_class($e),
+                ]);
+            }
+        }
+
+
+        // =====================================================
+        // REDIRECT
+        // =====================================================
+
+        if ($emailGagal) {
+
+            return redirect()->route(
+                'admin.email-error.dismantle',
+                ['id' => $workOrder->id]
             );
         }
-        return redirect()->route('admin.dismantle')->with('success', 'Work order berhasil diterbitkan.');
+
+
+        // Semua email berhasil
+
+        return redirect()->route('admin.dismantle')
+            ->with(
+                'success',
+                'Work order berhasil diterbitkan dan email berhasil dikirim.'
+            );
+    }
+
+    public function emailErrorDismantle($id)
+    {
+        $workOrder = WorkOrderDismantle::findOrFail($id);
+
+        return view(
+            'admin.email-error.dismantle',
+            compact('workOrder')
+        );
     }
     public function dismantleShow($id)
     {
@@ -4531,76 +5013,194 @@ class AdminController extends Controller
         // Simpan path file ke kolom JSON attachments
         $getRelokasi->attachments = $uploadedFiles;
         $getRelokasi->save();
-        // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+        // Dapatkan semua pengguna dengan role General Affair
         $gaUsers = User::where('is_role', 2)->get();
-        // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
+
+        // Dapatkan semua pengguna dengan role NA
         $naUsers = User::where('is_role', 6)->get();
 
+        // Dapatkan semua pengguna dengan role PSB
         $psbUsers = User::where('is_role', 5)->get();
-        // Buat notifikasi untuk setiap pengguna General Affair
+
+
+        // =====================================================
+        // NOTIFIKASI GA
+        // =====================================================
+
         foreach ($gaUsers as $gaUser) {
-            $url = route('ga.relokasi.show', ['id' => $getRelokasi->id]) . '#relokasi';
+
+            $url = route('ga.relokasi.show', [
+                'id' => $getRelokasi->id
+            ]) . '#relokasi';
 
             Notification::create([
                 'user_id' => $gaUser->id,
                 'message' => 'WO Relokasi baru telah diterbitkan dengan No Order: ' . $getRelokasi->no_spk,
-                'url' => $url, // URL dengan hash #request
+                'url' => $url,
             ]);
         }
-        // Buat notifikasi untuk setiap pengguna PSB
+
+
+        // =====================================================
+        // NOTIFIKASI PSB
+        // =====================================================
+
         foreach ($psbUsers as $psbUser) {
-            $url = route('psb.relokasi.show', ['id' => $getRelokasi->id]) . '#relokasi';
+
+            $url = route('psb.relokasi.show', [
+                'id' => $getRelokasi->id
+            ]) . '#relokasi';
 
             Notification::create([
                 'user_id' => $psbUser->id,
                 'message' => 'WO Relokasi baru telah diterbitkan dengan No Order: ' . $getRelokasi->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'url' => $url,
             ]);
         }
-        // Buat notifikasi untuk setiap pengguna PSB
+
+
+        // =====================================================
+        // NOTIFIKASI NA
+        // =====================================================
+
         foreach ($naUsers as $naUser) {
-            $url = route('na.relokasi.show', ['id' => $getRelokasi->id]) . '#relokasi';
+
+            $url = route('na.relokasi.show', [
+                'id' => $getRelokasi->id
+            ]) . '#relokasi';
 
             Notification::create([
                 'user_id' => $naUser->id,
                 'message' => 'WO Relokasi baru telah diterbitkan dengan No Order: ' . $getRelokasi->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'url' => $url,
             ]);
         }
-        // Ambil semua detail barang dari request_barang_id ini
-        $detailBarang = WorkOrderRelokasiDetail::where('work_order_relokasi_id', $getRelokasi->id)->get();
-        // Load relasi onlineBilling untuk email
+
+
+        // =====================================================
+        // DETAIL BARANG
+        // =====================================================
+
+        $detailBarang = WorkOrderRelokasiDetail::where(
+            'work_order_relokasi_id',
+            $getRelokasi->id
+        )->get();
+
+
+        // =====================================================
+        // LOAD RELASI UNTUK EMAIL
+        // =====================================================
+
         $getRelokasi->load('onlineBilling', 'admin');
+
+
+        // =====================================================
+        // FLAG EMAIL
+        // =====================================================
+
+        // Awalnya dianggap tidak ada email yang gagal
+        $emailGagal = false;
+
+
+        // =====================================================
+        // KIRIM EMAIL KE GA
+        // =====================================================
 
         $gaUsers = User::where('is_role', 2)
             ->whereNotNull('email')
             ->get();
 
         foreach ($gaUsers as $ga) {
-            Mail::to($ga->email)->send(
-                new \App\Mail\RelokasiMail(
-                    $getRelokasi,
-                    $detailBarang,
-                    2 // PSB
-                )
-            );
+
+            try {
+
+                Mail::to($ga->email)->send(
+                    new \App\Mail\RelokasiMail(
+                        $getRelokasi,
+                        $detailBarang,
+                        2 // GA
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error('Gagal mengirim email Work Order Relokasi ke GA', [
+                    'work_order_relokasi_id' => $getRelokasi->id,
+                    'no_spk' => $getRelokasi->no_spk,
+                    'user_id' => $ga->id,
+                    'email' => $ga->email,
+                    'error' => $e->getMessage(),
+                    'exception' => get_class($e),
+                ]);
+            }
         }
+
+
+        // =====================================================
+        // KIRIM EMAIL KE PSB
+        // =====================================================
 
         $psbUsers = User::where('is_role', 5)
             ->whereNotNull('email')
             ->get();
 
         foreach ($psbUsers as $psb) {
-            Mail::to($psb->email)->send(
-                new \App\Mail\RelokasiMail(
-                    $getRelokasi,
-                    $detailBarang,
 
-                    5 // PSB
-                )
+            try {
+
+                Mail::to($psb->email)->send(
+                    new \App\Mail\RelokasiMail(
+                        $getRelokasi,
+                        $detailBarang,
+                        5 // PSB
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error('Gagal mengirim email Work Order Relokasi ke PSB', [
+                    'work_order_relokasi_id' => $getRelokasi->id,
+                    'no_spk' => $getRelokasi->no_spk,
+                    'user_id' => $psb->id,
+                    'email' => $psb->email,
+                    'error' => $e->getMessage(),
+                    'exception' => get_class($e),
+                ]);
+            }
+        }
+
+
+        // =====================================================
+        // REDIRECT
+        // =====================================================
+
+        if ($emailGagal) {
+
+            return redirect()->route(
+                'admin.email-error.relokasi',
+                ['id' => $getRelokasi->id]
             );
         }
-        return redirect()->route('admin.relokasi')->with('success', 'Work order berhasil diterbitkan.');
+
+
+        // Semua email berhasil
+        return redirect()->route('admin.relokasi')
+            ->with(
+                'success',
+                'Work order berhasil diterbitkan'
+            );
+    }
+
+    public function emailErrorRelokasi($id)
+    {
+        $getRelokasi = WorkOrderRelokasi::findOrFail($id);
+
+        return view(
+            'admin.email-error.relokasi',
+            compact('getRelokasi')
+        );
     }
     public function relokasiShow($id)
     {
@@ -6180,50 +6780,190 @@ class AdminController extends Controller
         // Simpan path file ke kolom JSON attachments
         $getInstall->attachments = $uploadedFiles;
         $getInstall->save();
-        // Dapatkan semua pengguna dengan role General Affair (misalnya role 2)
+        // Dapatkan semua pengguna dengan role General Affair (role 2)
         $gaUsers = User::where('is_role', 2)->get();
-        // Dapatkan semua pengguna dengan role PSB (misalnya role 5)
+
+        // Dapatkan semua pengguna dengan role PSB (role 5)
         $psbUsers = User::where('is_role', 5)->get();
-        // Buat notifikasi untuk setiap pengguna General Affair
+
+
+        // ==========================================================
+        // NOTIFICATION
+        // ==========================================================
+
+        $jenis = $getInstall->jenis_pekerjaan;
+
+        $routeMap = [
+
+            'instalasi' => [
+                'ga'  => 'ga.instalasi.show',
+                'psb' => 'psb.instalasi.show',
+            ],
+
+            'jasa' => [
+                'ga'  => 'ga.jasa_show',
+                'psb' => 'psb.jasa_show',
+            ],
+
+            'poc' => [
+                'ga'  => 'ga.poc_show',
+                'psb' => 'psb.poc_show',
+            ],
+
+        ];
+
+        $hash = "#{$jenis}";
+
+
+        // Notification ke GA
         foreach ($gaUsers as $gaUser) {
-            $url = route('ga.instalasi.show', ['id' => $getInstall->id]) . '#instalasi';
+
+            $url = route(
+                $routeMap[$jenis]['ga'],
+                ['id' => $getInstall->id]
+            ) . $hash;
 
             Notification::create([
                 'user_id' => $gaUser->id,
-                'message' => 'WO Instalasi baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
-                'url' => $url, // URL dengan hash #request
+                'message' => 'WO ' . ucfirst($jenis) .
+                    ' baru telah diterbitkan dengan No Order: ' .
+                    $getInstall->no_spk,
+                'url' => $url,
             ]);
         }
-        // Buat notifikasi untuk setiap pengguna PSB
+
+
+        // Notification ke PSB
         foreach ($psbUsers as $psbUser) {
-            $url = route('psb.instalasi.show', ['id' => $getInstall->id]) . '#instalasi';
+
+            $url = route(
+                $routeMap[$jenis]['psb'],
+                ['id' => $getInstall->id]
+            ) . $hash;
 
             Notification::create([
                 'user_id' => $psbUser->id,
-                'message' => 'WO Instalasi baru telah diterbitkan dengan No Order: ' . $getInstall->no_spk,
-                'url' => $url, // URL dengan hash #instalasi
+                'message' => 'WO ' . ucfirst($jenis) .
+                    ' baru telah diterbitkan dengan No Order: ' .
+                    $getInstall->no_spk,
+                'url' => $url,
             ]);
         }
 
-        $detailBarang = WorkOrderInstallDetail::where('work_order_install_id', $getInstall->id)->get();
+
+        // ==========================================================
+        // EMAIL
+        // ==========================================================
+
+        $detailBarang = WorkOrderInstallDetail::where(
+            'work_order_install_id',
+            $getInstall->id
+        )->get();
 
 
+        // Tentukan mail berdasarkan jenis pekerjaan
         $mailClass = match ($getInstall->jenis_pekerjaan) {
+
             'instalasi' => \App\Mail\InstalasiMail::class,
-            'jasa'      => \App\Mail\JasaMail::class,
-            'poc'       => \App\Mail\POCMail::class,
+
+            'jasa' => \App\Mail\JasaMail::class,
+
+            'poc' => \App\Mail\POCMail::class,
         };
 
+
+        // Penanda jika ada email yang gagal
+        $emailGagal = false;
+
+
+        // ==========================================================
+        // KIRIM EMAIL KE PSB
+        // ==========================================================
+
         foreach ($psbUsers as $psb) {
-            Mail::to($psb->email)->send(
-                new $mailClass($getInstall, $detailBarang, 5)
-            );
+
+            // Lewati jika email kosong
+            if (empty($psb->email)) {
+                continue;
+            }
+
+            try {
+
+                Mail::to($psb->email)->send(
+                    new $mailClass(
+                        $getInstall,
+                        $detailBarang,
+                        5 // PSB
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error(
+                    'Gagal mengirim email Work Order ke PSB',
+                    [
+                        'work_order_install_id' => $getInstall->id,
+                        'no_spk' => $getInstall->no_spk,
+                        'jenis_pekerjaan' => $jenis,
+                        'user_id' => $psb->id,
+                        'email' => $psb->email,
+                        'error' => $e->getMessage(),
+                        'exception' => get_class($e),
+                    ]
+                );
+            }
         }
+
+
+        // ==========================================================
+        // KIRIM EMAIL KE GENERAL AFFAIR
+        // ==========================================================
+
         foreach ($gaUsers as $ga) {
-            Mail::to($ga->email)->send(
-                new $mailClass($getInstall, $detailBarang, 2)
-            );
+
+            // Lewati jika email kosong
+            if (empty($ga->email)) {
+                continue;
+            }
+
+            try {
+
+                Mail::to($ga->email)->send(
+                    new $mailClass(
+                        $getInstall,
+                        $detailBarang,
+                        2 // General Affair
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                $emailGagal = true;
+
+                Log::error(
+                    'Gagal mengirim email Work Order ke General Affair',
+                    [
+                        'work_order_install_id' => $getInstall->id,
+                        'no_spk' => $getInstall->no_spk,
+                        'jenis_pekerjaan' => $jenis,
+                        'user_id' => $ga->id,
+                        'email' => $ga->email,
+                        'error' => $e->getMessage(),
+                        'exception' => get_class($e),
+                    ]
+                );
+            }
         }
+
+
+        // ==========================================================
+        // REDIRECT
+        // ==========================================================
+        $emailErrorRoute = match ($getInstall->jenis_pekerjaan) {
+            'instalasi' => 'admin.email-error.instalasi',
+            'jasa'      => 'admin.email-error.jasa',
+            'poc'       => 'admin.email-error.poc',
+        };
 
         $route = match ($getInstall->jenis_pekerjaan) {
             'instalasi' => 'admin.instalasi',
@@ -6231,9 +6971,22 @@ class AdminController extends Controller
             'poc'       => 'admin.poc',
         };
 
+
+        // Jika ada email yang gagal
+        if ($emailGagal) {
+            return redirect()->route($emailErrorRoute, [
+                'id' => $getInstall->id
+            ]);
+        }
+
+
+        // Jika semua email berhasil
         return redirect()
             ->route($route)
-            ->with('success', 'Work order berhasil diterbitkan.');
+            ->with(
+                'success',
+                'Work Order berhasil diterbitkan'
+            );
     }
     public function exportWoSurvey()
     {

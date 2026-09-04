@@ -1243,6 +1243,7 @@ class DashboardController extends Controller
         // Validasi data input
         $request->validate([
             'is_role' => 'required|integer',
+            'email' => 'required|email|unique:users',
 
         ]);
 
@@ -1253,6 +1254,7 @@ class DashboardController extends Controller
         // Update data work order
         $userlist->update([
             'is_role' => $request->is_role,
+            'email' => $request->email,
 
         ]);
 

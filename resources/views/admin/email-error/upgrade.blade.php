@@ -37,7 +37,7 @@
                 </h4>
 
                 <div class="alert alert-warning">
-                    <strong>Work Order Survey berhasil diterbitkan</strong>,
+                    <strong>Work Order Upgrade berhasil diterbitkan</strong>,
                     tetapi email notifikasi tidak dapat dikirim secara otomatis.
                 </div>
 
@@ -47,11 +47,11 @@
 
 
 
-                <a href="{{ route('admin.survey') }}"
+                <a href="{{ route('admin.upgrade') }}"
                     class="btn btn-primary">
 
                     <i class="fa-solid fa-arrow-left me-1"></i>
-                    Kembali ke Survey
+                    Kembali ke Upgrade
 
                 </a>
 
