@@ -1108,7 +1108,7 @@ class HelpdeskController extends Controller
         return redirect()->route('hd.maintenance')
             ->with(
                 'success',
-                'Work order berhasil diterbitkan dan email berhasil dikirim.'
+                'Work order berhasil diterbitkan.'
             );
     }
     public function emailErrorMaintenance($id)
@@ -1476,7 +1476,7 @@ class HelpdeskController extends Controller
 
                 Mail::to([
                     $admin->email,
-                    'm.rizal@pc24.net.id'
+                    'presales@pc24.co.id'
                 ])->send(
                     new \App\Mail\GantiVendorMail(
                         $workOrder,
@@ -1492,7 +1492,7 @@ class HelpdeskController extends Controller
                     'no_spk' => $workOrder->no_spk,
                     'user_id' => $admin->id,
                     'email' => $admin->email,
-                    'cc_email' => 'm.rizal@pc24.net.id',
+                    'cc_email' => 'presales@pc24.co.id',
                     'error' => $e->getMessage(),
                     'exception' => get_class($e),
                 ]);
@@ -1518,7 +1518,7 @@ class HelpdeskController extends Controller
         return redirect()->route('hd.gantivendor')
             ->with(
                 'success',
-                'Work order berhasil diterbitkan dan email berhasil dikirim.'
+                'Work order berhasil diterbitkan.'
             );
     }
 
