@@ -33,6 +33,7 @@ use App\Models\WorkOrderGantiVendor;
 use App\Models\WorkOrderMaintenance;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
@@ -1238,26 +1239,28 @@ class DashboardController extends Controller
 
         return $this->renderView('userlist_edit', $data);
     }
+
     public function updateUser(Request $request, $id)
     {
-        // Validasi data input
-        $request->validate([
-            'is_role' => 'required|integer',
-
-        ]);
-
-        // Ambil data work order berdasarkan ID
         $userlist = User::findOrFail($id);
 
-
-        // Update data work order
-        $userlist->update([
-            'is_role' => $request->is_role,
-
+        $request->validate([
+            'is_role' => 'required|integer',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email')->ignore($userlist->id),
+            ],
         ]);
 
-        // Redirect dengan pesan sukses
-        return redirect()->route('superadmin.userlist', $id)->with('success', 'User berhasil diperbarui.');
+        $userlist->update([
+            'is_role' => $request->is_role,
+            'email' => $request->email,
+        ]);
+
+        return redirect()
+            ->route('superadmin.userlist')
+            ->with('success', 'User berhasil diperbarui.');
     }
 
     public function jasa(Request $request)

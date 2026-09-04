@@ -350,6 +350,39 @@ Route::group(['middleware' => ['admin', SessionTimeout::class]], function () {
         AdminController::class,
         'testFindOrCreateAccurateCustomer'
     ])->name('accurate.test-find-or-create-customer');
+
+
+    // Route email error
+    Route::get('/admin/survey/email-error/{id}', [AdminController::class, 'emailErrorSurvey'])
+        ->name('admin.email-error.survey');
+
+    Route::get('/admin/instalasi/email-error/{id}', [AdminController::class, 'emailErrorInstalasi'])
+        ->name('admin.email-error.instalasi');
+
+    Route::get('/admin/jasa/email-error/{id}', [AdminController::class, 'emailErrorJasa'])
+        ->name('admin.email-error.jasa');
+
+    Route::get('/admin/poc/email-error/{id}', [AdminController::class, 'emailErrorPoc'])
+        ->name('admin.email-error.poc');
+    Route::get(
+        '/admin/upgrade/email-error/{id}',
+        [AdminController::class, 'emailErrorUpgrade']
+    )->name('admin.email-error.upgrade');
+
+    Route::get(
+        '/admin/downgrade/email-error/{id}',
+        [AdminController::class, 'emailErrorDowngrade']
+    )->name('admin.email-error.downgrade');
+
+    Route::get(
+        '/admin/relokasi/email-error/{id}',
+        [AdminController::class, 'emailErrorRelokasi']
+    )->name('admin.email-error.relokasi');
+
+    Route::get(
+        '/admin/dismantle/email-error/{id}',
+        [AdminController::class, 'emailErrorDismantle']
+    )->name('admin.email-error.dismantle');
 });
 
 Route::group(['middleware' => ['ga', SessionTimeout::class]], function () {
@@ -592,6 +625,15 @@ Route::group(['middleware' => ['helpdesk', SessionTimeout::class]], function () 
         'helpdesk/attachment/{type}/{id}/{index}',
         [HelpdeskController::class, 'deleteAttachment']
     )->name('attachment.delete.hd');
+
+    Route::get(
+        '/helpdesk/maintenance/email-error/{id}',
+        [HelpdeskController::class, 'emailErrorMaintenance']
+    )->name('hd.email-error.maintenance');
+    Route::get(
+        '/hd/gantivendor/email-error/{id}',
+        [HelpdeskController::class, 'emailErrorGantiVendor']
+    )->name('hd.email-error.gantivendor');
 });
 
 Route::group(['middleware' => ['na', SessionTimeout::class]], function () {

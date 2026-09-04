@@ -56,7 +56,7 @@
                                                 </div>
                                                 <div class="form-group ">
                                                     <label for="nama_site">Email</label>
-                                                    <input type="text" class="form-control" id="email" name="email" value="{{ $userlist->email }}" readonly>
+                                                    <input type="text" class="form-control" id="email" name="email" value="{{ $userlist->email }}">
                                                 </div>
                                                 <div class="form-group ">
                                                     <label for="nama_site">Role</label>
