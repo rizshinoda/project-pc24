@@ -158,8 +158,8 @@
                                         <div class="form-group ">
                                             <label for="alamat_pelanggan">Nama Vendor</label>
 
-                                            <select class="form-control" id="vendor_id" name="vendor_id" required>
-                                                <option value="">Pilih Vendor</option>
+                                            <select class="form-control select2" id="vendor_id" name="vendor_id" data-placeholder="Pilih Vendor" required>
+                                                <option value=""></option>
                                                 @foreach ($vendors as $vendor)
                                                 <option value="{{ $vendor->id }}">{{ $vendor->nama_vendor }}</option>
                                                 @endforeach

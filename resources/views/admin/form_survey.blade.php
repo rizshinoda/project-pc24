@@ -168,8 +168,8 @@
                                             <div class="form-group row">
                                                 <label for="pelanggan_id" class="col-sm-4 col-form-label">Pelanggan</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="pelanggan_id" name="pelanggan_id" required>
-                                                        <option value="">Pilih Pelanggan</option>
+                                                    <select class="form-control select2" id="pelanggan_id" name="pelanggan_id" data-placeholder="Pilih Pelanggan" required>
+                                                        <option value=""></option>
                                                         @foreach ($pelanggans as $pelanggan)
                                                         <option value="{{ $pelanggan->id }}"
                                                             data-nama-gedung="{{ $pelanggan->nama_gedung }}"
@@ -209,8 +209,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Layanan</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="layanan" name="layanan" required>
-                                                        <option value="">Pilih Layanan</option>
+                                                    <select class="form-control select2" id="layanan" name="layanan" data-placeholder="Pilih Layanan" required>
+                                                        <option value=""></option>
                                                         <option value="-">-</option>
                                                         <option value="INTERNET">INTERNET</option>
                                                         <option value="METRO">METRO</option>
@@ -241,13 +241,13 @@
                                             <!-- Input Durasi dan Nama Durasi -->
                                             <div class="form-group row">
                                                 <label for="bandwidth" class="col-sm-4 col-form-label">Volume</label>
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-3">
                                                     <input type="number" name="bandwidth" id="bandwidth" class="form-control" min="1" required>
                                                 </div>
 
-                                                <div class="col-sm-4">
-                                                    <select class="form-control" id="satuan" name="satuan" required>
-                                                        <option value="" disabled selected>Pilih Satuan</option>
+                                                <div class="col-sm-5">
+                                                    <select class="form-control select2" id="satuan" name="satuan" data-placeholder="Satuan" required>
+                                                        <option value=""></option>
                                                         <option value="Gbps">Gbps</option>
                                                         <option value="Mbps">Mbps</option>
                                                         <option value="Kbps">Kbps</option>
@@ -262,8 +262,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">NNI</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="nni" name="nni">
-                                                        <option value="">Pilih NNI</option>
+                                                    <select class="form-control select2" id="nni" name="nni" data-placeholder="Pilih NNI" required>
+                                                        <option value=""></option>
                                                         <option value="-">-</option>
                                                         <option value="SURABAYA">SURABAYA</option>
                                                         <option value="YOGYAKARTA">YOGYAKARTA</option>
@@ -296,8 +296,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Vendor</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="vendor_id" name="vendor_id" required>
-                                                        <option value="">Pilih Vendor</option>
+                                                    <select class="form-control select2" id="vendor_id" name="vendor_id" data-placeholder="Pilih Vendor" required>
+                                                        <option value=""></option>
                                                         @foreach ($vendors as $vendor)
                                                         <option value="{{ $vendor->id }}">{{ $vendor->nama_vendor }}</option>
                                                         @endforeach
@@ -335,8 +335,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Instansi</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="instansi_id" name="instansi_id" required>
-                                                        <option value="">Pilih Instansi</option>
+                                                    <select class="form-control select2" id="instansi_id" name="instansi_id" data-placeholder="Pilih Instansi" required>
+                                                        <option value=""></option>
                                                         @foreach ($instansis as $instansi)
                                                         <option value="{{ $instansi->id }}">{{ $instansi->nama_instansi }}</option>
                                                         @endforeach
@@ -362,8 +362,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Nama Provinsi</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="provinsi" name="provinsi" required>
-                                                        <option value="">Pilih Provinsi</option>
+                                                    <select class="form-control select2" id="provinsi" name="provinsi" data-placeholder="Pilih Provinsi" required>
+                                                        <option value=""></option>
                                                         <option value="Aceh">Aceh</option>
                                                         <option value="Sumatera Utara">Sumatera Utara</option>
                                                         <option value="Sumatera Barat">Sumatera Barat</option>
@@ -421,8 +421,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Media</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="media" name="media" required>
-                                                        <option value="">Pilih Media</option>
+                                                    <select class="form-control select2" id="media" name="media" data-placeholder="Pilih Media" required>
+                                                        <option value=""></option>
                                                         <option value="FIBER OPTIC">FIBER OPTIC</option>
                                                         <option value="WIRELESS">WIRELESS</option>
                                                         <option value="M2M">M2M</option>

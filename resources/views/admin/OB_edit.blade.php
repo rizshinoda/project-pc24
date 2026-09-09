@@ -162,8 +162,8 @@
                                             <div class="form-group row">
                                                 <label for="pelanggan_id" class="col-sm-4 col-form-label">Pelanggan</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="pelanggan_id" name="pelanggan_id" required>
-                                                        <option value="">Pilih Pelanggan</option>
+                                                    <select class="form-control select2" id="pelanggan_id" name="pelanggan_id" data-placeholder="Pilih Pelanggan" required>
+                                                        <option value=""></option>
                                                         @foreach ($pelanggans as $pelanggan)
                                                         @php
                                                         $kodePelanggan = 'C' . str_pad($pelanggan->id, 2, '0', STR_PAD_LEFT);
@@ -206,8 +206,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Layanan</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="layanan" name="layanan" required>
-                                                        <option value="">Pilih Layanan</option>
+                                                    <select class="form-control select2" id="layanan" name="layanan" data-placeholder="Pilih Layanan" required>
+                                                        <option value=""></option>
                                                         <option value="-" {{ old('layanan', $getOB->layanan) == '-' ? 'selected' : '' }}>-</option>
                                                         <option value="INTERNET" {{ old('layanan', $getOB->layanan) == 'INTERNET' ? 'selected' : '' }}>INTERNET</option>
                                                         <option value="METRO" {{ old('layanan', $getOB->layanan) == 'METRO' ? 'selected' : '' }}>METRO</option>
@@ -237,7 +237,7 @@
                                                 <label for="bandwidth" class="col-sm-4 col-form-label">Bandwidth</label>
 
                                                 <!-- Input Bandwidth -->
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-3">
                                                     <input type="number"
                                                         name="bandwidth"
                                                         id="bandwidth"
@@ -248,9 +248,9 @@
                                                 </div>
 
                                                 <!-- Input Satuan -->
-                                                <div class="col-sm-4">
-                                                    <select class="form-control" id="satuan" name="satuan" required>
-                                                        <option value="" disabled>Pilih Satuan</option>
+                                                <div class="col-sm-5">
+                                                    <select class="form-control select2" id="satuan" name="satuan" data-placeholder="Pilih Satuan" required>
+                                                        <option value=""></option>
                                                         <option value="Gbps" {{ old('satuan', $getOB->satuan) == 'Gbps' ? 'selected' : '' }}>Gbps</option>
                                                         <option value="Mbps" {{ old('satuan', $getOB->satuan) == 'Mbps' ? 'selected' : '' }}>Mbps</option>
                                                         <option value="Kbps" {{ old('satuan', $getOB->satuan) == 'Kbps' ? 'selected' : '' }}>Kbps</option>
@@ -265,8 +265,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">NNI</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="nni" name="nni">
-                                                        <option value="">Pilih NNI</option>
+                                                    <select class="form-control select2" id="nni" name="nni" data-placeholder="Pilih NNI" required>
+                                                        <option value=""></option>
                                                         <option value="-" {{ old('nni', $getOB->nni) == '-' ? 'selected' : '' }}>-</option>
                                                         <option value="SURABAYA" {{ old('nni', $getOB->nni) == 'SURABAYA' ? 'selected' : '' }}>SURABAYA</option>
                                                         <option value="YOGYAKARTA" {{ old('nni', $getOB->nni) == 'YOGYAKARTA' ? 'selected' : '' }}>YOGYAKARTA</option>
@@ -300,8 +300,8 @@
                                             <div class="form-group row">
                                                 <label for="vendor_id" class="col-sm-4 col-form-label">Nama Vendor</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="vendor_id" name="vendor_id" required>
-                                                        <option value="">Pilih Vendor</option>
+                                                    <select class="form-control select2" id="vendor_id" name="vendor_id" data-placeholder="Pilih Vendor" required>
+                                                        <option value=""></option>
                                                         @foreach ($vendors as $vendor)
                                                         <option value="{{ $vendor->id }}"
                                                             {{ $getOB->vendor_id == $vendor->id ? 'selected' : '' }}>
@@ -332,7 +332,7 @@
                                             <!-- Edit Durasi -->
                                             <div class="form-group row">
                                                 <label for="durasi" class="col-sm-4 col-form-label">Durasi</label>
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-3">
                                                     <input type="number"
                                                         name="durasi"
                                                         id="durasi"
@@ -341,9 +341,9 @@
                                                         value="{{ old('durasi', $getOB->durasi) }}"
                                                         required>
                                                 </div>
-                                                <div class="col-sm-4">
-                                                    <select name="nama_durasi" id="nama_durasi" class="form-control" required>
-                                                        <option value="" disabled>Pilih Satuan Durasi</option>
+                                                <div class="col-sm-5">
+                                                    <select name="nama_durasi" id="nama_durasi" class="form-control select2" data-placeholder="Durasi" required>
+                                                        <option value=""></option>
                                                         <option value="hari" {{ old('nama_durasi', $getOB->nama_durasi) == 'hari' ? 'selected' : '' }}>Hari</option>
                                                         <option value="bulan" {{ old('nama_durasi', $getOB->nama_durasi) == 'bulan' ? 'selected' : '' }}>Bulan</option>
                                                         <option value="tahun" {{ old('nama_durasi', $getOB->nama_durasi) == 'tahun' ? 'selected' : '' }}>Tahun</option>
@@ -387,8 +387,8 @@
                                             <div class="form-group row">
                                                 <label for="instansi_id" class="col-sm-4 col-form-label">Nama Instansi</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="instansi_id" name="instansi_id" required>
-                                                        <option value="">Pilih Instansi</option>
+                                                    <select class="form-control select2" id="instansi_id" name="instansi_id" data-placeholder="Pilih Instansi" required>
+                                                        <option value=""></option>
                                                         @foreach ($instansis as $instansi)
                                                         <option value="{{ $instansi->id }}"
                                                             {{ $getOB->instansi_id == $instansi->id ? 'selected' : '' }}>
@@ -414,8 +414,8 @@
                                             <div class="form-group row">
                                                 <label for="provinsi" class="col-sm-4 col-form-label">Nama Provinsi</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="provinsi" name="provinsi" required>
-                                                        <option value="">Pilih Provinsi</option>
+                                                    <select class="form-control select2" id="provinsi" name="provinsi" data-placeholder="Pilih Provinsi" required>
+                                                        <option value=""></option>
                                                         <option value="Aceh" {{ $getOB->provinsi == 'Aceh' ? 'selected' : '' }}>Aceh</option>
                                                         <option value="Sumatera Utara" {{ $getOB->provinsi == 'Sumatera Utara' ? 'selected' : '' }}>Sumatera Utara</option>
                                                         <option value="Sumatera Barat" {{ $getOB->provinsi == 'Sumatera Barat' ? 'selected' : '' }}>Sumatera Barat</option>
@@ -472,8 +472,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Media</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="media" name="media" required>
-                                                        <option value="">Pilih Media</option>
+                                                    <select class="form-control select2" id="media" name="media" data-placeholder="Pilih Media" required>
+                                                        <option value=""></option>
                                                         <option value="FIBER OPTIC" {{ old('media', $getOB->media) == 'FIBER OPTIC' ? 'selected' : '' }}>FIBER OPTIC</option>
                                                         <option value="WIRELESS" {{ old('media', $getOB->media) == 'WIRELESS' ? 'selected' : '' }}>WIRELESS</option>
                                                         <option value="M2M" {{ old('media', $getOB->media) == 'M2M' ? 'selected' : '' }}>M2M</option>

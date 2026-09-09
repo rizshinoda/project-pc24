@@ -11,6 +11,8 @@
  <link rel="stylesheet" href="{{asset('/dist/assets/vendors/ti-icons/css/themify-icons.css')}}">
  <link rel="stylesheet" href="{{asset('/dist/assets/vendors/css/vendor.bundle.base.css')}}">
  <link rel="stylesheet" href="{{asset('/dist/assets/vendors/font-awesome/css/font-awesome.min.css')}}">
+ <link rel="stylesheet"
+     href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
  <!-- endinject -->
  <!-- Plugin css for this page -->
  <link rel="stylesheet" href="{{asset('/dist/assets/vendors/font-awesome/css/font-awesome.min.css')}}" />
@@ -393,5 +395,117 @@
      #stock-table {
          position: relative;
          z-index: 10;
+     }
+ </style>
+
+ <style>
+     /* =========================================
+   SELECT2 CUSTOM
+========================================= */
+
+     /* Select2 utama */
+     .select2-container {
+         width: 100% !important;
+     }
+
+     /* Kotak select */
+     .select2-container .select2-selection--single {
+         height: 48px !important;
+         border: 1px solid #ccc !important;
+         border-radius: 8px !important;
+         display: flex !important;
+         align-items: center !important;
+         position: relative !important;
+         background-color: #fff !important;
+     }
+
+     /* Teks */
+     .select2-container .select2-selection--single .select2-selection__rendered {
+         line-height: 46px !important;
+         padding-left: 12px !important;
+         padding-right: 70px !important;
+     }
+
+     /* Panah */
+     .select2-container .select2-selection--single .select2-selection__arrow {
+         height: 46px !important;
+         right: 10px !important;
+         top: 0 !important;
+     }
+
+     /* =========================================
+   X / CLEAR DI SEBELAH KANAN
+========================================= */
+
+     .select2-container--default .select2-selection--single .select2-selection__clear {
+         position: absolute !important;
+         right: 35px !important;
+         top: 50% !important;
+         transform: translateY(-50%) !important;
+         margin: 0 !important;
+         font-size: 22px !important;
+         font-weight: bold !important;
+         color: #777 !important;
+         z-index: 10 !important;
+     }
+
+     /* Hover X */
+     .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+         color: #dc3545 !important;
+     }
+
+     /* =========================================
+   WARNA HIJAU JIKA SUDAH DIPILIH
+========================================= */
+
+     .select2-container.select2-filled .select2-selection--single {
+         background-color: #d4edda !important;
+         border-color: #ccc !important;
+     }
+
+     /* =========================================
+   SEARCH BOX
+========================================= */
+
+     .select2-container .select2-search--dropdown {
+         padding: 8px !important;
+     }
+
+     .select2-container .select2-search--dropdown .select2-search__field {
+         height: 42px !important;
+         padding: 8px 12px !important;
+         font-size: 15px !important;
+         border: 1px solid #ccc !important;
+         border-radius: 6px !important;
+     }
+
+     .select2-container .select2-search--dropdown .select2-search__field:focus {
+         border-color: #0d6efd !important;
+         box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15) !important;
+         outline: none !important;
+     }
+
+     /* =========================================
+   ITEM DROPDOWN
+========================================= */
+
+     .select2-container .select2-results__option {
+         padding: 10px 12px !important;
+         font-size: 12px !important;
+     }
+
+     /* Hover / item aktif = BIRU */
+     .select2-container--default .select2-results__option--highlighted[aria-selected] {
+         background-color: #0d6efd !important;
+         color: white !important;
+     }
+
+     /* =========================================
+   DROPDOWN
+========================================= */
+
+     .select2-container .select2-dropdown {
+         border: 1px solid #ccc !important;
+         border-radius: 0 0 8px 8px !important;
      }
  </style>
