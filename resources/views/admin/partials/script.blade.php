@@ -117,7 +117,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+
         const pelangganSelect = document.getElementById('pelanggan_id');
+
         const namaGedungInput = document.getElementById('nama_gedung');
         const alamatInput = document.getElementById('alamat');
         const noPelangganInput = document.getElementById('no_pelanggan');
@@ -125,64 +127,222 @@
         const noSpkInput = document.getElementById('no_spk');
         const noJaringanInput = document.getElementById('no_jaringan');
 
-        pelangganSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
 
-            // Pakai value langsung (lebih aman)
-            const pelangganId = this.value;
-            const namaGedung = selectedOption.getAttribute('data-nama-gedung');
-            const alamat = selectedOption.getAttribute('data-alamat');
-            const noPelanggan = selectedOption.getAttribute('data-no-pelanggan');
-            const fotoUrl = selectedOption.getAttribute('data-foto');
+        // =====================================================
+        // SELECT2
+        // =====================================================
 
-            // Isi data pelanggan
-            namaGedungInput.value = namaGedung || '';
-            alamatInput.value = alamat || '';
-            noPelangganInput.value = noPelanggan || '';
+        if (pelangganSelect && !$(pelangganSelect).hasClass('select2-hidden-accessible')) {
 
-            // Generate preview no_jaringan mengikuti serial no_spk
-            if (pelangganId) {
-                const kodePelanggan = 'C' + String(pelangganId).padStart(2, '0');
+            $(pelangganSelect).select2({
+                width: '100%',
+                allowClear: true,
+                closeOnSelect: true
+            });
+
+        }
+
+
+        // =====================================================
+        // PROSES PELANGGAN
+        // =====================================================
+
+        function prosesPelanggan() {
+
+            if (!pelangganSelect) {
+                return;
+            }
+
+            const pelangganId = pelangganSelect.value;
+
+
+            // =================================================
+            // JIKA TIDAK ADA PELANGGAN
+            // =================================================
+
+            if (!pelangganId) {
+
+                if (namaGedungInput) {
+                    namaGedungInput.value = '';
+                }
+
+                if (alamatInput) {
+                    alamatInput.value = '';
+                }
+
+                if (noPelangganInput) {
+                    noPelangganInput.value = '';
+                }
+
+                if (noJaringanInput) {
+                    noJaringanInput.value = '';
+                }
+
+                if (fotoPelangganImg) {
+                    fotoPelangganImg.src = '';
+                    fotoPelangganImg.style.display = 'none';
+                }
+
+                updateColor(namaGedungInput);
+                updateColor(alamatInput);
+                updateColor(noPelangganInput);
+                updateColor(noJaringanInput);
+
+                return;
+            }
+
+
+            // =================================================
+            // OPTION YANG DIPILIH
+            // =================================================
+
+            const selectedOption =
+                pelangganSelect.options[pelangganSelect.selectedIndex];
+
+            if (!selectedOption) {
+                return;
+            }
+
+
+            // =================================================
+            // AMBIL DATA
+            // =================================================
+
+            const namaGedung =
+                selectedOption.getAttribute('data-nama-gedung') || '';
+
+            const alamat =
+                selectedOption.getAttribute('data-alamat') || '';
+
+            const noPelanggan =
+                selectedOption.getAttribute('data-no-pelanggan') || '';
+
+            const fotoUrl =
+                selectedOption.getAttribute('data-foto') || '';
+
+
+            // =================================================
+            // ISI DATA OTOMATIS
+            // =================================================
+
+            if (namaGedungInput) {
+                namaGedungInput.value = namaGedung;
+            }
+
+            if (alamatInput) {
+                alamatInput.value = alamat;
+            }
+
+            if (noPelangganInput) {
+                noPelangganInput.value = noPelanggan;
+            }
+
+
+            // =================================================
+            // GENERATE NO JARINGAN
+            // =================================================
+
+            if (noSpkInput && noJaringanInput && noSpkInput.value) {
+
+                const kodePelanggan =
+                    'C' + String(pelangganId).padStart(2, '0');
 
                 const now = new Date();
-                const periode = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-                const noSpk = noSpkInput.value;
+                const periode =
+                    `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-                // Ambil serial dari bagian terakhir no_spk
-                const serial = noSpk.split('/').pop();
+                const serial =
+                    noSpkInput.value.split('/').pop();
 
-                noJaringanInput.value = `${kodePelanggan}-${periode}${serial}`;
-            } else {
-                noJaringanInput.value = '';
+                noJaringanInput.value =
+                    `${kodePelanggan}-${periode}${serial}`;
+
             }
 
-            // Tampilkan foto
-            if (fotoUrl) {
-                fotoPelangganImg.src = fotoUrl;
-                fotoPelangganImg.style.display = 'block';
-            } else {
-                fotoPelangganImg.src = '';
-                fotoPelangganImg.style.display = 'none';
+
+            // =================================================
+            // FOTO
+            // =====================================================
+
+            if (fotoPelangganImg) {
+
+                if (fotoUrl) {
+
+                    fotoPelangganImg.src = fotoUrl;
+                    fotoPelangganImg.style.display = 'block';
+
+                } else {
+
+                    fotoPelangganImg.src = '';
+                    fotoPelangganImg.style.display = 'none';
+
+                }
+
             }
 
-            toggleInputClass(namaGedungInput);
-            toggleInputClass(alamatInput);
-            toggleInputClass(noPelangganInput);
-            toggleInputClass(noJaringanInput);
-        });
 
-        toggleInputClass(noSpkInput);
+            // =================================================
+            // UPDATE WARNA
+            // =================================================
 
-        if (window.location.hash === '#no_spk') {
-            noSpkInput?.scrollIntoView({
-                behavior: 'smooth'
+            updateColor(namaGedungInput);
+            updateColor(alamatInput);
+            updateColor(noPelangganInput);
+            updateColor(noJaringanInput);
+
+        }
+
+
+        // =====================================================
+        // EVENT PELANGGAN
+        // =====================================================
+
+        if (pelangganSelect) {
+
+            $(pelangganSelect).on('change', function() {
+
+                prosesPelanggan();
+
             });
+
         }
 
-        function toggleInputClass(inputElement) {
-            inputElement.classList.toggle('input-filled', !!inputElement.value);
+
+        // =====================================================
+        // WARNA INPUT
+        // =====================================================
+
+        function updateColor(element) {
+
+            if (!element) {
+                return;
+            }
+
+            if (element.value && element.value.trim() !== '') {
+
+                element.classList.add('input-filled');
+
+            } else {
+
+                element.classList.remove('input-filled');
+
+            }
+
         }
+
+
+        // =====================================================
+        // KONDISI AWAL
+        // =====================================================
+
+        updateColor(noSpkInput);
+        updateColor(namaGedungInput);
+        updateColor(alamatInput);
+        updateColor(noPelangganInput);
+        updateColor(noJaringanInput);
+
+
     });
 
     function markAsReadAndRedirect(notificationId, url) {
@@ -429,16 +589,30 @@
             }
         });
     }
-    document.querySelectorAll('.form-control').forEach(input => {
-        input.addEventListener('input', function() {
-            if (this.value.trim() !== '') {
-                // Jika input diisi
-                this.style.backgroundColor = '#d4edda'; // Hijau muda
+    document.querySelectorAll('.form-control').forEach(function(input) {
+
+        // Lewati input file
+        if (input.type === 'file') {
+            return;
+        }
+
+        function updateColor() {
+
+            if (input.value && input.value.trim() !== '') {
+                input.classList.add('input-filled');
             } else {
-                // Jika input kosong
-                this.style.backgroundColor = '#ffffff'; // Merah muda
+                input.classList.remove('input-filled');
             }
-        });
+
+        }
+
+        // Jalankan saat halaman pertama kali dibuka
+        updateColor();
+
+        // Jalankan ketika user mengubah data
+        input.addEventListener('input', updateColor);
+        input.addEventListener('change', updateColor);
+
     });
 </script>
 
@@ -1690,6 +1864,43 @@
                 );
 
             });
+
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+
+        $('.select2').select2({
+            width: '100%',
+            allowClear: true
+        });
+
+        $('.select2').each(function() {
+
+            const select = $(this);
+            const container = select.next('.select2');
+
+            function updateSelectColor() {
+
+                if (select.val()) {
+                    container.addClass('select2-filled');
+                } else {
+                    container.removeClass('select2-filled');
+                }
+
+            }
+
+            // Saat pertama kali halaman dibuka
+            updateSelectColor();
+
+            // Saat pilihan berubah
+            select.on('change', function() {
+                updateSelectColor();
+            });
+
+        });
 
     });
 </script>

@@ -168,8 +168,8 @@
                                             <div class="form-group row">
                                                 <label for="pelanggan_id" class="col-sm-4 col-form-label">Pelanggan</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="pelanggan_id" name="pelanggan_id" required>
-                                                        <option value="">Pilih Pelanggan</option>
+                                                    <select class="form-control select2" id="pelanggan_id" name="pelanggan_id" data-placeholder="Pilih Pelanggan" required>
+                                                        <option value=""></option>
                                                         @foreach ($pelanggans as $pelanggan)
                                                         <option value="{{ $pelanggan->id }}"
                                                             data-nama-gedung="{{ $pelanggan->nama_gedung }}"
@@ -209,8 +209,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Layanan</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="layanan" name="layanan" required>
-                                                        <option value="">Pilih Layanan</option>
+                                                    <select class="form-control select2" id="layanan" name="layanan" data-placeholder="Pilih Layanan" required>
+                                                        <option value=""></option>
                                                         <option value="-" {{ old('layanan', $getSurvey->layanan) == '-' ? 'selected' : '' }}>-</option>
                                                         <option value="INTERNET" {{ old('layanan', $getSurvey->layanan) == 'INTERNET' ? 'selected' : '' }}>INTERNET</option>
                                                         <option value="METRO" {{ old('layanan', $getSurvey->layanan) == 'METRO' ? 'selected' : '' }}>METRO</option>
@@ -244,7 +244,7 @@
                                                 <label for="bandwidth" class="col-sm-4 col-form-label">Volume</label>
 
                                                 <!-- Input Bandwidth -->
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-3">
                                                     <input type="number"
                                                         name="bandwidth"
                                                         id="bandwidth"
@@ -255,9 +255,9 @@
                                                 </div>
 
                                                 <!-- Input Satuan -->
-                                                <div class="col-sm-4">
-                                                    <select class="form-control" id="satuan" name="satuan" required>
-                                                        <option value="" disabled>Pilih Satuan</option>
+                                                <div class="col-sm-5">
+                                                    <select class="form-control select2" id="satuan" name="satuan" data-placeholder="Satuan" required>
+                                                        <option value="" disabled></option>
                                                         <option value="Gbps" {{ old('satuan', $getSurvey->satuan) == 'Gbps' ? 'selected' : '' }}>Gbps</option>
                                                         <option value="Mbps" {{ old('satuan', $getSurvey->satuan) == 'Mbps' ? 'selected' : '' }}>Mbps</option>
                                                         <option value="Kbps" {{ old('satuan', $getSurvey->satuan) == 'Kbps' ? 'selected' : '' }}>Kbps</option>
@@ -272,8 +272,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">NNI</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="nni" name="nni">
-                                                        <option value="">Pilih NNI</option>
+                                                    <select class="form-control select2" id="nni" name="nni" data-placeholder="Pilih NNI">
+                                                        <option value=""></option>
                                                         <option value="-" {{ old('nni', $getSurvey->nni) == '-' ? 'selected' : '' }}>-</option>
                                                         <option value="SURABAYA" {{ old('nni', $getSurvey->nni) == 'SURABAYA' ? 'selected' : '' }}>SURABAYA</option>
                                                         <option value="YOGYAKARTA" {{ old('nni', $getSurvey->nni) == 'YOGYAKARTA' ? 'selected' : '' }}>YOGYAKARTA</option>
@@ -307,8 +307,8 @@
                                             <div class="form-group row">
                                                 <label for="vendor_id" class="col-sm-4 col-form-label">Nama Vendor</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="vendor_id" name="vendor_id" required>
-                                                        <option value="">Pilih Vendor</option>
+                                                    <select class="form-control select2" id="vendor_id" name="vendor_id" data-placeholder="Pilih Vendor" required>
+                                                        <option value=""></option>
                                                         @foreach ($vendors as $vendor)
                                                         <option value="{{ $vendor->id }}"
                                                             {{ $getSurvey->vendor_id == $vendor->id ? 'selected' : '' }}>
@@ -358,8 +358,8 @@
                                             <div class="form-group row">
                                                 <label for="instansi_id" class="col-sm-4 col-form-label">Nama Instansi</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="instansi_id" name="instansi_id" required>
-                                                        <option value="">Pilih Instansi</option>
+                                                    <select class="form-control select2" id="instansi_id" name="instansi_id" data-placeholder="Pilih Instansi" required>
+                                                        <option value=""></option>
                                                         @foreach ($instansis as $instansi)
                                                         <option value="{{ $instansi->id }}"
                                                             {{ $getSurvey->instansi_id == $instansi->id ? 'selected' : '' }}>
@@ -385,8 +385,8 @@
                                             <div class="form-group row">
                                                 <label for="provinsi" class="col-sm-4 col-form-label">Nama Provinsi</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="provinsi" name="provinsi" required>
-                                                        <option value="">Pilih Provinsi</option>
+                                                    <select class="form-control select2" id="provinsi" name="provinsi" data-placeholder="Pilih Provinsi" required>
+                                                        <option value=""></option>
                                                         <option value="Aceh" {{ $getSurvey->provinsi == 'Aceh' ? 'selected' : '' }}>Aceh</option>
                                                         <option value="Sumatera Utara" {{ $getSurvey->provinsi == 'Sumatera Utara' ? 'selected' : '' }}>Sumatera Utara</option>
                                                         <option value="Sumatera Barat" {{ $getSurvey->provinsi == 'Sumatera Barat' ? 'selected' : '' }}>Sumatera Barat</option>
@@ -443,8 +443,8 @@
                                             <div class="form-group row">
                                                 <label for="alamat_pelanggan" class="col-sm-4 col-form-label">Media</label>
                                                 <div class="col-sm-8">
-                                                    <select class="form-control" id="media" name="media" required>
-                                                        <option value="">Pilih Media</option>
+                                                    <select class="form-control select2" id="media" name="media" data-placeholder="Pilih Media" required>
+                                                        <option value=""></option>
                                                         <option value="FIBER OPTIC" {{ old('media', $getSurvey->media) == 'FIBER OPTIC' ? 'selected' : '' }}>FIBER OPTIC</option>
                                                         <option value="WIRELESS" {{ old('media', $getSurvey->media) == 'WIRELESS' ? 'selected' : '' }}>WIRELESS</option>
                                                         <option value="M2M" {{ old('media', $getSurvey->media) == 'M2M' ? 'selected' : '' }}>M2M</option>
