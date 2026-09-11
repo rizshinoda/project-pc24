@@ -1447,12 +1447,15 @@ class HelpdeskController extends Controller
             ]);
         }
 
-
         // =====================================================
         // LOAD RELASI UNTUK EMAIL
         // =====================================================
 
-        $workOrder->load('onlineBilling', 'admin');
+        $workOrder->load(
+            'onlineBilling.pelanggan',
+            'onlineBilling.vendor',
+            'onlineBilling.instansi'
+        );
 
 
         // =====================================================
@@ -1463,41 +1466,43 @@ class HelpdeskController extends Controller
 
 
         // =====================================================
-        // KIRIM EMAIL KE ADMIN
+        // EMAIL PENERIMA TERTENTU
         // =====================================================
 
-        $adminUsers = User::where('is_role', 1)
-            ->whereNotNull('email')
-            ->get();
+        $emailPenerima = [
+            'presales@pc24.co.id',
 
-        foreach ($adminUsers as $admin) {
+        ];
 
-            try {
 
-                Mail::to([
-                    $admin->email,
-                    'presales@pc24.co.id'
-                ])->send(
+        // =====================================================
+        // KIRIM EMAIL
+        // =====================================================
+
+        try {
+
+            Mail::to($emailPenerima)
+                ->send(
                     new \App\Mail\GantiVendorMail(
-                        $workOrder,
-                        1 // Admin
+                        $workOrder
                     )
                 );
-            } catch (\Throwable $e) {
+        } catch (\Throwable $e) {
 
-                $emailGagal = true;
+            $emailGagal = true;
 
-                Log::error('Gagal mengirim email Work Order Ganti Vendor', [
-                    'work_order_ganti_vendor_id' => $workOrder->id,
-                    'no_spk' => $workOrder->no_spk,
-                    'user_id' => $admin->id,
-                    'email' => $admin->email,
-                    'cc_email' => 'presales@pc24.co.id',
-                    'error' => $e->getMessage(),
-                    'exception' => get_class($e),
-                ]);
-            }
+            Log::error('Gagal mengirim email Work Order Ganti Vendor', [
+                'work_order_ganti_vendor_id' => $workOrder->id,
+                'no_spk' => $workOrder->no_spk,
+                'email_penerima' => $emailPenerima,
+                'cc_email' => 'presales@pc24.co.id',
+                'error' => $e->getMessage(),
+                'exception' => get_class($e),
+            ]);
         }
+
+
+
 
 
         // =====================================================
