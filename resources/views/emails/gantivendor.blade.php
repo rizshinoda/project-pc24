@@ -1,10 +1,5 @@
 <!DOCTYPE html>
 <html>
-@php
-$basePath = match ((int) $targetRole) {
-1 => '/admin/gantivendor/',
-};
-@endphp
 
 <head>
     <meta charset="UTF-8">
@@ -81,12 +76,6 @@ $basePath = match ((int) $targetRole) {
 
 
 
-    <p style="margin: 6px 0;">
-        📎 <a href="{{ url($basePath . $getGantivendor->id) }}">
-            Lihat Detail Permintaan
-        </a>
-    </p>
-    <br>
     <p style="margin-top: 10px;">Warm regards,<br>
         {{ $getGantivendor->admin->name ?? 'User Pengaju' }}
     </p>

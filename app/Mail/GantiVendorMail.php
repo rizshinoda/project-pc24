@@ -14,14 +14,12 @@ class GantiVendorMail extends Mailable
 {
     use Queueable, SerializesModels;
     public $workOrder;
-    public $targetRole;
     /**
      * Create a new message instance.
      */
-    public function __construct($workOrder, int $targetRole)
+    public function __construct($workOrder)
     {
         $this->workOrder = $workOrder;
-        $this->targetRole = $targetRole;
     }
 
     /**
@@ -49,7 +47,6 @@ class GantiVendorMail extends Mailable
             view: 'emails.gantivendor',
             with: [
                 'getGantivendor' => $this->workOrder,
-                'targetRole' => $this->targetRole,
             ]
         );
     }
