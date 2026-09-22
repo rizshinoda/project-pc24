@@ -428,6 +428,7 @@
                                                         <option value="Lampung" {{ $getOB->provinsi == 'Lampung' ? 'selected' : '' }}>Lampung</option>
                                                         <option value="DKI Jakarta" {{ $getOB->provinsi == 'DKI Jakarta' ? 'selected' : '' }}>DKI Jakarta</option>
                                                         <option value="Jawa Barat" {{ $getOB->provinsi == 'Jawa Barat' ? 'selected' : '' }}>Jawa Barat</option>
+                                                        <option value="Banten" {{ $getOB->provinsi == 'Banten' ? 'selected' : '' }}>Banten</option>
                                                         <option value="Jawa Tengah" {{ $getOB->provinsi == 'Jawa Tengah' ? 'selected' : '' }}>Jawa Tengah</option>
                                                         <option value="DI Yogyakarta" {{ $getOB->provinsi == 'DI Yogyakarta' ? 'selected' : '' }}>DI Yogyakarta</option>
                                                         <option value="Jawa Timur" {{ $getOB->provinsi == 'Jawa Timur' ? 'selected' : '' }}>Jawa Timur</option>

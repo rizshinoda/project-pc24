@@ -399,6 +399,7 @@
                                                         <option value="Lampung" {{ $getSurvey->provinsi == 'Lampung' ? 'selected' : '' }}>Lampung</option>
                                                         <option value="DKI Jakarta" {{ $getSurvey->provinsi == 'DKI Jakarta' ? 'selected' : '' }}>DKI Jakarta</option>
                                                         <option value="Jawa Barat" {{ $getSurvey->provinsi == 'Jawa Barat' ? 'selected' : '' }}>Jawa Barat</option>
+                                                        <option value="Banten" {{ $getSurvey->provinsi == 'Banten' ? 'selected' : '' }}>Banten</option>
                                                         <option value="Jawa Tengah" {{ $getSurvey->provinsi == 'Jawa Tengah' ? 'selected' : '' }}>Jawa Tengah</option>
                                                         <option value="DI Yogyakarta" {{ $getSurvey->provinsi == 'DI Yogyakarta' ? 'selected' : '' }}>DI Yogyakarta</option>
                                                         <option value="Jawa Timur" {{ $getSurvey->provinsi == 'Jawa Timur' ? 'selected' : '' }}>Jawa Timur</option>

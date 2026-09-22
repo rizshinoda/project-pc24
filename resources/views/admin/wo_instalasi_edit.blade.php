@@ -535,6 +535,7 @@
                                                         <option value="Lampung" {{ $getInstall->provinsi == 'Lampung' ? 'selected' : '' }}>Lampung</option>
                                                         <option value="DKI Jakarta" {{ $getInstall->provinsi == 'DKI Jakarta' ? 'selected' : '' }}>DKI Jakarta</option>
                                                         <option value="Jawa Barat" {{ $getInstall->provinsi == 'Jawa Barat' ? 'selected' : '' }}>Jawa Barat</option>
+                                                        <option value="Banten" {{ $getInstall->provinsi == 'Banten' ? 'selected' : '' }}>Banten</option>
                                                         <option value="Jawa Tengah" {{ $getInstall->provinsi == 'Jawa Tengah' ? 'selected' : '' }}>Jawa Tengah</option>
                                                         <option value="DI Yogyakarta" {{ $getInstall->provinsi == 'DI Yogyakarta' ? 'selected' : '' }}>DI Yogyakarta</option>
                                                         <option value="Jawa Timur" {{ $getInstall->provinsi == 'Jawa Timur' ? 'selected' : '' }}>Jawa Timur</option>
