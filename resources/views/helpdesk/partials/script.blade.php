@@ -21,8 +21,11 @@
 <script src="{{asset('mailler/src/sweetalert2.min.js')}}"></script>
 <script type="text/javascript">
     $('.btn-logout').on('click', function(e) {
+
         e.preventDefault();
+
         const href = $(this).attr('href');
+
         Swal.fire({
             title: "Logout",
             text: "Apakah Anda yakin ingin keluar?",
@@ -30,14 +33,45 @@
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Ya"
+            confirmButtonText: "Ya",
+            cancelButtonText: "Batal"
         }).then((result) => {
+
             if (result.isConfirmed) {
-                document.location.href = href
+
+                // Logout dari Bablast terlebih dahulu
+                if (window.BablastLiveChat) {
+                    window.BablastLiveChat('logout');
+                }
+
+                // Kemudian logout dari Laravel
+                document.location.href = href;
+            }
+
+        });
+    });
+
+
+    function confirmDelete(formId) {
+
+        Swal.fire({
+            title: 'Hapus',
+            text: "Apakah Anda yakin untuk menghapusnya?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                document.getElementById('delete-form-' + formId).submit();
 
             }
         });
-    })
+    }
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -831,33 +865,7 @@
     });
 </script>
 <script>
-    const currentBablastUser = "{{ auth()->id() ?? '' }}";
-    const lastBablastUser = localStorage.getItem('bablast_last_user_id');
-
-    // Jika user berbeda dari user sebelumnya
-    if (
-        currentBablastUser &&
-        lastBablastUser &&
-        currentBablastUser !== lastBablastUser
-    ) {
-        Object.keys(localStorage)
-            .filter(key => key.startsWith('bablast_lc_'))
-            .forEach(key => {
-                localStorage.removeItem(key);
-            });
-    }
-
-    // Simpan user yang sedang aktif
-    if (currentBablastUser) {
-        localStorage.setItem(
-            'bablast_last_user_id',
-            currentBablastUser
-        );
-    }
-
-    // Bablast identify
-    window.BablastLiveChatQueue =
-        window.BablastLiveChatQueue || [];
+    window.BablastLiveChatQueue = window.BablastLiveChatQueue || [];
 
     @auth
     window.BablastLiveChatQueue.push(["identify", {
