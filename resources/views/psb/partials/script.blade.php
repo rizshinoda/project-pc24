@@ -667,3 +667,8 @@
         billingOptions
     ).render();
 </script>
+<script
+    src="https://s3.bablast.id/livechat/widget.min.js"
+    data-sender-key="RAMOK8YG"
+    data-api-base="https://si-api.bablast.id/v1/livechat"
+    async></script>
