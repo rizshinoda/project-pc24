@@ -1904,8 +1904,47 @@
 
     });
 </script>
+<script>
+    const currentBablastUser = "{{ auth()->id() ?? '' }}";
+    const lastBablastUser = localStorage.getItem('bablast_last_user_id');
+
+    // Jika user berbeda dari user sebelumnya
+    if (
+        currentBablastUser &&
+        lastBablastUser &&
+        currentBablastUser !== lastBablastUser
+    ) {
+        Object.keys(localStorage)
+            .filter(key => key.startsWith('bablast_lc_'))
+            .forEach(key => {
+                localStorage.removeItem(key);
+            });
+    }
+
+    // Simpan user yang sedang aktif
+    if (currentBablastUser) {
+        localStorage.setItem(
+            'bablast_last_user_id',
+            currentBablastUser
+        );
+    }
+
+    // Bablast identify
+    window.BablastLiveChatQueue =
+        window.BablastLiveChatQueue || [];
+
+    @auth
+    window.BablastLiveChatQueue.push(["identify", {
+        user_id: "{{ auth()->id() }}",
+        name: "{{ auth()->user()->name }}",
+        email: "{{ auth()->user()->email }}"
+    }]);
+    @endauth
+</script>
+
 <script
     src="https://s3.bablast.id/livechat/widget.min.js"
     data-sender-key="RAMOK8YG"
     data-api-base="https://si-api.bablast.id/v1/livechat"
-    async></script>
+    async>
+</script>
