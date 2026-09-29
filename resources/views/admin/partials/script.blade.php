@@ -1932,8 +1932,9 @@
 </script>
 
 <script
-    src="https://s3.bablast.id/livechat/widget.min.js"
+    src="{{ asset('vendor/bablast/widget.js') }}?v=5"
     data-sender-key="RAMOK8YG"
     data-api-base="https://si-api.bablast.id/v1/livechat"
+    charset="utf-8"
     async>
 </script>
