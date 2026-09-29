@@ -20,8 +20,11 @@
 <script src="{{asset('mailler/src/sweetalert2.min.js')}}"></script>
 <script type="text/javascript">
     $('.btn-logout').on('click', function(e) {
+
         e.preventDefault();
+
         const href = $(this).attr('href');
+
         Swal.fire({
             title: "Logout",
             text: "Apakah Anda yakin ingin keluar?",
@@ -29,14 +32,45 @@
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Ya"
+            confirmButtonText: "Ya",
+            cancelButtonText: "Batal"
         }).then((result) => {
+
             if (result.isConfirmed) {
-                document.location.href = href
+
+                // Logout dari Bablast terlebih dahulu
+                if (window.BablastLiveChat) {
+                    window.BablastLiveChat('logout');
+                }
+
+                // Kemudian logout dari Laravel
+                document.location.href = href;
+            }
+
+        });
+    });
+
+
+    function confirmDelete(formId) {
+
+        Swal.fire({
+            title: 'Hapus',
+            text: "Apakah Anda yakin untuk menghapusnya?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                document.getElementById('delete-form-' + formId).submit();
 
             }
         });
-    })
+    }
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -666,4 +700,23 @@
         document.querySelector("#billing-chart"),
         billingOptions
     ).render();
+</script>
+<script>
+    window.BablastLiveChatQueue = window.BablastLiveChatQueue || [];
+
+    @auth
+    window.BablastLiveChatQueue.push(["identify", {
+        user_id: "{{ auth()->id() }}",
+        name: "{{ auth()->user()->name }}",
+        email: "{{ auth()->user()->email }}"
+    }]);
+    @endauth
+</script>
+
+<script
+    src="{{ asset('vendor/bablast/widget.js') }}?v=5"
+    data-sender-key="RAMOK8YG"
+    data-api-base="https://si-api.bablast.id/v1/livechat"
+    charset="utf-8"
+    async>
 </script>
