@@ -152,7 +152,7 @@
                                     @endif
 
                                     {{-- Form untuk mengedit work order --}}
-                                    <form action="{{ route('admin.downgrade_update', $workOrder->id) }}" method="POST" enctype="multipart/form-data">
+                                    <form action="{{ route('admin.downgrade_update', $workOrder->id) }}" method="POST" enctype="multipart/form-data" class="form-submit-once">
                                         @csrf
                                         @method('PUT') {{-- Gunakan metode PUT untuk update --}}
 

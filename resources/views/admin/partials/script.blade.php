@@ -1938,3 +1938,35 @@
     charset="utf-8"
     async>
 </script>
+<script>
+    /**
+     * Mencegah double submit pada form Work Order.
+     * Berlaku untuk semua form yang memakai class
+     * .form-submit-once
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('form.form-submit-once').forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.dataset.submitting === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+
+                // Tandai form sudah dikirim
+                form.dataset.submitting = 'true';
+
+                // Nonaktifkan tombol submit pada form ini saja
+                form.querySelectorAll(
+                    'button[type="submit"], input[type="submit"]'
+                ).forEach(function(button) {
+                    button.disabled = true;
+
+                    if (button.tagName === 'BUTTON') {
+                        button.dataset.originalText = button.textContent;
+                        button.textContent = 'Sedang memproses...';
+                    }
+                });
+            });
+        });
+    });
+</script>
