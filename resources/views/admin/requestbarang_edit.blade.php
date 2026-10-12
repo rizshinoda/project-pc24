@@ -137,7 +137,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="mb-5 text-center">Form Request Barang</h4>
-                                <form action="{{ route('admin.request_barang.update', $requestBarang->id) }}" method="POST">
+                                <form action="{{ route('admin.request_barang.update', $requestBarang->id) }}" method="POST" enctype="multipart/form-data" class="form-submit-once">
                                     @csrf
                                     @method('PUT')
 

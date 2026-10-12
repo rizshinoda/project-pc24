@@ -156,7 +156,7 @@
                                 <h4 class="mb-5 text-center">Form Tambah Instalasi</h4>
                                 <!-- Tombol Filter -->
                                 {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('admin.form_storeinstalasi') }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route('admin.form_storeinstalasi') }}" method="POST" enctype="multipart/form-data" class="form-submit-once">
                                     @csrf
 
                                     <div class="row">

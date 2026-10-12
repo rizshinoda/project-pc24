@@ -138,7 +138,7 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="mb-5 text-center">Tambah Pelanggan</h4>
-                                    <form action="{{ route('pelanggan.store') }}" method="POST" enctype="multipart/form-data">
+                                    <form action="{{ route('pelanggan.store') }}" method="POST" enctype="multipart/form-data " class="form-submit-once">
                                         @csrf
 
                                         <div class="form-group">

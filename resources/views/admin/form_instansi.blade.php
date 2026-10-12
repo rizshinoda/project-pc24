@@ -151,7 +151,7 @@
                                 @endif -->
 
                                     {{-- Form untuk membuat work order --}}
-                                    <form action="{{ route('instansi.store') }}" method="POST" enctype="multipart/form-data">
+                                    <form action="{{ route('instansi.store') }}" method="POST" enctype="multipart/form-data" class="form-submit-once">
                                         @csrf
 
 

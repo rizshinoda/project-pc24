@@ -150,7 +150,7 @@
                                     @endif
 
                                     {{-- Form untuk membuat work order --}}
-                                    <form action="{{ route('admin.downgrade_store') }}" method="POST" enctype="multipart/form-data">
+                                    <form action="{{ route('admin.downgrade_store') }}" method="POST" enctype="multipart/form-data" class="form-submit-once">
                                         @csrf
 
                                         <div class="row">

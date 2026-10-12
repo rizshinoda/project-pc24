@@ -151,7 +151,7 @@
     @endif -->
 
                                 {{-- Form untuk membuat work order --}}
-                                <form action="{{ route('admin.wo_survey_update', ['id' => $getSurvey->id]) }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route('admin.wo_survey_update', ['id' => $getSurvey->id]) }}" method="POST" enctype="multipart/form-data " class="form-submit-once">
                                     @csrf
                                     @method('PUT') {{-- Karena ini adalah form update, gunakan method PUT --}}
 
