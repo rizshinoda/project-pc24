@@ -395,7 +395,7 @@
 
                                     @endif
                                     <h4 class="card-title mt-2">Progres POC</h4>
-                                    @if ($getInstall->status === 'On Progress' || $getInstall->status === 'Shipped' || $getgetInstallRelokasi->status === 'Completed')
+                                    @if ($getInstall->status === 'On Progress' || $getInstall->status === 'Shipped' || $getInstall->status === 'Completed')
                                     <a href="{{ route('hd_poc_add_progress', $getInstall->id) }}"
                                         class="btn btn-info btn-sm mb-2">
                                         <i class="fa fa-plus"></i> Add Progress
