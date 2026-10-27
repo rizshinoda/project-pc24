@@ -117,9 +117,6 @@
                         @endif
                     </div>
 
-
-
-
                     <!-- Menampilkan detail survey -->
                     <div class="row row-cols-1 row-cols-md-3 g-3">
                         <!-- Card 1: WO Info -->
@@ -327,6 +324,8 @@
                                                     <th style=" text-align: center; vertical-align: middle;">Jumlah</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Kualitas</th>
                                                     <th style=" text-align: center; vertical-align: middle;">Status Konfigurasi</th>
+                                                    <th style=" text-align: center; vertical-align: middle;">Aksi</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -345,6 +344,17 @@
                                                         <span class="badge badge-pill bg-success">Sudah Dikonfigurasi</span>
                                                         @else
                                                         <span class="badge badge-pill bg-warning">Belum Dikonfigurasi</span>
+                                                        @endif
+                                                    </td>
+                                                    <td style=" text-align: center; vertical-align: middle;">
+                                                        @if(!$barangKeluar->is_configured)
+                                                        <form action="{{ route('na.configure-barang', $barangKeluar->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="btn btn-info btn-sm">Konfigurasikan</button>
+                                                        </form>
+                                                        @else
+                                                        <button class="btn btn-secondary btn-sm" disabled>Sudah Dikonfigurasi</button>
                                                         @endif
                                                     </td>
                                                 </tr>
