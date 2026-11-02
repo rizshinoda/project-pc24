@@ -3154,6 +3154,166 @@ class GaController extends Controller
 
         return $this->renderView('wo_poc_createshipped', $data);
     }
+    public function createrequest()
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // Mengambil daftar jenis unik dari StockBarang
+        $jenisList = Jenis::select('id', 'nama_jenis')->get();
+
+        // Mengambil data stok dengan total jumlah berdasarkan tipe, merek, dan jenis, serta melakukan pagination
+        $stockBarangs = StockBarang::with(['merek', 'tipe', 'jenis'])
+            ->selectRaw('tipe_id, merek_id, jenis_id, kualitas, SUM(jumlah) as total_jumlah')
+            ->groupBy('tipe_id', 'merek_id', 'jenis_id', 'kualitas')
+            ->get();
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('stockBarangs', 'jenisList', 'notifications'));
+
+        return $this->renderView('requestbarang_create', $data);
+    }
+
+    public function storerequest(Request $request)
+    {
+        // Validasi input data
+        $validatedData = $request->validate([
+            'nama_penerima' => 'required|string|max:255',
+            'alamat_penerima' => 'required|string|max:255',
+            'no_penerima' => 'required|string',
+            'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
+
+            'cart' => 'nullable|array', // Keranjang tidak wajib
+        ]);
+
+        // Buat request barang baru di `request_barangs`
+        $requestBarang = RequestBarang::create([
+            'nama_penerima' => $validatedData['nama_penerima'],
+            'alamat_penerima' => $validatedData['alamat_penerima'],
+            'no_penerima' => $validatedData['no_penerima'],
+            'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
+
+            'status' => 'pending',
+            'user_id' => Auth::user()->id,
+        ]);
+
+        // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
+        if (!empty($validatedData['cart'])) {
+            foreach ($validatedData['cart'] as $jenis => $merekArray) {
+                foreach ($merekArray as $merek => $tipeArray) {
+                    foreach ($tipeArray as $tipe => $kualitasArray) {
+                        foreach ($kualitasArray as $kualitas => $item) {
+                            $stockBarang = StockBarang::whereHas('merek', fn($query) => $query->where('nama_merek', $merek))
+                                ->whereHas('tipe', fn($query) => $query->where('nama_tipe', $tipe))
+                                ->where('kualitas', $kualitas)
+                                ->first();
+
+                            RequestBarangDetails::create([
+                                'request_barang_id' => $requestBarang->id,
+                                'stock_barang_id' => $stockBarang?->id, // Gunakan null-safe operator untuk menghindari error jika tidak ditemukan
+                                'merek' => $merek,
+                                'tipe' => $tipe,
+                                'kualitas' => $kualitas,
+                                'jumlah' => $item['total_jumlah'],
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        return redirect()->route('ga.request_barang')->with('success', 'Request barang berhasil diajukan.');
+    }
+
+    public function editrequest($id)
+    {
+        // Ambil notifikasi yang belum dibaca
+        $notifications = Notification::where('user_id', Auth::user()->id)->where('is_read', false)->get();
+
+        // Ambil data permintaan barang berdasarkan ID
+        $requestBarang = RequestBarang::with('requestBarangDetails')->findOrFail($id);
+
+        // Dapatkan daftar jenis barang
+        $jenisList = Jenis::all();
+
+        // Mengambil data stok dengan total jumlah berdasarkan tipe, merek, dan jenis, serta melakukan pagination
+        $stockBarangs = StockBarang::with(['merek', 'tipe', 'jenis'])
+            ->selectRaw('tipe_id, merek_id, jenis_id, kualitas, SUM(jumlah) as total_jumlah')
+            ->groupBy('tipe_id', 'merek_id', 'jenis_id', 'kualitas')
+            ->paginate(10); // Menggunakan pagination dengan 10 item per halaman
+
+        // Siapkan data detail barang dalam format array, kosongkan keranjang
+        $requestBarangDetails = []; // Kosongkan keranjang
+
+        // Gabungkan data survey ke dalam data role
+        $data = array_merge($this->ambilDataRole(), compact('stockBarangs', 'jenisList', 'requestBarang', 'requestBarangDetails', 'notifications'));
+
+        return $this->renderView('requestbarang_edit', $data);
+    }
+
+
+
+    public function updateRequest(Request $request, $id)
+    {
+        // Validasi input data
+        $validatedData = $request->validate([
+            'nama_penerima' => 'required|string|max:255',
+            'alamat_penerima' => 'required|string|max:255',
+            'no_penerima' => 'required|string',
+            'keterangan' => 'nullable|string',
+            'non_stock' => 'nullable|string',
+            'kebutuhan' => 'nullable|string',
+
+            'cart' => 'nullable|array', // Keranjang tidak wajib
+        ]);
+
+        // Temukan request barang yang ingin diperbarui
+        $requestBarang = RequestBarang::findOrFail($id);
+        $requestBarang->update([
+            'nama_penerima' => $validatedData['nama_penerima'],
+            'alamat_penerima' => $validatedData['alamat_penerima'],
+            'no_penerima' => $validatedData['no_penerima'],
+            'keterangan' => $validatedData['keterangan'],
+            'non_stock' => $validatedData['non_stock'],
+            'kebutuhan' => $validatedData['kebutuhan'],
+
+        ]);
+
+        // Hapus detail barang yang ada sebelumnya
+        RequestBarangDetails::where('request_barang_id', $requestBarang->id)->delete();
+
+        // Simpan detail barang ke `request_barang_details` jika keranjang tidak kosong
+        if (!empty($validatedData['cart'])) {
+            foreach ($validatedData['cart'] as $jenis => $merekArray) {
+                foreach ($merekArray as $merek => $tipeArray) {
+                    foreach ($tipeArray as $tipe => $kualitasArray) {
+                        foreach ($kualitasArray as $kualitas => $item) {
+                            $stockBarang = StockBarang::whereHas('merek', fn($query) => $query->where('nama_merek', $merek))
+                                ->whereHas('tipe', fn($query) => $query->where('nama_tipe', $tipe))
+                                ->where('kualitas', $kualitas)
+                                ->first();
+
+                            RequestBarangDetails::create([
+                                'request_barang_id' => $requestBarang->id,
+                                'stock_barang_id' => $stockBarang?->id, // Gunakan null-safe operator untuk menghindari error jika tidak ditemukan
+                                'merek' => $merek,
+                                'tipe' => $tipe,
+                                'kualitas' => $kualitas,
+                                'jumlah' => $item['total_jumlah'],
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return redirect()->route('ga.request_barang')->with('success', 'Request barang berhasil diperbarui.');
+    }
 }
 
 // ambilDataRole(): Fungsi ini mengembalikan informasi tentang role pengguna, termasuk teks role (roleText) dan folder view (viewFolder) yang diturunkan dari role.

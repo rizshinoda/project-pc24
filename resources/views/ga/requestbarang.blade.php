@@ -182,6 +182,8 @@
                                         <!-- Tombol Filter -->
                                         <div class="">
                                             <button type="submit" class="btn btn-info btn-sm mb-4 ">Cari</button>
+                                            <a href="{{route('ga.request_barang.create')}}" class="btn btn-info btn-sm mb-4 ">Buat Request</a>
+
                                         </div>
                                     </div>
                                 </form>
@@ -251,7 +253,9 @@
                                                     <a href="{{ route('ga.request_barang.show', $requestBarang->id) }}" class="btn btn-success btn-sm">
                                                         <i class="fa fa-eye"></i>
                                                     </a>
-
+                                                    <a href="{{ route('ga.request_barang.edit', $requestBarang->id) }}" class="btn btn-info btn-sm">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                             @endforeach

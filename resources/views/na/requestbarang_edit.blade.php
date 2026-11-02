@@ -251,7 +251,8 @@
                                             <div class="form-group row">
                                                 <label for="keterangan" class="col-sm-4 col-form-label">Kebutuhan</label>
                                                 <div class="col-sm-8">
-                                                    <textarea id="kebutuhan" name="kebutuhan" class="form-control" rows="4">{{ $requestBarang->kebutuhan }}</textarea>
+                                                    <textarea id="kebutuhan" name="kebutuhan" class="form-control" rows="4" maxlength="255">{{ old('kebutuhan', $requestBarang->kebutuhan) }}</textarea>
+                                                    <span class="text-muted text-sm">*Maksimal 255 karakter</span>
                                                 </div>
                                             </div>
                                         </div>

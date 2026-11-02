@@ -832,3 +832,165 @@
     charset="utf-8"
     async>
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const jenisSelect = document.getElementById('jenis_id');
+        const stockRows = document.querySelectorAll('#stock-table-body tr');
+        const cartTableBody = document.getElementById('cart-table-body');
+        const searchInput = document.getElementById('search');
+        const submitButton = document.getElementById("submit-request");
+
+        // Sembunyikan semua baris saat dimuat
+        stockRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        // Filter berdasarkan jenis barang
+        jenisSelect.addEventListener('change', function() {
+            const selectedJenisId = this.value;
+
+            // Sembunyikan semua baris terlebih dahulu
+            stockRows.forEach(row => {
+                row.style.display = 'none';
+            });
+
+            // Tampilkan baris yang sesuai dengan jenis yang dipilih
+            stockRows.forEach(row => {
+                const rowJenisId = row.getAttribute('data-jenis-id');
+                if (rowJenisId === selectedJenisId || !selectedJenisId) {
+                    row.style.display = '';
+                }
+            });
+
+            // Reset pencarian
+            searchInput.value = '';
+        });
+
+        // Pencarian di tabel
+        searchInput.addEventListener('keyup', function() {
+            const filter = this.value.toLowerCase();
+            const selectedJenisId = jenisSelect.value;
+
+            stockRows.forEach(row => {
+                const merek = row.cells[0].textContent.toLowerCase();
+                const tipe = row.cells[1].textContent.toLowerCase();
+                const rowJenisId = row.getAttribute('data-jenis-id');
+
+                // Filter berdasarkan jenis dan input pencarian
+                if (
+                    (merek.includes(filter) || tipe.includes(filter)) &&
+                    (rowJenisId === selectedJenisId || !selectedJenisId)
+                ) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const stockId = this.getAttribute('data-id');
+                const merek = this.getAttribute('data-merek');
+                const tipe = this.getAttribute('data-tipe');
+                const kualitas = this.getAttribute('data-kualitas');
+                const jumlahInput = parseInt(this.closest('tr').querySelector('.quantity').value);
+                const maxStock = parseInt(this.getAttribute('data-jumlah'));
+
+                // Validasi jumlah input
+                if (jumlahInput > 0 && jumlahInput <= maxStock) {
+                    const uniqueKey = `${stockId}-${merek}-${tipe}-${kualitas}`;
+
+                    const existingRow = Array.from(cartTableBody.children).find(row => row.getAttribute('data-unique-key') === uniqueKey);
+
+                    if (existingRow) {
+                        const jumlahCell = existingRow.querySelector('.cart-quantity');
+                        const newJumlah = parseInt(jumlahCell.value) + jumlahInput;
+
+                        if (newJumlah <= maxStock) {
+                            jumlahCell.value = newJumlah;
+                        } else {
+                            Swal.fire('Peringatan', 'Jumlah yang diminta melebihi stok yang tersedia.', 'warning');
+                        }
+                    } else {
+                        const row = document.createElement('tr');
+                        row.setAttribute('data-unique-key', uniqueKey);
+                        row.innerHTML = `
+                <td>${merek}</td>
+                <td>${tipe}</td>
+                <td>
+                    <input type="number" name="cart[${stockId}][${merek}][${tipe}][${kualitas}][total_jumlah]" value="${jumlahInput}" class="form-control cart-quantity" min="1" max="${maxStock}" style="width: 80px;" />
+                </td>
+                <td>${kualitas}</td>
+                <td><button type="button" class="btn btn-danger remove-from-cart"><i class="fa fa-close"></i></button></td>
+            `;
+                        cartTableBody.appendChild(row);
+
+                        // Event listener untuk mengedit jumlah barang di keranjang
+                        row.querySelector('.cart-quantity').addEventListener('input', function() {
+                            const newJumlah = parseInt(this.value);
+                            if (newJumlah > maxStock) {
+                                Swal.fire('Peringatan', 'Jumlah yang diminta melebihi stok yang tersedia.', 'warning');
+                                this.value = maxStock;
+                            } else if (newJumlah < 1) {
+                                Swal.fire('Peringatan', 'Jumlah tidak boleh kurang dari 1.', 'warning');
+                                this.value = 1;
+                            }
+                        });
+                    }
+                } else {
+                    Swal.fire('Error', 'Jumlah yang diminta tidak valid atau melebihi stok yang tersedia.', 'error');
+                }
+            });
+        });
+
+        // Delegation untuk remove item dari keranjang
+        cartTableBody.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-from-cart') || event.target.closest('.remove-from-cart')) {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Barang ini akan dihapus dari keranjang.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, hapus'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        event.target.closest('tr').remove();
+                        Swal.fire('Dihapus!', 'Barang telah dihapus dari keranjang.', 'success');
+                    }
+                });
+            }
+        });
+
+        // Validasi sebelum submit form
+        submitButton.addEventListener("click", function(event) {
+            if (cartTableBody.children.length === 0) {
+                event.preventDefault();
+                Swal.fire('Error', 'Keranjang tidak boleh kosong. Silakan tambahkan barang ke keranjang sebelum mengirim permintaan.', 'error');
+            }
+        });
+
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select-search').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Pilih...',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return 'Data tidak ditemukan';
+                },
+                searching: function() {
+                    return 'Mencari...';
+                }
+            }
+        });
+    });
+</script>

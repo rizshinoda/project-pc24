@@ -141,62 +141,53 @@
                                         @csrf
 
                                         <div class="form-group">
-                                            <label for="alamat_pelanggan">Jenis Barang</label>
-
-                                            <select name="jenis_id" id="jenis_id" class="form-control" required>
+                                            <label for="jenis_id">Jenis Barang</label>
+                                            <select name="jenis_id" id="jenis_id" class="form-control select-search" required>
                                                 <option value="">Pilih Jenis</option>
                                                 @foreach ($jenis as $j)
                                                 <option value="{{ $j->id }}">{{ $j->nama_jenis }}</option>
                                                 @endforeach
                                             </select>
-
                                         </div>
-                                        <div class="form-group ">
-                                            <label for="alamat_pelanggan">Merek Barang</label>
 
-                                            <select name="merek_id" id="merek_id" class="form-control" required>
+                                        <div class="form-group">
+                                            <label for="merek_id">Merek Barang</label>
+                                            <select name="merek_id" id="merek_id" class="form-control select-search" required>
                                                 <option value="">Pilih Merek</option>
                                                 @foreach ($mereks as $m)
                                                 <option value="{{ $m->id }}">{{ $m->nama_merek }}</option>
                                                 @endforeach
                                             </select>
-
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="alamat_pelanggan">Tipe Barang</label>
-
-                                            <select name="tipe_id" id="tipe_id" class="form-control" required>
+                                            <label for="tipe_id">Tipe Barang</label>
+                                            <select name="tipe_id" id="tipe_id" class="form-control select-search" required>
                                                 <option value="">Pilih Tipe</option>
                                                 @foreach ($tipes as $t)
                                                 <option value="{{ $t->id }}">{{ $t->nama_tipe }}</option>
                                                 @endforeach
                                             </select>
-
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="alamat_pelanggan">Serial Number</label>
-
+                                            <label for="serial_number">Serial Number</label>
                                             <input type="text" class="form-control" id="serial_number" name="serial_number">
-
-                                        </div>
-                                        <div class="form-group ">
-                                            <label for="alamat_pelanggan">Jumlah</label>
-
-                                            <input type="number" name="jumlah" value="1" class="form-control form-control-sm" min="1">
-
                                         </div>
 
-                                        <div class="form-group ">
-                                            <label for="alamat_pelanggan">Kualitas</label>
+                                        <div class="form-group">
+                                            <label for="jumlah">Jumlah</label>
+                                            <input type="number" name="jumlah" id="jumlah" value="1" class="form-control form-control-sm" min="1">
+                                        </div>
 
-                                            <select name="kualitas" class="form-control" required>
+                                        <div class="form-group">
+                                            <label for="kualitas">Kualitas</label>
+                                            <select name="kualitas" id="kualitas" class="form-control" required>
                                                 <option value="baru">Baru</option>
                                                 <option value="bekas">Bekas</option>
                                             </select>
-
                                         </div>
+
                                         <div class="text-center">
                                             <button type="submit" class="btn btn-info">Tambah Barang</button>
                                             <a href="{{ route('ga.stockbarang') }}" class="btn btn-light">Kembali</a>
