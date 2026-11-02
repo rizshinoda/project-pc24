@@ -439,6 +439,13 @@ Route::group(['middleware' => ['ga', SessionTimeout::class]], function () {
 
     // Routes untuk Request Barang
     Route::get('ga/requestbarang', [GaController::class, 'requestbarang'])->name('ga.request_barang');
+    Route::get('ga/requestbarang/create', [GaController::class, 'createrequest'])->name('ga.request_barang.create');
+    Route::post('ga/requestbarang', [GaController::class, 'storerequest'])->name('ga.request_barang.store');
+    Route::post('ga/requestbarang/add-to-cart', [GaController::class, 'addToCart'])->name('ga.request_barang.add_to_cart');
+    Route::get('ga/requestbarang/{id}/edit', [GaController::class, 'editrequest'])->name('ga.request_barang.edit');
+    Route::put('ga/requestbarang/{id}/update', [GaController::class, 'updateRequest'])->name('ga.request_barang.update');
+    Route::delete('ga/requestbarang/{id}', [GaController::class, 'requestDestroy'])->name('ga.request_destroy');
+
     Route::get('ga/requestbarang/{id}', [GaController::class, 'showrequest'])->name('ga.request_barang.show');
     Route::post('ga/request-barang/{id}/approve', [GaController::class, 'approve'])->name('ga.request_barang.approve');
     Route::post('ga/request-barang/{id}/reject', [GaController::class, 'reject'])->name('ga.request_barang.reject');
